@@ -22,5 +22,6 @@
         <file>update-realtime-enabled-dark.png</file>
         <file>update-realtime-disabled.png</file>
         <file>update-realtime-disabled-dark.png</file>
+        <file>../data/classwatch-logo.png</file>
     </qresource>
 </RCC>
