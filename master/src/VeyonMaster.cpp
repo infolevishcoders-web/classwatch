@@ -27,6 +27,7 @@
 
 #include "VeyonMaster.h"
 #include "BuiltinFeatures.h"
+#include "ClassWatchComputerManagerExtension.h"
 #include "ComputerControlListModel.h"
 #include "ComputerMonitoringModel.h"
 #include "FeatureManager.h"
@@ -43,6 +44,7 @@ VeyonMaster::VeyonMaster( QObject* parent ) :
 	m_userConfig(new UserConfig(QStringLiteral("VeyonMaster"))),
 	m_features( featureList() ),
 	m_computerManager( new ComputerManager( *m_userConfig, this ) ),
+	m_classWatchComputerManager( new ClassWatchComputerManagerExtension( m_computerManager, this ) ),
 	m_computerControlListModel( new ComputerControlListModel( this, this ) ),
 	m_computerMonitoringModel( new ComputerMonitoringModel( this ) ),
 	m_localSessionControlInterface( Computer( NetworkObject::Uid::createUuid(),

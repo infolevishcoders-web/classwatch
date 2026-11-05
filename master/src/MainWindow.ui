@@ -317,6 +317,26 @@ Press and hold to load arrangement from a file or save current arrangement to a 
          </widget>
         </item>
         <item>
+         <widget class="QToolButton" name="classWatchComputerPanelButton">
+          <property name="text">
+           <string>ClassWatch IDs</string>
+          </property>
+          <property name="icon">
+           <iconset resource="../resources/master.qrc">
+            <normaloff>:/master/computers.png</normaloff>:/master/computers.png</iconset>
+          </property>
+          <property name="checkable">
+           <bool>true</bool>
+          </property>
+          <property name="toolButtonStyle">
+           <enum>Qt::ToolButtonStyle::ToolButtonTextBesideIcon</enum>
+          </property>
+          <attribute name="buttonGroup">
+           <string notr="true">buttonGroup</string>
+          </attribute>
+         </widget>
+        </item>
+        <item>
          <widget class="QToolButton" name="slideshowPanelButton">
           <property name="text">
            <string>Slideshow</string>

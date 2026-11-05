@@ -32,6 +32,7 @@
 class QModelIndex;
 
 class BuiltinFeatures;
+class ClassWatchComputerManagerExtension;
 class ComputerControlListModel;
 class ComputerManager;
 class ComputerMonitoringModel;
@@ -53,6 +54,11 @@ public:
 	ComputerManager& computerManager()
 	{
 		return *m_computerManager;
+	}
+
+	ClassWatchComputerManagerExtension& classWatchComputerManager()
+	{
+		return *m_classWatchComputerManager;
 	}
 
 	ComputerControlListModel& computerControlListModel()
@@ -107,6 +113,7 @@ private:
 	UserConfig* m_userConfig;
 	const FeatureList m_features;
 	ComputerManager* m_computerManager;
+	ClassWatchComputerManagerExtension* m_classWatchComputerManager;
 	ComputerControlListModel* m_computerControlListModel;
 	ComputerMonitoringModel* m_computerMonitoringModel;
 
