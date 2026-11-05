@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.18.0)
 message("Using CMake ${CMAKE_VERSION}")
 
-project(veyon)
+project(ClassWatch)
 
 option(WITH_CORE_ONLY "Build core library only" OFF)
 option(WITH_ADDONS "Build add-ons" OFF)
@@ -49,11 +49,12 @@ if (NOT VERSION_STRING MATCHES "^v.*")
 endif()
 
 if(VERSION_STRING STREQUAL "")
-	set(VERSION_MAJOR 4)
-	set(VERSION_MINOR 11)
-	set(VERSION_PATCH 4)
+	set(VERSION_MAJOR 1)
+	set(VERSION_MINOR 0)
+	set(VERSION_PATCH 0)
 	set(VERSION_BUILD 0)
 	set(VERSION_STRING "${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}")
+	set(VEYON_BASE_VERSION "4.11.4")
 else()
 	string(REGEX REPLACE "^v([0-9]+)\\..*" "\\1" VERSION_MAJOR "${VERSION_STRING}")
 	string(REGEX REPLACE "^v[0-9]+\\.([0-9]+).*" "\\1" VERSION_MINOR "${VERSION_STRING}")
@@ -120,26 +121,26 @@ endif()
 if(VEYON_BUILD_ANDROID)
 	set(CMAKE_INSTALL_PREFIX "/")
 	set(VEYON_LIB_DIR "libs/${ANDROID_ABI}")
-	set(VEYON_INSTALL_PLUGIN_DIR "${VEYON_LIB_DIR}/veyon")
-	set(VEYON_INSTALL_DATA_DIR "${CMAKE_INSTALL_DATADIR}/veyon")
+	set(VEYON_INSTALL_PLUGIN_DIR "${VEYON_LIB_DIR}/classwatch")
+	set(VEYON_INSTALL_DATA_DIR "${CMAKE_INSTALL_DATADIR}/classwatch")
 	set(VEYON_PLUGIN_DIR "")
 	set(VEYON_TRANSLATIONS_DIR "/translations")
 else()
 	if(CMAKE_INSTALL_LIBDIR)
-		set(VEYON_LIB_DIR "${CMAKE_INSTALL_LIBDIR}/veyon" CACHE INTERNAL "Veyon library directory")
+		set(VEYON_LIB_DIR "${CMAKE_INSTALL_LIBDIR}/classwatch" CACHE INTERNAL "ClassWatch library directory")
 	else()
-		set(VEYON_LIB_DIR lib/veyon CACHE INTERNAL "Veyon library directory")
+		set(VEYON_LIB_DIR lib/classwatch CACHE INTERNAL "ClassWatch library directory")
 	endif()
 
 	set(VEYON_INSTALL_PLUGIN_DIR "${VEYON_LIB_DIR}")
-	set(VEYON_INSTALL_DATA_DIR "${CMAKE_INSTALL_DATADIR}/veyon")
+	set(VEYON_INSTALL_DATA_DIR "${CMAKE_INSTALL_DATADIR}/classwatch")
 
 	if(WIN32)
 		set(VEYON_PLUGIN_DIR "plugins")
 		set(VEYON_TRANSLATIONS_DIR "translations")
 	else()
 		set(VEYON_PLUGIN_DIR "../${VEYON_LIB_DIR}")
-		set(VEYON_TRANSLATIONS_DIR "../share/veyon/translations")
+		set(VEYON_TRANSLATIONS_DIR "../share/classwatch/translations")
 	endif()
 endif()
 
@@ -296,7 +297,7 @@ endif()
 add_definitions(
 	)
 
-file(GLOB_RECURSE IN_FILES RELATIVE ${CMAKE_SOURCE_DIR} "veyonconfig.h.in" "*.desktop.in" "*.policy.in" "*.service.in" "*.nsi.in")
+file(GLOB_RECURSE IN_FILES RELATIVE ${CMAKE_SOURCE_DIR} "classwatchconfig.h.in" "*.desktop.in" "*.policy.in" "*.service.in" "*.nsi.in")
 configure_files(${IN_FILES})
 
 set(CMAKE_AUTOMOC TRUE)
@@ -355,9 +356,10 @@ include(CPack)
 #
 
 message("\n"
-	"Veyon build summary\n"
-	"--------------------\n"
+	"ClassWatch build summary\n"
+	"------------------------\n"
 	"* Version                     : ${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}.${VERSION_BUILD} (${VERSION_STRING})\n"
+	"* Based on Veyon              : ${VEYON_BASE_VERSION}\n"
 	"* Install prefix              : ${CMAKE_INSTALL_PREFIX}\n"
 	"* Library directory           : ${CMAKE_INSTALL_PREFIX}/${VEYON_LIB_DIR}\n"
 	"* Plugin directory            : ${CMAKE_INSTALL_PREFIX}/${VEYON_INSTALL_PLUGIN_DIR}\n"

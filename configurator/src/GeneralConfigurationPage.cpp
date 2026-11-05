@@ -197,8 +197,8 @@ void GeneralConfigurationPage::clearLogFiles()
 
 	if( serviceControl.isServiceRunning() )
 	{
-		if (QMessageBox::question(this, tr("Veyon service"),
-								   tr("The Veyon service needs to be stopped temporarily "
+		if (QMessageBox::question(this, tr("ClassWatch service"),
+								   tr("The ClassWatch service needs to be stopped temporarily "
 									  "in order to remove the log files. Continue?"),
 								  QMessageBox::Yes | QMessageBox::No,
 								  QMessageBox::Yes) == QMessageBox::Yes)
@@ -213,14 +213,14 @@ void GeneralConfigurationPage::clearLogFiles()
 	}
 
 	bool success = true;
-	const QStringList logFilesFilter( { QStringLiteral("Veyon*.log") } );
+	const QStringList logFilesFilter( { QStringLiteral("ClassWatch*.log") } );
 
 	QDir d( VeyonCore::filesystem().expandPath( VeyonCore::config().logFileDirectory() ) );
 	const auto localLogFiles = d.entryList( logFilesFilter );
 
 	for( const auto& f : localLogFiles )
 	{
-		if( f.startsWith( QLatin1String("VeyonConfigurator") ) )
+		if( f.startsWith( QLatin1String("ClassWatchConfigurator") ) )
 		{
 			d.remove( f );
 		}
@@ -234,7 +234,7 @@ void GeneralConfigurationPage::clearLogFiles()
 	const auto globalLogFiles = d.entryList( logFilesFilter );
 	for( const auto& f : globalLogFiles )
 	{
-		if( f != QLatin1String("VeyonConfigurator.log") )
+		if( f != QLatin1String("ClassWatchConfigurator.log") )
 		{
 			success &= d.remove( f );
 		}

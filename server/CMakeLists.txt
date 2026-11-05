@@ -1,6 +1,6 @@
 include(BuildVeyonApplication)
 
-build_veyon_application(veyon-server
+build_veyon_application(classwatch-server
 	NAME Server
 	SOURCES
 	src/ComputerControlClient.cpp
@@ -23,24 +23,24 @@ build_veyon_application(veyon-server
 	src/VncServer.h)
 
 configure_file(
-	"${CMAKE_CURRENT_SOURCE_DIR}/data/io.veyon.veyon-server.desktop.in"
-	"${CMAKE_CURRENT_BINARY_DIR}/data/io.veyon.veyon-server.desktop"
+	"${CMAKE_CURRENT_SOURCE_DIR}/data/io.levish.classwatch-server.desktop.in"
+	"${CMAKE_CURRENT_BINARY_DIR}/data/io.levish.classwatch-server.desktop"
 	@ONLY
 )
 configure_file(
-	"${CMAKE_CURRENT_SOURCE_DIR}/data/io.veyon.veyon-server.service.in"
-	"${CMAKE_CURRENT_BINARY_DIR}/data/io.veyon.veyon-server.service"
+	"${CMAKE_CURRENT_SOURCE_DIR}/data/io.levish.classwatch-server.service.in"
+	"${CMAKE_CURRENT_BINARY_DIR}/data/io.levish.classwatch-server.service"
 	@ONLY
 )
 
 install(
-	FILES "${CMAKE_CURRENT_BINARY_DIR}/data/io.veyon.veyon-server.desktop"
+	FILES "${CMAKE_CURRENT_BINARY_DIR}/data/io.levish.classwatch-server.desktop"
 	DESTINATION "${CMAKE_INSTALL_DATADIR}/applications"
 	COMPONENT pipewire-vnc-server
 )
 
 install(
-	FILES "${CMAKE_CURRENT_BINARY_DIR}/data/io.veyon.veyon-server.service"
+	FILES "${CMAKE_CURRENT_BINARY_DIR}/data/io.levish.classwatch-server.service"
 	DESTINATION "${CMAKE_INSTALL_DATADIR}/dbus-1/services"
 	COMPONENT pipewire-vnc-server
 )

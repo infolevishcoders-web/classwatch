@@ -71,13 +71,13 @@
                 --replace-fail 'set(SYSTEMD_SERVICE_INSTALL_DIR /lib/systemd/system)' \
                                'set(SYSTEMD_SERVICE_INSTALL_DIR ''${CMAKE_INSTALL_PREFIX}/lib/systemd/system)'
 
-              substituteInPlace core/src/veyonconfig.h.in \
-                --replace-fail '@VEYON_PLUGIN_DIR@' "$out/lib/veyon"
+              substituteInPlace core/src/classwatchconfig.h.in \
+                --replace-fail '@VEYON_PLUGIN_DIR@' "$out/lib/classwatch"
             '';
 
             postFixup = ''
               for bin in $out/bin/.*-wrapped; do
-                patchelf --set-rpath "$out/lib/veyon:$(patchelf --print-rpath $bin)" $bin
+                patchelf --set-rpath "$out/lib/classwatch:$(patchelf --print-rpath $bin)" $bin
               done
             '';
 

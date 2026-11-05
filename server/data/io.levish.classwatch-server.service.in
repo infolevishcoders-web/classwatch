@@ -1,0 +1,3 @@
+[D-BUS Service]
+Name=io.levish.classwatch-server
+Exec=@CMAKE_INSTALL_PREFIX@/bin/classwatch-server

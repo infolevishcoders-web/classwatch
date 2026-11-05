@@ -1,4 +1,4 @@
-set(WINDOWS_INSTALL_FILES "veyon-${VEYON_WINDOWS_ARCH}-${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}.${VERSION_BUILD}")
+set(WINDOWS_INSTALL_FILES "classwatch-${VEYON_WINDOWS_ARCH}-${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}.${VERSION_BUILD}")
 
 set(DLLDIR "${MINGW_PREFIX}/bin")
 set(DLLDIR_LIB "${MINGW_PREFIX}/lib")
@@ -18,8 +18,8 @@ add_custom_target(windows-binaries
 	COMMAND mkdir -p ${WINDOWS_INSTALL_FILES}/interception
 	COMMAND cp ${CMAKE_SOURCE_DIR}/3rdparty/interception/* ${WINDOWS_INSTALL_FILES}/interception
 	COMMAND cp ${CMAKE_SOURCE_DIR}/3rdparty/ddengine/${DLL_DDENGINE} ${WINDOWS_INSTALL_FILES}
-	COMMAND cp core/veyon-core.dll ${WINDOWS_INSTALL_FILES}
-	COMMAND find . -mindepth 2 -name 'veyon-*.exe' -exec cp '{}' ${WINDOWS_INSTALL_FILES}/ '\;'
+	COMMAND cp core/classwatch-core.dll ${WINDOWS_INSTALL_FILES}
+	COMMAND find . -mindepth 2 -name 'classwatch-*.exe' -exec cp '{}' ${WINDOWS_INSTALL_FILES}/ '\;'
 	COMMAND mkdir -p ${WINDOWS_INSTALL_FILES}/plugins
 	COMMAND find plugins/ -name '*.dll' -exec cp '{}' ${WINDOWS_INSTALL_FILES}/plugins/ '\;'
 	COMMAND mv ${WINDOWS_INSTALL_FILES}/plugins/lib*.dll ${WINDOWS_INSTALL_FILES}
@@ -66,7 +66,7 @@ add_custom_target(windows-binaries
 	COMMAND cp ${CMAKE_SOURCE_DIR}/README.md ${WINDOWS_INSTALL_FILES}/README.TXT
 	COMMAND todos ${WINDOWS_INSTALL_FILES}/*.TXT
 	COMMAND cp -ra ${CMAKE_SOURCE_DIR}/nsis ${WINDOWS_INSTALL_FILES}
-	COMMAND cp ${CMAKE_BINARY_DIR}/nsis/veyon.nsi ${WINDOWS_INSTALL_FILES}
+	COMMAND cp ${CMAKE_BINARY_DIR}/nsis/classwatch.nsi ${WINDOWS_INSTALL_FILES}
 	COMMAND find ${WINDOWS_INSTALL_FILES} -ls
 )
 

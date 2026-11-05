@@ -15,21 +15,21 @@ set(core_RESOURCES
 	${CMAKE_CURRENT_BINARY_DIR}/builddata.qrc
 	)
 
-add_library(veyon-core SHARED ${veyoncore_SOURCES} ${core_RESOURCES} ${libvncclient_SOURCES})
+add_library(classwatch-core SHARED ${veyoncore_SOURCES} ${core_RESOURCES} ${libvncclient_SOURCES})
 
-target_compile_definitions(veyon-core PRIVATE XK_KOREAN)
+target_compile_definitions(classwatch-core PRIVATE XK_KOREAN)
 
-set_default_target_properties(veyon-core)
+set_default_target_properties(classwatch-core)
 
-target_compile_options(veyon-core PRIVATE -Wno-parentheses)
+target_compile_options(classwatch-core PRIVATE -Wno-parentheses)
 
-target_include_directories(veyon-core PUBLIC
+target_include_directories(classwatch-core PUBLIC
 	${CMAKE_CURRENT_BINARY_DIR}
 	${CMAKE_CURRENT_SOURCE_DIR}/src
 	${CMAKE_CURRENT_BINARY_DIR}/src
 	)
 
-target_link_libraries(veyon-core PUBLIC
+target_link_libraries(classwatch-core PUBLIC
 	Qt${QT_MAJOR_VERSION}::Concurrent
 	Qt${QT_MAJOR_VERSION}::Gui
 	Qt${QT_MAJOR_VERSION}::Network
@@ -39,49 +39,49 @@ target_link_libraries(veyon-core PUBLIC
 
 if(WITH_QT6)
 	# required by qca-qt6
-	target_link_libraries(veyon-core PUBLIC Qt6::Core5Compat)
+	target_link_libraries(classwatch-core PUBLIC Qt6::Core5Compat)
 endif()
 
 if(WITH_TESTS)
-	target_link_libraries(veyon-core PUBLIC Qt${QT_MAJOR_VERSION}::Test)
+	target_link_libraries(classwatch-core PUBLIC Qt${QT_MAJOR_VERSION}::Test)
 endif()
 
-target_link_libraries(veyon-core PUBLIC OpenSSL::SSL)
+target_link_libraries(classwatch-core PUBLIC OpenSSL::SSL)
 
 if(WITH_BUNDLED_LIBVNC)
-	target_link_libraries(veyon-core PUBLIC vncclient)
+	target_link_libraries(classwatch-core PUBLIC vncclient)
 else()
-	target_link_libraries(veyon-core PUBLIC LibVNC::LibVNCClient)
+	target_link_libraries(classwatch-core PUBLIC LibVNC::LibVNCClient)
 endif()
 
 if(VEYON_BUILD_WINDOWS)
 	# add Windows Socket library required by libvncclient
-	target_link_libraries(veyon-core PRIVATE -lws2_32)
-	set_target_properties(veyon-core PROPERTIES PREFIX "")
-	add_windows_resources(veyon-core
-		NAME VeyonCore
-		DESCRIPTION "Veyon Core Library")
+	target_link_libraries(classwatch-core PRIVATE -lws2_32)
+	set_target_properties(classwatch-core PROPERTIES PREFIX "")
+	add_windows_resources(classwatch-core
+		NAME ClassWatchCore
+		DESCRIPTION "ClassWatch Core Library")
 	if(NOT WITH_CORE_ONLY)
-		install(TARGETS veyon-core RUNTIME DESTINATION ${VEYON_LIB_DIR})
+		install(TARGETS classwatch-core RUNTIME DESTINATION ${VEYON_LIB_DIR})
 	endif()
 else()
 	if(NOT WITH_CORE_ONLY)
-		install(TARGETS veyon-core LIBRARY DESTINATION ${VEYON_LIB_DIR})
+		install(TARGETS classwatch-core LIBRARY DESTINATION ${VEYON_LIB_DIR})
 	endif()
 endif()
 
 if(VEYON_BUILD_WINDOWS)
-	target_compile_definitions(veyon-core PUBLIC _WIN32_WINNT=0x0602)
+	target_compile_definitions(classwatch-core PUBLIC _WIN32_WINNT=0x0602)
 endif()
 
 if(WITH_PCH)
 	set(PCH ${CMAKE_CURRENT_SOURCE_DIR}/src/PrecompiledHeader.h)
-	target_precompile_headers(veyon-core PRIVATE ${PCH})
+	target_precompile_headers(classwatch-core PRIVATE ${PCH})
 
-	add_pch_target(veyon-application-pch ${PCH})
-	set_target_properties(veyon-application-pch PROPERTIES COMPILE_OPTIONS "${CMAKE_COMPILE_OPTIONS_PIE}")
-	set_target_properties(veyon-application-pch PROPERTIES LINK_OPTIONS "${CMAKE_LINK_OPTIONS_PIE}")
+	add_pch_target(classwatch-application-pch ${PCH})
+	set_target_properties(classwatch-application-pch PROPERTIES COMPILE_OPTIONS "${CMAKE_COMPILE_OPTIONS_PIE}")
+	set_target_properties(classwatch-application-pch PROPERTIES LINK_OPTIONS "${CMAKE_LINK_OPTIONS_PIE}")
 
-	add_pch_target(veyon-library-pch ${PCH})
-	set_target_properties(veyon-library-pch PROPERTIES POSITION_INDEPENDENT_CODE TRUE)
+	add_pch_target(classwatch-library-pch ${PCH})
+	set_target_properties(classwatch-library-pch PROPERTIES POSITION_INDEPENDENT_CODE TRUE)
 endif()

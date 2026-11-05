@@ -24,6 +24,7 @@
 
 #include "WebApiAuthenticationProxy.h"
 #include "WebApiConfiguration.h"
+#include "classwatchconfig.h"
 
 
 WebApiAuthenticationProxy::WebApiAuthenticationProxy( const WebApiConfiguration& configuration ) :
@@ -33,7 +34,7 @@ WebApiAuthenticationProxy::WebApiAuthenticationProxy( const WebApiConfiguration&
 
 
 
-#if VEYON_VERSION_MAJOR < 5
+#if CLASSWATCH_VERSION_MAJOR < 5
 #include "RfbVeyonAuth.h"
 
 QVector<QUuid> WebApiAuthenticationProxy::authenticationMethods()
@@ -70,7 +71,7 @@ WebApiAuthenticationProxy::AuthenticationMethod WebApiAuthenticationProxy::initC
 		if( m_credentialsPopulated.wait( &credentialsWaitMutex, m_waitConditionWaitTime ) == false )
 		{
 			vWarning() << "waiting for credentials timed out";
-#if VEYON_VERSION_MAJOR >= 5
+#if CLASSWATCH_VERSION_MAJOR >= 5
 			return {};
 #else
 			return RfbVeyonAuth::Invalid;
@@ -79,7 +80,7 @@ WebApiAuthenticationProxy::AuthenticationMethod WebApiAuthenticationProxy::initC
 		l.relock();
 	}
 
-#if VEYON_VERSION_MAJOR >= 5
+#if CLASSWATCH_VERSION_MAJOR >= 5
 	return m_selectedAuthenticationMethod;
 #else
 	if( m_selectedAuthenticationMethod == m_authKeysUuid )

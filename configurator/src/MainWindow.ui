@@ -3,11 +3,11 @@
  <class>MainWindow</class>
  <widget class="QMainWindow" name="MainWindow">
   <property name="windowTitle">
-   <string>Veyon Configurator</string>
+   <string>ClassWatch Configurator</string>
   </property>
   <property name="windowIcon">
    <iconset resource="../resources/configurator.qrc">
-    <normaloff>:/configurator/veyon-configurator.png</normaloff>:/configurator/veyon-configurator.png</iconset>
+    <normaloff>:/configurator/classwatch-configurator.png</normaloff>:/configurator/classwatch-configurator.png</iconset>
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QGridLayout" name="gridLayout" columnstretch="0,1">
@@ -165,7 +165,7 @@
     <property name="title">
      <string>&amp;Help</string>
     </property>
-    <addaction name="actionAboutVeyon"/>
+    <addaction name="actionAboutClassWatch"/>
     <addaction name="actionAboutQt"/>
    </widget>
    <widget class="QMenu" name="menu_View">
@@ -214,13 +214,13 @@
     <string>Ctrl+O</string>
    </property>
   </action>
-  <action name="actionAboutVeyon">
+  <action name="actionAboutClassWatch">
    <property name="icon">
     <iconset resource="../../core/resources/core.qrc">
      <normaloff>:/core/help-about.png</normaloff>:/core/help-about.png</iconset>
    </property>
    <property name="text">
-    <string>About Veyon</string>
+    <string>About ClassWatch</string>
    </property>
   </action>
   <action name="actionAboutQt">
@@ -302,10 +302,10 @@
    </hints>
   </connection>
   <connection>
-   <sender>actionAboutVeyon</sender>
+   <sender>actionAboutClassWatch</sender>
    <signal>triggered()</signal>
    <receiver>MainWindow</receiver>
-   <slot>aboutVeyon()</slot>
+   <slot>aboutClassWatch()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>-1</x>
@@ -351,7 +351,7 @@
   </connection>
  </connections>
  <slots>
-  <slot>aboutVeyon()</slot>
+  <slot>aboutClassWatch()</slot>
   <slot>resetConfiguration()</slot>
  </slots>
 </ui>

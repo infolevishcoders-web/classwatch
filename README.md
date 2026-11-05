@@ -1,20 +1,20 @@
-# Veyon - Virtual Eye On Networks
+# ClassWatch - Classroom Monitoring & Management System
 
-[![.github/workflows/build.yml](https://github.com/veyon/veyon/actions/workflows/build.yml/badge.svg?branch=4.5)](https://github.com/veyon/veyon/actions/workflows/build.yml)
-[![Latest stable release](https://img.shields.io/github/release/veyon/veyon.svg?maxAge=3600)](https://github.com/veyon/veyon/releases)
-[![Overall downloads on Github](https://img.shields.io/github/downloads/veyon/veyon/total.svg?maxAge=3600)](https://github.com/veyon/veyon/releases)
-[![Documentation Status](https://readthedocs.org/projects/veyon/badge/?version=latest)](https://docs.veyon.io/)
-[![Localise on Transifex](https://img.shields.io/badge/localise-on_transifex-green.svg)](https://app.transifex.com/veyon-solutions/veyon/)
+**ClassWatch by Levish Coders**
+
+Based on Veyon 4.11.4 (https://github.com/veyon/veyon)
+Copyright (c) 2004-2026 Tobias Junghans / Veyon Solutions
+
 [![license](https://img.shields.io/badge/license-GPLv2-green.svg)](LICENSE)
 
+## What is ClassWatch?
 
-## What is Veyon?
+ClassWatch is a professional classroom computer laboratory management system
+built on the Veyon open-source framework. It provides monitoring and control
+of computers across multiple platforms, supporting digital learning environments,
+virtual training, and remote support.
 
-Veyon is a free and open source software for monitoring and controlling
-computers across multiple platforms. Veyon supports you in teaching in digital
-learning environments, performing virtual trainings or giving remote support.
-
-The following features are available in Veyon:
+The following features are available in ClassWatch:
 
   * Overview: monitor all computers in one or multiple locations or classrooms
   * Remote access: view or control computers to watch and support users
@@ -27,33 +27,40 @@ The following features are available in Veyon:
   * Teaching material: distribute and open documents, images and videos easily
   * Administration: power on/off and reboot computers remotely
 
-
 ## License
 
 Copyright (c) 2004-2026 Tobias Junghans / Veyon Solutions.
+Copyright (c) 2026 Levish Coders.
 
 See the file COPYING for the GNU GENERAL PUBLIC LICENSE.
+This project is licensed under GPL-2.0.
 
 
 ## Installation and configuration
 
-Please refer to the official Veyon Administrator Manual at https://docs.veyon.io/en/latest/admin/index.html
-for information on the installation and configuration of Veyon.
+Please refer to the official ClassWatch Administrator Manual for information
+on the installation and configuration of ClassWatch.
+
+For reference, the original Veyon Administrator Manual is available at
+https://docs.veyon.io/en/latest/admin/index.html
 
 
 ## Usage
 
-Please refer to the official Veyon User Manual at https://docs.veyon.io/en/latest/user/index.html
-for information on how to use Veyon.
+Please refer to the official ClassWatch User Manual for information on how
+to use ClassWatch.
+
+For reference, the original Veyon User Manual is available at
+https://docs.veyon.io/en/latest/user/index.html
 
 
-## Veyon on Linux
+## ClassWatch on Linux
 
 ### Downloading sources
 
 First grab the latest sources by cloning the Git repository and fetching all submodules:
 
-	git clone --recursive https://github.com/veyon/veyon.git && cd veyon
+	git clone --recursive https://github.com/levishcoders/classwatch.git && cd classwatch
 
 
 ### Installing dependencies
@@ -129,7 +136,7 @@ For generating a package you can run
 
 	fakeroot make package
 
-Then you'll get something like veyon_x.y.z_arch.deb or veyon-x.y.z.arch.rpm
+Then you'll get something like classwatch_x.y.z_arch.deb or classwatch-x.y.z.arch.rpm
 
 Alternatively you can install the built binaries directly (not recommended for
 production systems) by running the following command as root:
@@ -149,15 +156,16 @@ This PPA contains official Veyon packages for Ubuntu suitable for use both on de
 
 ## Join development
 
-If you are interested in Veyon, its programming, artwork, testing or something like that, you're welcome to participate in the development of Veyon!
+If you are interested in ClassWatch, its programming, artwork, testing or something like that, you're welcome to participate in the development of ClassWatch!
 
-Before starting the implementation of a new feature, please always open an issue at https://github.com/veyon/veyon/issues to start a discussion about your intended implementation. There may be different ideas, improvements, hints or maybe an already ongoing work on this feature.
+For contributions to the original Veyon project, please refer to https://github.com/veyon/veyon/issues.
 
 ## Join translation team
 
-Veyon and its documentation are translated at the Transifex platform. Please go to https://app.transifex.com/veyon-solutions/veyon and join the corresponding translation team. Please DO NOT submit pull requests for modified translation files since this would require manual Transifex synchronizations on our side.
+ClassWatch and its documentation are translated at the Transifex platform. Please go to https://app.transifex.com/veyon-solutions/veyon and join the corresponding translation team. Please DO NOT submit pull requests for modified translation files since this would require manual Transifex synchronizations on our side.
 
 ## More information
 
-* https://veyon.io/
-* https://docs.veyon.io/
+* https://levishcoders.com/
+* https://github.com/levishcoders/classwatch
+* Original Veyon project: https://veyon.io/

@@ -22,7 +22,7 @@
  *
  */
 
-#include <veyonconfig.h>
+#include <classwatchconfig.h>
 
 #include <QAbstractButton>
 #include <QAction>
@@ -156,21 +156,21 @@ VeyonCore* VeyonCore::instance()
 
 QString VeyonCore::versionString()
 {
-	return QStringLiteral( VEYON_VERSION );
+	return QStringLiteral( CLASSWATCH_VERSION );
 }
 
 
 
 QString VeyonCore::pluginDir()
 {
-	return QStringLiteral( VEYON_PLUGIN_DIR );
+	return QStringLiteral( CLASSWATCH_PLUGIN_DIR );
 }
 
 
 
 QString VeyonCore::translationsDirectory()
 {
-	return QCoreApplication::applicationDirPath() + QDir::separator() + QStringLiteral(VEYON_TRANSLATIONS_DIR);
+	return QCoreApplication::applicationDirPath() + QDir::separator() + QStringLiteral(CLASSWATCH_TRANSLATIONS_DIR);
 }
 
 
@@ -194,14 +194,14 @@ QString VeyonCore::qtTranslationsDirectory()
 
 QString VeyonCore::executableSuffix()
 {
-	return QStringLiteral( VEYON_EXECUTABLE_SUFFIX ); // clazy:exclude=empty-qstringliteral
+	return QStringLiteral( CLASSWATCH_EXECUTABLE_SUFFIX ); // clazy:exclude=empty-qstringliteral
 }
 
 
 
 QString VeyonCore::sharedLibrarySuffix()
 {
-	return QStringLiteral( VEYON_SHARED_LIBRARY_SUFFIX );
+	return QStringLiteral( CLASSWATCH_SHARED_LIBRARY_SUFFIX );
 }
 
 
@@ -216,16 +216,16 @@ QString VeyonCore::applicationsDirectory()
 
 QString VeyonCore::sessionIdEnvironmentVariable()
 {
-	return QStringLiteral("VEYON_SESSION_ID");
+	return QStringLiteral("CLASSWATCH_SESSION_ID");
 }
 
 
 
 void VeyonCore::setupApplicationParameters()
 {
-	QCoreApplication::setOrganizationName( QStringLiteral( "Veyon Solutions" ) );
-	QCoreApplication::setOrganizationDomain( QStringLiteral( "veyon.io" ) );
-	QCoreApplication::setApplicationName( QStringLiteral( "Veyon" ) );
+	QCoreApplication::setOrganizationName( QStringLiteral( "Levish Coders" ) );
+	QCoreApplication::setOrganizationDomain( QStringLiteral( "levishcoders.com" ) );
+	QCoreApplication::setApplicationName( QStringLiteral( "ClassWatch" ) );
 
 	QCoreApplication::setAttribute( Qt::AA_ShareOpenGLContexts );
 

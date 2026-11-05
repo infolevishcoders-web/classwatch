@@ -1,0 +1,9 @@
+[Desktop Entry]
+Version=1.5
+Type=Application
+NoDisplay=true
+Exec=@CMAKE_INSTALL_PREFIX@/bin/classwatch-server
+Name=ClassWatch Server
+Comment=ClassWatch remote desktop server
+Icon=classwatch
+Categories=Qt;Education;Network;RemoteAccess;

@@ -14,17 +14,17 @@ set(cli_SOURCES
 	src/ShellCommands.h
 	)
 
-build_veyon_application(veyon-cli
+build_veyon_application(classwatch-cli
 	NAME CLI
-	DESCRIPTION "Veyon Command Line Interface (console version)"
+	DESCRIPTION "ClassWatch Command Line Interface (console version)"
 	CONSOLE
 	SOURCES ${cli_SOURCES})
 
-target_compile_options(veyon-cli PRIVATE -Wno-date-time)
+target_compile_options(classwatch-cli PRIVATE -Wno-date-time)
 
 if(VEYON_BUILD_WINDOWS)
-	build_veyon_application(veyon-wcli
+	build_veyon_application(classwatch-wcli
 		NAME WCLI
-		DESCRIPTION "Veyon Command Line Interface (non-console version)"
+		DESCRIPTION "ClassWatch Command Line Interface (non-console version)"
 		SOURCES ${cli_SOURCES})
 endif()

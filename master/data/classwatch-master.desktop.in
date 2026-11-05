@@ -1,0 +1,11 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Exec=@CMAKE_INSTALL_PREFIX@/bin/classwatch-master
+Icon=classwatch-master
+Terminal=false
+Name=ClassWatch Master
+Comment=ClassWatch - Classroom Monitoring & Management System
+Comment[de]=ClassWatch - Klassenzimmerüberwachungs- und Managementsystem
+Categories=Qt;Education;Network;RemoteAccess;
+Keywords=classroom,control,computer,room,lab,monitoring,teacher,student

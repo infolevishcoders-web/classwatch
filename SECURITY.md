@@ -6,9 +6,9 @@ Usually, only the latest stable release series is provided with security updates
 
 | Version | Supported          |
 | ------- | ------------------ |
-| 4.7.x   | ✔️                 |
-| < 4.7.x | ❌                 |
+| 1.x.x   | ✔️                 |
+| < 1.x.x | ❌                 |
 
 ## Reporting a Vulnerability
 
-If you have found a security-related bug in Veyon, please contact us via email at security@veyon.io to disclose the details about your findings. As soon as we learn about potential security vulnerabilities, we will work together to analyze and fix them as soon as possible.
+If you have found a security-related bug in ClassWatch, please contact us via email at security@levishcoders.com to disclose the details about your findings. As soon as we learn about potential security vulnerabilities, we will work together to analyze and fix them as soon as possible.

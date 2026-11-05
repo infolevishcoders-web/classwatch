@@ -1,6 +1,6 @@
 <RCC>
     <qresource prefix="/configurator">
-        <file>veyon-configurator.png</file>
+        <file>classwatch-configurator.png</file>
         <file>help-about.png</file>
         <file>network-vpn.png</file>
         <file>configure-shortcuts.png</file>

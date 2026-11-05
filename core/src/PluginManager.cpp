@@ -22,7 +22,7 @@
  *
  */
 
-#include <veyonconfig.h>
+#include <classwatchconfig.h>
 
 #include <QCoreApplication>
 #include <QDir>
@@ -174,7 +174,7 @@ void PluginManager::initPluginSearchPath()
 		m_pluginSearchPaths.append(pluginSearchPath);
 		QCoreApplication::addLibraryPath( pluginSearchPath );
 	}
-#if defined(VEYON_WITH_TESTS)
+#if defined(CLASSWATCH_WITH_TESTS)
 	for (const auto& baseDir : {QStringLiteral(CMAKE_BINARY_DIR "/plugins/platform"),
 								 QStringLiteral(CMAKE_BINARY_DIR "/plugins/vncserver"),
 								 QStringLiteral(CMAKE_BINARY_DIR "/plugins/")})

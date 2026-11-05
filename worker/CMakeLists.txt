@@ -1,6 +1,6 @@
 include(BuildVeyonApplication)
 
-build_veyon_application(veyon-worker
+build_veyon_application(classwatch-worker
 	NAME Worker
 	SOURCES
 	src/FeatureWorkerManagerConnection.cpp
