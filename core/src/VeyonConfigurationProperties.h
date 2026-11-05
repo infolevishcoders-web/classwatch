@@ -177,6 +177,8 @@
 	OP( VeyonConfiguration, VeyonCore::config(), bool, legacyComputerFilterHidden, setLegacyComputerFilterHidden, "ComputerFilterHidden", "Master", false, Configuration::Property::Flag::Legacy )	\
 	OP( VeyonConfiguration, VeyonCore::config(), int, legacyPrimaryServicePort, setLegacyPrimaryServicePort, "PrimaryServicePort", "Network", 11100, Configuration::Property::Flag::Legacy )			\
 
+#include "ClassWatchConfigurationProperties.h"
+
 #define FOREACH_VEYON_CONFIG_PROPERTY(OP)				\
 	FOREACH_VEYON_CORE_CONFIG_PROPERTIES(OP)			\
 	FOREACH_VEYON_VNC_CONNECTION_CONFIG_PROPERTIES(OP)	\
@@ -193,4 +195,5 @@
 	FOREACH_VEYON_AUTHENTICATION_CONFIG_PROPERTY(OP)	\
 	FOREACH_VEYON_KEY_AUTHENTICATION_CONFIG_PROPERTY(OP)	\
 	FOREACH_VEYON_ACCESS_CONTROL_CONFIG_PROPERTY(OP) \
+	FOREACH_CLASSWATCH_CONFIG_PROPERTIES(OP)			\
 	FOREACH_VEYON_LEGACY_CONFIG_PROPERTY(OP)

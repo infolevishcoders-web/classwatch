@@ -16,6 +16,9 @@ build_veyon_application(classwatch-configurator
 	src/AccessControlRulesTestDialog.cpp
 	src/AccessControlRulesTestDialog.h
 	src/AccessControlRulesTestDialog.ui
+	src/ClassWatchConfigurationPage.cpp
+	src/ClassWatchConfigurationPage.h
+	src/ClassWatchConfigurationPage.ui
 	src/GeneralConfigurationPage.cpp
 	src/GeneralConfigurationPage.h
 	src/GeneralConfigurationPage.ui

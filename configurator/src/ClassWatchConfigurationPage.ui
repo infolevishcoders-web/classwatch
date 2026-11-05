@@ -1,0 +1,282 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>ClassWatchConfigurationPage</class>
+ <widget class="QWidget" name="ClassWatchConfigurationPage">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>600</width>
+    <height>500</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>ClassWatch Settings</string>
+  </property>
+  <layout class="QVBoxLayout" name="mainLayout">
+   <item>
+    <widget class="QGroupBox" name="schoolInfoGroup">
+     <property name="title">
+      <string>School Information</string>
+     </property>
+     <layout class="QFormLayout" name="schoolInfoLayout">
+      <item row="0" column="0">
+       <widget class="QLabel" name="schoolNameLabel">
+        <property name="text">
+         <string>School Name:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QLineEdit" name="schoolNameEdit">
+        <property name="placeholderText">
+         <string>Enter school name</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="laboratoryNameLabel">
+        <property name="text">
+         <string>Laboratory Name:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="QLineEdit" name="laboratoryNameEdit">
+        <property name="placeholderText">
+         <string>Enter laboratory name</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="computerIdGroup">
+     <property name="title">
+      <string>Computer Identification</string>
+     </property>
+     <layout class="QFormLayout" name="computerIdLayout">
+      <item row="0" column="0">
+       <widget class="QLabel" name="idPrefixLabel">
+        <property name="text">
+         <string>ID Prefix:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QLineEdit" name="idPrefixEdit">
+        <property name="text">
+         <string>CW</string>
+        </property>
+        <property name="maxLength">
+         <number>5</number>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="startNumberLabel">
+        <property name="text">
+         <string>Start Number:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="QSpinBox" name="startNumberSpinBox">
+        <property name="minimum">
+         <number>1</number>
+        </property>
+        <property name="maximum">
+         <number>9999</number>
+        </property>
+        <property name="value">
+         <number>1</number>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0">
+       <widget class="QLabel" name="registryPathLabel">
+        <property name="text">
+         <string>Registry Path:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="1">
+       <widget class="QLineEdit" name="registryPathEdit">
+        <property name="placeholderText">
+         <string>%APPDATA%/ClassWatch/classwatch_computers.json</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="featuresGroup">
+     <property name="title">
+      <string>ClassWatch Features</string>
+     </property>
+     <layout class="QVBoxLayout" name="featuresLayout">
+      <item>
+       <widget class="QCheckBox" name="autoRegisterCheckBox">
+        <property name="text">
+         <string>Auto-register discovered computers</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QCheckBox" name="showIdsInMonitoringCheckBox">
+        <property name="text">
+         <string>Show ClassWatch IDs in monitoring view</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QCheckBox" name="studentNotificationsCheckBox">
+        <property name="text">
+         <string>Enable student notifications</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QCheckBox" name="fileDistributionCheckBox">
+        <property name="text">
+         <string>Enable file distribution</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QCheckBox" name="audioClassroomCheckBox">
+        <property name="text">
+         <string>Enable audio classroom</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QCheckBox" name="webFilteringCheckBox">
+        <property name="text">
+         <string>Enable web filtering</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QCheckBox" name="timetableCheckBox">
+        <property name="text">
+         <string>Enable timetable management</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QCheckBox" name="multiSessionCheckBox">
+        <property name="text">
+         <string>Enable Windows Server multi-session support</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="studentFolderGroup">
+     <property name="title">
+      <string>Student Folders</string>
+     </property>
+     <layout class="QFormLayout" name="studentFolderLayout">
+      <item row="0" column="0">
+       <widget class="QLabel" name="studentFolderLabel">
+        <property name="text">
+         <string>Default Student Folder:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QLineEdit" name="studentFolderEdit">
+        <property name="placeholderText">
+         <string>%USERPROFILE%/ClassWatch</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="auditGroup">
+     <property name="title">
+      <string>Audit &amp; Logging</string>
+     </property>
+     <layout class="QFormLayout" name="auditLayout">
+      <item row="0" column="0">
+       <widget class="QCheckBox" name="enableAuditCheckBox">
+        <property name="text">
+         <string>Enable audit logging</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="auditLogPathLabel">
+        <property name="text">
+         <string>Audit Log Path:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="QLineEdit" name="auditLogPathEdit">
+        <property name="placeholderText">
+         <string>%APPDATA%/ClassWatch/audit.log</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="buttonLayout">
+     <item>
+      <spacer name="horizontalSpacer">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QPushButton" name="applyButton">
+       <property name="text">
+        <string>Apply</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="resetButton">
+       <property name="text">
+        <string>Reset</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
