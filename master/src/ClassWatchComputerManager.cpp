@@ -63,7 +63,7 @@ QString ClassWatchComputerManager::registerComputer( const Computer& computer )
 	// Create ClassWatchComputer from Computer
 	ClassWatchComputer cwComputer( computer );
 	cwComputer.setClassWatchId( classWatchId );
-	cwComputer.setConnectionStatus( "Registered" );
+	cwComputer.setConnectionStatus( QStringLiteral("Registered") );
 	cwComputer.setLastConnectionTime( QDateTime::currentDateTime() );
 
 	// Store in maps

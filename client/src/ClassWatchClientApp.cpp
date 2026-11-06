@@ -145,7 +145,7 @@ QString ClassWatchClientApp::getClassWatchId()
 	int startNumber = config.classWatchIdStartNumber();
 	
 	// For now, return a placeholder ID
-	return QString( QStringLiteral("%1-%2") ).arg( prefix ).arg( startNumber, 3, 10, QChar( u\'0\' ) );
+	return QStringLiteral("%1-%2").arg( prefix ).arg( startNumber, 3, 10, QChar(QLatin1Char('0')) );
 }
 
 QString ClassWatchClientApp::getConnectionStatus()

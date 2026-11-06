@@ -37,6 +37,7 @@ jobs:
           mingw-w64-ucrt-x86_64-openldap
           mingw-w64-ucrt-x86_64-cyrus-sasl
           mingw-w64-ucrt-x86_64-pkgconf
+          mingw-w64-ucrt-x86_64-libvncserver
 
     - name: Build ClassWatch
       shell: msys2 {0}
@@ -47,7 +48,7 @@ jobs:
         cmake --version
         mkdir build
         cd build
-        cmake .. -G "MinGW Makefiles" -DCMAKE_BUILD_TYPE=Release -DWITH_TESTS=OFF -DWITH_BUNDLED_LIBVNC=ON -DWITH_WEBAPI=OFF -DWITH_PCH=OFF
+        cmake .. -G "MinGW Makefiles" -DCMAKE_BUILD_TYPE=Release -DWITH_TESTS=OFF -DWITH_BUNDLED_LIBVNC=OFF -DWITH_WEBAPI=OFF -DWITH_PCH=OFF
         cmake --build . --parallel
 
     - name: Package Windows Installer

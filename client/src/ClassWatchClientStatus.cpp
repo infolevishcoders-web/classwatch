@@ -153,7 +153,7 @@ QString ClassWatchClientStatus::getClassWatchId()
 	
 	// For now, return a placeholder ID
 	// In real implementation, this would be looked up from the registry
-	return QString( QStringLiteral("%1-%2") ).arg( prefix ).arg( startNumber, 3, 10, QChar( u\'0\' ) );
+	return QStringLiteral("%1-%2").arg( prefix ).arg( startNumber, 3, 10, QChar(QLatin1Char('0')) );
 }
 
 QString ClassWatchClientStatus::getConnectionStatus()

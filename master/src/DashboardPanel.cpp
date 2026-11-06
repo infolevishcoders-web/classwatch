@@ -44,8 +44,7 @@ DashboardPanel::DashboardPanel( VeyonMaster& master, QWidget *parent ) :
 
 	// Connect quick action buttons
 	connect(ui->monitorAllButton, &QPushButton::clicked, this, [this]() {
-		// Select all computers for monitoring
-		m_master.computerMonitoringModel()->selectAll();
+		// TODO: Implement monitor all computers feature
 	});
 
 	connect(ui->lockAllButton, &QPushButton::clicked, this, [this]() {
@@ -84,7 +83,7 @@ void DashboardPanel::showEvent( QShowEvent* event )
 void DashboardPanel::refreshStatistics()
 {
 	// Get computer statistics from the monitoring model
-	auto model = m_master.computerControlListModel();
+	auto* model = &m_master.computerControlListModel();
 	if (!model) {
 		return;
 	}
@@ -132,7 +131,7 @@ void DashboardPanel::updateComputerList()
 {
 	ui->computerStatusList->clear();
 
-	auto model = m_master.computerControlListModel();
+	auto* model = &m_master.computerControlListModel();
 	if (!model) {
 		return;
 	}
@@ -153,28 +152,28 @@ void DashboardPanel::updateComputerList()
 
 			switch (state) {
 			case VncConnection::State::Connected:
-				statusText = QString("%1 - %2 (Connected)").arg(computerName, userName);
-				statusIcon = QIcon(":/master/host-online.png");
+				statusText = QStringLiteral("%1 - %2 (Connected)").arg(computerName, userName);
+				statusIcon = QIcon(QStringLiteral(":/master/host-online.png"));
 				break;
 			case VncConnection::State::Disconnected:
 			case VncConnection::State::HostOffline:
-				statusText = QString("%1 - Offline").arg(computerName);
-				statusIcon = QIcon(":/master/host-offline.png");
+				statusText = QStringLiteral("%1 - Offline").arg(computerName);
+				statusIcon = QIcon(QStringLiteral(":/master/host-offline.png"));
 				break;
 			case VncConnection::State::AuthenticationFailed:
 			case VncConnection::State::AccessControlFailed:
 			case VncConnection::State::ConnectionFailed:
 			case VncConnection::State::ServerNotRunning:
-				statusText = QString("%1 - Error").arg(computerName);
-				statusIcon = QIcon(":/master/host-access-denied.png");
+				statusText = QStringLiteral("%1 - Error").arg(computerName);
+				statusIcon = QIcon(QStringLiteral(":/master/host-access-denied.png"));
 				break;
 			case VncConnection::State::Connecting:
-				statusText = QString("%1 - Connecting...").arg(computerName);
-				statusIcon = QIcon(":/master/host-dns-error.png");
+				statusText = QStringLiteral("%1 - Connecting...").arg(computerName);
+				statusIcon = QIcon(QStringLiteral(":/master/host-dns-error.png"));
 				break;
 			default:
-				statusText = QString("%1 - Unknown").arg(computerName);
-				statusIcon = QIcon(":/master/host-dns-error.png");
+				statusText = QStringLiteral("%1 - Unknown").arg(computerName);
+				statusIcon = QIcon(QStringLiteral(":/master/host-dns-error.png"));
 				break;
 			}
 

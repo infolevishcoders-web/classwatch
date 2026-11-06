@@ -36,7 +36,7 @@ ClassWatchConfigurationPage::ClassWatchConfigurationPage( QWidget* parent ) :
 	
 	// Set window title and icon
 	setWindowTitle( tr( "ClassWatch" ) );
-	setWindowIcon( QIcon( ":/configurator/classwatch-configurator.png" ) );
+	setWindowIcon( QIcon( QStringLiteral( ":/configurator/classwatch-configurator.png" ) ) );
 }
 
 ClassWatchConfigurationPage::~ClassWatchConfigurationPage()
