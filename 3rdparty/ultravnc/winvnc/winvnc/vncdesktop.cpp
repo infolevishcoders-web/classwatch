@@ -246,11 +246,7 @@ bool vncDesktop::FastDetectChanges(rfb::Region2D &rgn, rfb::Rect &rect, int nZon
 				}
 				else {
 					SendMessage(hWnd, LVM_GETITEMRECT, j, (LPARAM)ptritemrect);
-#ifdef _X64
 					SIZE_T copied = 0;
-#else
-					DWORD copied = 0;
-#endif
 					ReadProcessMemory(hProcess, (void*)ptritemrect, (LPVOID)&itemrect, sizeof(itemrect), &copied);
 					rfb::Rect wrect = rfb::Rect(itemrect).intersect(m_Cliprect);
 					iconregion.assign_union(wrect);

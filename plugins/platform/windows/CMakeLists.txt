@@ -14,6 +14,7 @@ build_veyon_plugin(windows-platform
 	WindowsDeviceFunctions.cpp
 	WindowsFilesystemFunctions.cpp
 	WindowsInputDeviceFunctions.cpp
+	${CMAKE_SOURCE_DIR}/3rdparty/interception/library/interception.c
 	WindowsKeyboardShortcutTrapper.cpp
 	WindowsNetworkFunctions.cpp
 	WindowsServerProcess.cpp
@@ -62,13 +63,15 @@ build_veyon_plugin(windows-platform
 
 target_include_directories(windows-platform PRIVATE
 	../common
+	${CMAKE_SOURCE_DIR}/3rdparty/interception/library
 	${ultravnc_DIR}/addon/ms-logon/authSSP
 	${ultravnc_DIR}/winvnc/winvnc
 	${ultravnc_DIR}
 	)
 
-target_link_libraries(windows-platform PRIVATE -lws2_32 -lwtsapi32 -lnetapi32 -luserenv -limm32 -lntdll -linterception -liphlpapi -lsetupapi -lsecur32)
+target_link_libraries(windows-platform PRIVATE -lws2_32 -lwtsapi32 -lnetapi32 -luserenv -limm32 -lntdll -liphlpapi -lsetupapi -lsecur32)
 target_link_libraries(windows-platform PRIVATE Qt6::GuiPrivate)
-target_compile_definitions(windows-platform PRIVATE ULTRAVNC_VEYON_SUPPORT)
-target_compile_options(windows-platform PRIVATE "-Wno-unknown-pragmas;-flarge-source-files;-Wno-misleading-indentation")
+target_compile_definitions(windows-platform PRIVATE ULTRAVNC_VEYON_SUPPORT INTERCEPTION_STATIC)
+target_compile_options(windows-platform PRIVATE
+	"-Wno-unknown-pragmas;-flarge-source-files;-Wno-misleading-indentation;-Wno-unused-but-set-variable;-Wno-error=unused-but-set-variable;-DGWL_USERDATA=GWLP_USERDATA;-DGWL_WNDPROC=GWLP_WNDPROC;-DGWL_HINSTANCE=GWLP_HINSTANCE;-DGWL_STYLE=GWLP_STYLE;-DGWL_EXSTYLE=GWLP_EXSTYLE")
 set_source_files_properties(WindowsNetworkFunctions.cpp PROPERTIES SKIP_UNITY_BUILD_INCLUSION TRUE SKIP_PRECOMPILE_HEADERS TRUE)
