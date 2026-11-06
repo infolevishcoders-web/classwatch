@@ -39,7 +39,7 @@ jobs:
         version: '6.5.3'
         arch: win64_mingw
         cache: true
-        modules: qtcharts qtwebsockets
+        modules: qtcharts qtwebsockets qt5compat
 
     - name: Build ClassWatch
       run: |
@@ -88,7 +88,7 @@ jobs:
           libldap2-dev \
           libsasl2-dev \
           libpam0g-dev \
-          libprocps-dev \
+          libproc2-dev \
           libfakekey-dev \
           libxtst-dev \
           xorg-dev \
@@ -141,9 +141,9 @@ jobs:
         mkdir build
         cd build
         cmake .. -DCMAKE_BUILD_TYPE=Release -DWITH_TESTS=OFF \
-          -DLDAP_INCLUDE_DIR=/opt/homebrew/opt/openldap/include \
-          -DLDAP_LIBRARY=/opt/homebrew/opt/openldap/lib/libldap.dylib \
-          -DLBER_LIBRARY=/opt/homebrew/opt/openldap/lib/liblber.dylib
+          -DLdap_INCLUDE_DIRS=/opt/homebrew/opt/openldap/include \
+          -DLdap_LIBRARIES=/opt/homebrew/opt/openldap/lib/libldap.dylib \
+          -DLber_LIBRARIES=/opt/homebrew/opt/openldap/lib/liblber.dylib
         cmake --build . --parallel
 
     - name: Package macOS
