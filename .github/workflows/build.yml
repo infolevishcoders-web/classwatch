@@ -24,6 +24,10 @@ jobs:
           mingw-w64-ucrt-x86_64-make
           mingw-w64-ucrt-x86_64-gcc
           mingw-w64-ucrt-x86_64-openssl
+          mingw-w64-ucrt-x86_64-qt6-base
+          mingw-w64-ucrt-x86_64-qt6-websockets
+          mingw-w64-ucrt-x86_64-qt6-charts
+          mingw-w64-ucrt-x86_64-qt6-5compat
           mingw-w64-ucrt-x86_64-qca-qt6
           mingw-w64-ucrt-x86_64-zlib
           mingw-w64-ucrt-x86_64-libpng
@@ -33,19 +37,10 @@ jobs:
           mingw-w64-ucrt-x86_64-cyrus-sasl
           mingw-w64-ucrt-x86_64-pkgconf
 
-    - name: Install Qt
-      uses: jurplel/install-qt-action@v3
-      with:
-        version: '6.7.3'
-        arch: win64_mingw
-        cache: true
-        modules: qtcharts qtwebsockets qt5compat
-
     - name: Build ClassWatch
       shell: msys2 {0}
       run: |
         export PATH="/ucrt64/bin:$PATH"
-        export CMAKE_PREFIX_PATH="/d/a/_temp/qt/6.7.3/mingw_64"
         which cmake
         which mingw32-make
         cmake --version
