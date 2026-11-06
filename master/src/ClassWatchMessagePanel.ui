@@ -1,0 +1,358 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>ClassWatchMessagePanel</class>
+ <widget class="QWidget" name="ClassWatchMessagePanel">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>600</width>
+    <height>700</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>ClassWatch Messages</string>
+  </property>
+  <layout class="QVBoxLayout" name="mainLayout">
+   <item>
+    <widget class="QTabWidget" name="messageTabs">
+     <property name="currentIndex">
+      <number>0</number>
+     </property>
+     <widget class="QWidget" name="sendMessageTab">
+      <attribute name="title">
+       <string>Send Message</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="sendMessageLayout">
+       <item>
+        <widget class="QGroupBox" name="recipientGroup">
+         <property name="title">
+          <string>Recipient</string>
+         </property>
+         <layout class="QVBoxLayout" name="recipientLayout">
+          <item>
+           <layout class="QHBoxLayout" name="recipientTypeLayout">
+            <item>
+             <widget class="QRadioButton" name="privateRadio">
+              <property name="text">
+               <string>Private Message</string>
+              </property>
+              <property name="checked">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QRadioButton" name="announcementRadio">
+              <property name="text">
+               <string>Class Announcement</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QRadioButton" name="broadcastRadio">
+              <property name="text">
+               <string>Broadcast to All</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <widget class="QComboBox" name="recipientCombo">
+            <property name="editable">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <widget class="QGroupBox" name="messageContentGroup">
+         <property name="title">
+          <string>Message</string>
+         </property>
+         <layout class="QVBoxLayout" name="messageContentLayout">
+          <item>
+           <widget class="QTextEdit" name="messageTextEdit">
+            <property name="placeholderText">
+             <string>Enter your message here...</string>
+            </property>
+            <property name="maximumHeight">
+             <number>200</number>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="messageButtonsLayout">
+            <item>
+             <widget class="QPushButton" name="sendButton">
+              <property name="text">
+               <string>Send</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="clearButton">
+              <property name="text">
+               <string>Clear</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <spacer name="horizontalSpacer">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+            <item>
+             <widget class="QCheckBox" name="readReceiptCheck">
+              <property name="text">
+               <string>Request read receipt</string>
+              </property>
+              <property name="checked">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+         </layout>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="messageHistoryTab">
+      <attribute name="title">
+       <string>Message History</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="messageHistoryLayout">
+       <item>
+        <widget class="QTreeWidget" name="messageHistoryTree">
+         <property name="headerLabels">
+          <stringlist>
+           <string>Time</string>
+           <string>Type</string>
+           <string>Recipient</string>
+           <string>Message</string>
+           <string>Status</string>
+          </stringlist>
+         </property>
+         <property name="rootIsDecorated">
+          <bool>false</bool>
+         </property>
+         <property name="uniformRowHeights">
+          <bool>true</bool>
+         </property>
+         <property name="alternatingRowColors">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="historyButtonsLayout">
+         <item>
+          <widget class="QPushButton" name="refreshHistoryButton">
+           <property name="text">
+            <string>Refresh</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="clearHistoryButton">
+           <property name="text">
+            <string>Clear History</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="exportHistoryButton">
+           <property name="text">
+            <string>Export</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <spacer name="horizontalSpacer2">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item>
+          <widget class="QComboBox" name="filterCombo">
+           <property name="editable">
+            <bool>false</bool>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="fileTransferTab">
+      <attribute name="title">
+       <string>File Transfer</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="fileTransferLayout">
+       <item>
+        <widget class="QGroupBox" name="fileSelectGroup">
+         <property name="title">
+          <string>Select File</string>
+         </property>
+         <layout class="QVBoxLayout" name="fileSelectLayout">
+          <item>
+           <layout class="QHBoxLayout" name="fileSelectButtonsLayout">
+            <item>
+             <widget class="QLineEdit" name="filePathEdit">
+              <property name="placeholderText">
+               <string>Select file to send...</string>
+              </property>
+              <property name="readOnly">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="browseButton">
+              <property name="text">
+               <string>Browse</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <widget class="QComboBox" name="fileRecipientCombo">
+            <property name="editable">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="sendFileButton">
+            <property name="text">
+             <string>Send File</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <widget class="QGroupBox" name="transferHistoryGroup">
+         <property name="title">
+          <string>Transfer History</string>
+         </property>
+         <layout class="QVBoxLayout" name="transferHistoryLayout">
+          <item>
+           <widget class="QTreeWidget" name="transferHistoryTree">
+            <property name="headerLabels">
+             <stringlist>
+              <string>Time</string>
+              <string>File</string>
+              <string>Recipient</string>
+              <string>Size</string>
+              <string>Status</string>
+             </stringlist>
+            </property>
+            <property name="rootIsDecorated">
+             <bool>false</bool>
+            </property>
+            <property name="uniformRowHeights">
+             <bool>true</bool>
+            </property>
+            <property name="alternatingRowColors">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="chatTab">
+      <attribute name="title">
+       <string>Chat</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="chatLayout">
+       <item>
+        <widget class="QListWidget" name="chatHistoryList">
+         <property name="alternatingRowColors">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="chatInputLayout">
+         <item>
+          <widget class="QLineEdit" name="chatInputEdit">
+           <property name="placeholderText">
+            <string>Type message...</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="sendChatButton">
+           <property name="text">
+            <string>Send</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+      </layout>
+     </widget>
+    </widget>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="bottomButtonsLayout">
+     <item>
+      <widget class="QPushButton" name="closeButton">
+       <property name="text">
+        <string>Close</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="horizontalSpacer3">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QLabel" name="statusLabel">
+       <property name="text">
+        <string>Ready</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

@@ -34,6 +34,7 @@
 #include "AboutDialog.h"
 #include "AccessControlProvider.h"
 #include "ClassWatchComputerPanel.h"
+#include "ClassWatchMessagePanel.h"
 #include "ClassWatchSessionPanel.h"
 #include "DashboardPanel.h"
 #include "MainWindow.h"
@@ -102,6 +103,7 @@ MainWindow::MainWindow( VeyonMaster &masterCore, QWidget* parent ) :
 	auto dashboardPanel = new DashboardPanel( m_master );
 	auto classWatchComputerPanel = new ClassWatchComputerPanel( &m_master );
 	auto classWatchSessionPanel = new ClassWatchSessionPanel( &m_master );
+	auto classWatchMessagePanel = new ClassWatchMessagePanel( &m_master );
 	auto slideshowPanel = new SlideshowPanel( m_master.userConfig(), ui->computerMonitoringWidget );
 	auto spotlightPanel = new SpotlightPanel( m_master.userConfig(), ui->computerMonitoringWidget );
 
@@ -120,6 +122,7 @@ MainWindow::MainWindow( VeyonMaster &masterCore, QWidget* parent ) :
 	mainSplitter->addWidget( dashboardPanel );
 	mainSplitter->addWidget( classWatchComputerPanel );
 	mainSplitter->addWidget( classWatchSessionPanel );
+	mainSplitter->addWidget( classWatchMessagePanel );
 	mainSplitter->addWidget( monitoringSplitter );
 
 	mainSplitter->setStretchFactor( mainSplitter->indexOf(monitoringSplitter), 1 );
@@ -131,6 +134,7 @@ MainWindow::MainWindow( VeyonMaster &masterCore, QWidget* parent ) :
 		{ screenshotManagementPanel, ui->screenshotManagementPanelButton },
 		{ classWatchComputerPanel, ui->classWatchComputerPanelButton },
 		{ classWatchSessionPanel, ui->classWatchSessionPanelButton },
+		{ classWatchMessagePanel, ui->classWatchMessagePanelButton },
 		{ slideshowPanel, ui->slideshowPanelButton },
 		{ spotlightPanel, ui->spotlightPanelButton }
 	};
