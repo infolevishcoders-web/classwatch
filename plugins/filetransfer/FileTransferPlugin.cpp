@@ -24,6 +24,7 @@
 
 #include <QCoreApplication>
 #include <QDesktopServices>
+#include <QGuiApplication>
 #include <QFileDialog>
 #include <QFileInfo>
 #include <QMessageBox>
@@ -445,7 +446,7 @@ QString FileTransferPlugin::destinationDirectory() const
 
 FileTransferPlugin::LockedFileAction FileTransferPlugin::queryLockedFileAction(const QString& fileName)
 {
-	qApp->setQuitOnLastWindowClosed(false);
+	QGuiApplication::setQuitOnLastWindowClosed(false);
 
 	const auto processId = VeyonCore::platform().filesystemFunctions().findFileLockingProcess(fileName);
 	const auto applicationName = VeyonCore::platform().coreFunctions().getApplicationName(processId);

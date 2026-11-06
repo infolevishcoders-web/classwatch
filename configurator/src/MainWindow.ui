@@ -275,6 +275,12 @@
    <container>1</container>
   </customwidget>
   <customwidget>
+   <class>ClassWatchConfigurationPage</class>
+   <extends>QWidget</extends>
+   <header>ClassWatchConfigurationPage.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
    <class>GeneralConfigurationPage</class>
    <extends>QWidget</extends>
    <header>GeneralConfigurationPage.h</header>

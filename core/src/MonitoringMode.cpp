@@ -609,7 +609,7 @@ void MonitoringMode::updateScreenInfoList()
 
 QString MonitoringMode::queryUserIdentity()
 {
-	qApp->setQuitOnLastWindowClosed(false);
+	QGuiApplication::setQuitOnLastWindowClosed(false);
 
 	QInputDialog dialog;
 	dialog.setWindowTitle(tr("Identification request"));

@@ -63,7 +63,8 @@ bool FileReadThread::start()
 
 	m_timer->singleShot( 0, this, [this]() {
 		m_file = new QFile( m_fileName );
-		m_file->open( QFile::ReadOnly );
+		const auto fileOpened = m_file->open( QFile::ReadOnly );
+		Q_UNUSED( fileOpened );
 		connect( m_thread, &QThread::finished, m_file, &QObject::deleteLater );
 
 		m_mutex.lock();

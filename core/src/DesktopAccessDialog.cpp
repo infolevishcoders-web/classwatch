@@ -135,7 +135,7 @@ DesktopAccessDialog::Choice DesktopAccessDialog::requestDesktopAccess( const QSt
 		hostName = host;
 	}
 
-	qApp->setQuitOnLastWindowClosed( false );
+	QGuiApplication::setQuitOnLastWindowClosed( false );
 
 	QMessageBox m( QMessageBox::Question,
 				   tr( "Confirm desktop access" ),

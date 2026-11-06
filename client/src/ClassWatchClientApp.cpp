@@ -82,7 +82,7 @@ void ClassWatchClientApp::setupTrayIcon()
 
 void ClassWatchClientApp::setupMenu()
 {
-	m_trayMenu = new QMenu( this );
+	m_trayMenu = new QMenu();
 	
 	// Status action
 	auto* statusAction = new QAction( QStringLiteral("Show Status"), this );
