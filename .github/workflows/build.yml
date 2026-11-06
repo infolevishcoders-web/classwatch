@@ -26,8 +26,8 @@ jobs:
           mingw-w64-ucrt-x86_64-gcc
           mingw-w64-ucrt-x86_64-openssl
           mingw-w64-ucrt-x86_64-qca-qt6
-          mingw-w64-ucrt-x86_64-libvncserver
           mingw-w64-ucrt-x86_64-zlib
+          mingw-w64-ucrt-x86_64-libpng
           mingw-w64-ucrt-x86_64-libjpeg-turbo
           mingw-w64-ucrt-x86_64-lzo2
           mingw-w64-ucrt-x86_64-openldap
@@ -45,7 +45,7 @@ jobs:
       run: |
         mkdir build
         cd build
-        cmake .. -G "MinGW Makefiles" -DCMAKE_BUILD_TYPE=Release -DWITH_TESTS=OFF
+        cmake .. -G "MinGW Makefiles" -DCMAKE_BUILD_TYPE=Release -DWITH_TESTS=OFF -DWITH_BUNDLED_LIBVNC=ON -DWITH_WEBAPI=OFF
         cmake --build . --parallel
 
     - name: Package Windows Installer
@@ -84,6 +84,7 @@ jobs:
           libvncserver-dev \
           zlib1g-dev \
           libjpeg-dev \
+          libpng-dev \
           liblzo2-dev \
           libldap2-dev \
           libsasl2-dev \
@@ -103,7 +104,7 @@ jobs:
       run: |
         mkdir build
         cd build
-        cmake .. -DCMAKE_BUILD_TYPE=Release -DWITH_TESTS=OFF
+        cmake .. -DCMAKE_BUILD_TYPE=Release -DWITH_TESTS=OFF -DWITH_WEBAPI=OFF
         cmake --build . --parallel $(nproc)
 
     - name: Package Linux
@@ -130,7 +131,7 @@ jobs:
 
     - name: Install dependencies
       run: |
-        brew install cmake qt openssl qca libvncserver openldap cyrus-sasl
+        brew install cmake qt openssl qca libvncserver openldap cyrus-sasl libpng
 
     - name: Build ClassWatch
       env:
@@ -140,7 +141,7 @@ jobs:
       run: |
         mkdir build
         cd build
-        cmake .. -DCMAKE_BUILD_TYPE=Release -DWITH_TESTS=OFF \
+        cmake .. -DCMAKE_BUILD_TYPE=Release -DWITH_TESTS=OFF -DWITH_WEBAPI=OFF \
           -DLdap_INCLUDE_DIRS=/opt/homebrew/opt/openldap/include \
           -DLdap_LIBRARIES=/opt/homebrew/opt/openldap/lib/libldap.dylib \
           -DLber_LIBRARIES=/opt/homebrew/opt/openldap/lib/liblber.dylib
