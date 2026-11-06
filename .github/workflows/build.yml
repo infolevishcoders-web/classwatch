@@ -14,8 +14,6 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
-      with:
-        submodules: recursive
 
     - name: Setup MSYS2
       uses: msys2/setup-msys2@v2
@@ -32,6 +30,7 @@ jobs:
           mingw-w64-ucrt-x86_64-lzo2
           mingw-w64-ucrt-x86_64-openldap
           mingw-w64-ucrt-x86_64-cyrus-sasl
+          mingw-w64-ucrt-x86_64-pkgconf
 
     - name: Install Qt
       uses: jurplel/install-qt-action@v3
@@ -42,13 +41,16 @@ jobs:
         modules: qtcharts qtwebsockets qt5compat
 
     - name: Build ClassWatch
+      shell: msys2 {0}
       run: |
+        export PKG_CONFIG_PATH=/ucrt64/lib/pkgconfig
         mkdir build
         cd build
-        cmake .. -G "MinGW Makefiles" -DCMAKE_BUILD_TYPE=Release -DWITH_TESTS=OFF -DWITH_BUNDLED_LIBVNC=ON -DWITH_WEBAPI=OFF
+        cmake .. -G "MinGW Makefiles" -DCMAKE_BUILD_TYPE=Release -DWITH_TESTS=OFF -DWITH_BUNDLED_LIBVNC=ON -DWITH_WEBAPI=OFF -DWITH_PCH=OFF
         cmake --build . --parallel
 
     - name: Package Windows Installer
+      shell: msys2 {0}
       run: |
         cd build
         cpack -G NSIS
@@ -66,8 +68,6 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
-      with:
-        submodules: recursive
 
     - name: Install dependencies
       run: |
@@ -104,7 +104,7 @@ jobs:
       run: |
         mkdir build
         cd build
-        cmake .. -DCMAKE_BUILD_TYPE=Release -DWITH_TESTS=OFF -DWITH_WEBAPI=OFF
+        cmake .. -DCMAKE_BUILD_TYPE=Release -DWITH_TESTS=OFF -DWITH_WEBAPI=OFF -DWITH_PCH=OFF
         cmake --build . --parallel $(nproc)
 
     - name: Package Linux
@@ -126,8 +126,6 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
-      with:
-        submodules: recursive
 
     - name: Install dependencies
       run: |
@@ -141,7 +139,7 @@ jobs:
       run: |
         mkdir build
         cd build
-        cmake .. -DCMAKE_BUILD_TYPE=Release -DWITH_TESTS=OFF -DWITH_WEBAPI=OFF \
+        cmake .. -DCMAKE_BUILD_TYPE=Release -DWITH_TESTS=OFF -DWITH_WEBAPI=OFF -DWITH_PCH=OFF \
           -DLdap_INCLUDE_DIRS=/opt/homebrew/opt/openldap/include \
           -DLdap_LIBRARIES=/opt/homebrew/opt/openldap/lib/libldap.dylib \
           -DLber_LIBRARIES=/opt/homebrew/opt/openldap/lib/liblber.dylib
