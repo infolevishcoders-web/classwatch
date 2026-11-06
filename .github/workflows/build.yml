@@ -44,6 +44,8 @@ jobs:
     - name: Build ClassWatch
       shell: msys2 {0}
       run: |
+        export PATH="/ucrt64/bin:$PATH"
+        export CMAKE_PREFIX_PATH="/d/a/_temp/qt/6.7.3/mingw_64"
         which cmake
         which mingw32-make
         cmake --version

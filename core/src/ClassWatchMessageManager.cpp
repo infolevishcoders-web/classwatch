@@ -82,7 +82,7 @@ QString ClassWatchMessageManager::sendPrivateMessage( const QString& recipientId
 	m_messages[messageId] = msgObj;
 	m_messageQueue.append( messageId );
 	
-	logMessageEvent( messageId, "message_created", QString( QStringLiteral("Private message to %1") ).arg( recipientId ) );
+	logMessageEvent( messageId, QStringLiteral("message_created"), QString( QStringLiteral("Private message to %1") ).arg( recipientId ) );
 	processMessageQueue();
 	
 	return messageId;
@@ -110,7 +110,7 @@ QString ClassWatchMessageManager::sendAnnouncement( const QString& message, cons
 	m_messages[messageId] = msgObj;
 	m_messageQueue.append( messageId );
 	
-	logMessageEvent( messageId, "message_created", "Class announcement" );
+	logMessageEvent( messageId, QStringLiteral("message_created"), QStringLiteral("Class announcement") );
 	processMessageQueue();
 	
 	return messageId;
@@ -139,7 +139,7 @@ QString ClassWatchMessageManager::sendBroadcast( const QString& message, const Q
 	m_messages[messageId] = msgObj;
 	m_messageQueue.append( messageId );
 	
-	logMessageEvent( messageId, "message_created", "Broadcast message" );
+	logMessageEvent( messageId, QStringLiteral("message_created"), QStringLiteral("Broadcast message") );
 	processMessageQueue();
 	
 	return messageId;
@@ -157,7 +157,7 @@ QString ClassWatchMessageManager::sendSystemMessage( const QString& message, con
 	msgObj[QStringLiteral("id")] = messageId;
 	msgObj[QStringLiteral("type")] = QStringLiteral("system");
 	msgObj[QStringLiteral("senderId")] = QStringLiteral("system");
-	msgObj[QStringLiteral("recipientId")] = targetId.isEmpty() ? "all" : targetId;
+	msgObj[QStringLiteral("recipientId")] = targetId.isEmpty() ? QStringLiteral("all") : targetId;
 	msgObj[QStringLiteral("message")] = message;
 	msgObj[QStringLiteral("timestamp")] = QDateTime::currentDateTime().toString( Qt::ISODate );
 	msgObj[QStringLiteral("status")] = QStringLiteral("pending");
@@ -166,7 +166,7 @@ QString ClassWatchMessageManager::sendSystemMessage( const QString& message, con
 	m_messages[messageId] = msgObj;
 	m_messageQueue.append( messageId );
 	
-	logMessageEvent( messageId, "message_created", QString( QStringLiteral("System message to %1") ).arg( targetId.isEmpty() ? "all" : targetId ) );
+	logMessageEvent( messageId, QStringLiteral("message_created"), QString( QStringLiteral("System message to %1") ).arg( targetId.isEmpty() ? QStringLiteral("all") : targetId ) );
 	processMessageQueue();
 	
 	return messageId;
@@ -184,7 +184,7 @@ void ClassWatchMessageManager::cancelMessage( const QString& messageId )
 	if ( status == QStringLiteral("pending") || status == QStringLiteral("sent") ) {
 		msgObj[QStringLiteral("status")] = QStringLiteral("cancelled");
 		m_messageQueue.removeAll( messageId );
-		logMessageEvent( messageId, "message_cancelled", "Message cancelled by user" );
+		logMessageEvent( messageId, QStringLiteral("message_cancelled"), QStringLiteral("Message cancelled by user") );
 	}
 }
 
@@ -368,7 +368,7 @@ QString ClassWatchMessageManager::sendFile( const QString& recipientId, const QS
 	m_fileTransfers[transferId] = transferObj;
 	
 	Q_EMIT fileTransferStarted( transferId, filePath );
-	logMessageEvent( transferId, "file_transfer_started", QString( QStringLiteral("File %1 to %2") ).arg( fileInfo.fileName() ).arg( recipientId ) );
+	logMessageEvent( transferId, QStringLiteral("file_transfer_started"), QString( QStringLiteral("File %1 to %2") ).arg( fileInfo.fileName() ).arg( recipientId ) );
 	
 	return transferId;
 }
@@ -391,7 +391,7 @@ QString ClassWatchMessageManager::sendFileToAll( const QString& filePath, const 
 {
 	// This would send to all connected computers
 	// For now, return a placeholder
-	return sendFile( "all", filePath, senderId );
+	return sendFile( QStringLiteral("all"), filePath, senderId );
 }
 
 void ClassWatchMessageManager::cancelFileTransfer( const QString& transferId )
@@ -402,7 +402,7 @@ void ClassWatchMessageManager::cancelFileTransfer( const QString& transferId )
 	
 	QJsonObject& transferObj = m_fileTransfers[transferId];
 	transferObj[QStringLiteral("status")] = QStringLiteral("cancelled");
-	logMessageEvent( transferId, "file_transfer_cancelled", "File transfer cancelled" );
+	logMessageEvent( transferId, QStringLiteral("file_transfer_cancelled"), QStringLiteral("File transfer cancelled") );
 }
 
 QJsonObject ClassWatchMessageManager::getFileTransferStatus( const QString& transferId ) const
@@ -470,7 +470,7 @@ void ClassWatchMessageManager::onMessageTimeout()
 			if ( timestamp.msecsTo( now ) > 30000 ) { // 30 seconds timeout
 				msgObj[QStringLiteral("status")] = QStringLiteral("failed");
 				msgObj[QStringLiteral("error")] = QStringLiteral("Message delivery timeout");
-				logMessageEvent( it.key(), "message_failed", "Delivery timeout" );
+				logMessageEvent( it.key(), QStringLiteral("message_failed"), QStringLiteral("Delivery timeout") );
 			}
 		}
 	}
@@ -517,7 +517,7 @@ void ClassWatchMessageManager::processMessageQueue()
 		msgObj[QStringLiteral("sentTime")] = QDateTime::currentDateTime().toString( Qt::ISODate );
 		
 		Q_EMIT messageSent( messageId, msgObj[QStringLiteral("recipientId")].toString() );
-		logMessageEvent( messageId, "message_sent", "Message sent successfully" );
+		logMessageEvent( messageId, QStringLiteral("message_sent"), QStringLiteral("Message sent successfully") );
 	}
 	
 	// Clear processed messages from queue
@@ -629,5 +629,5 @@ bool ClassWatchMessageManager::validateFilePath( const QString& filePath ) const
 QString ClassWatchMessageManager::getDefaultSenderId() const
 {
 	// Return a default sender ID (e.g., teacher name or computer ID)
-	return "teacher";
+	return QStringLiteral("teacher");
 }
