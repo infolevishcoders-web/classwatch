@@ -14,6 +14,8 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
+      with:
+        submodules: recursive
 
     - name: Setup MSYS2
       uses: msys2/setup-msys2@v2
@@ -28,7 +30,7 @@ jobs:
           mingw-w64-ucrt-x86_64-zlib
           mingw-w64-ucrt-x86_64-libjpeg-turbo
           mingw-w64-ucrt-x86_64-lzo2
-          mingw-w64-ucrt-x86_64-ldap
+          mingw-w64-ucrt-x86_64-openldap
           mingw-w64-ucrt-x86_64-cyrus-sasl
 
     - name: Install Qt
@@ -64,6 +66,8 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
+      with:
+        submodules: recursive
 
     - name: Install dependencies
       run: |
@@ -82,7 +86,8 @@ jobs:
           libjpeg-dev \
           liblzo2-dev \
           libldap2-dev \
-          libsasl2-dev
+          libsasl2-dev \
+          libpam0g-dev
 
     - name: Build ClassWatch
       run: |
@@ -110,12 +115,18 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
+      with:
+        submodules: recursive
 
     - name: Install dependencies
       run: |
         brew install cmake qt openssl qca libvncserver openldap cyrus-sasl
 
     - name: Build ClassWatch
+      env:
+        PKG_CONFIG_PATH: /opt/homebrew/opt/openldap/lib/pkgconfig:/opt/homebrew/opt/cyrus-sasl/lib/pkgconfig:/opt/homebrew/lib/pkgconfig
+        LDFLAGS: -L/opt/homebrew/opt/openldap/lib -L/opt/homebrew/opt/cyrus-sasl/lib
+        CPPFLAGS: -I/opt/homebrew/opt/openldap/include -I/opt/homebrew/opt/cyrus-sasl/include
       run: |
         mkdir build
         cd build
