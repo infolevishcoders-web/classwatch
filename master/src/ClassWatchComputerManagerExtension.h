@@ -51,8 +51,8 @@ public:
 
 	// Batch operations
 	void syncComputersFromComputerManager();
-	void saveClassWatchRegistry( const QString& filePath );
-	void loadClassWatchRegistry( const QString& filePath );
+	bool saveClassWatchRegistry( const QString& filePath );
+	bool loadClassWatchRegistry( const QString& filePath );
 
 	// Queries
 	ClassWatchComputerList getAllClassWatchComputers() const;

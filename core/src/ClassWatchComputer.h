@@ -144,6 +144,11 @@ public:
 		return m_gpuInfo;
 	}
 
+	bool isValid() const
+	{
+		return !m_classWatchId.isEmpty();
+	}
+
 private:
 	QString m_classWatchId;
 	QString m_windowsVersion;

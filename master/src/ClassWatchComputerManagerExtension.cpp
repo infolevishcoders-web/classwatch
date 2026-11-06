@@ -166,21 +166,23 @@ void ClassWatchComputerManagerExtension::syncComputersFromComputerManager()
 	}
 }
 
-void ClassWatchComputerManagerExtension::saveClassWatchRegistry( const QString& filePath )
+bool ClassWatchComputerManagerExtension::saveClassWatchRegistry( const QString& filePath )
 {
-	m_classWatchManager->saveRegistry( filePath );
+	return m_classWatchManager->saveRegistry( filePath );
 }
 
-void ClassWatchComputerManagerExtension::loadClassWatchRegistry( const QString& filePath )
+bool ClassWatchComputerManagerExtension::loadClassWatchRegistry( const QString& filePath )
 {
-	m_classWatchManager->loadRegistry( filePath );
-	
+	bool result = m_classWatchManager->loadRegistry( filePath );
+
 	// Rebuild UID mapping
 	m_uidToClassWatchId.clear();
 	ClassWatchComputerList computers = m_classWatchManager->getAllComputers();
 	for ( const ClassWatchComputer& computer : computers ) {
 		m_uidToClassWatchId[computer.networkObjectUid()] = computer.classWatchId();
 	}
+
+	return result;
 }
 
 ClassWatchComputerList ClassWatchComputerManagerExtension::getAllClassWatchComputers() const

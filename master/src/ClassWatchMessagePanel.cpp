@@ -265,7 +265,7 @@ void ClassWatchMessagePanel::onSendChatMessage()
 	// For now, this is a simplified chat implementation
 	// In a real implementation, this would use the chat room system
 	
-	QString timestamp = QDateTime::currentDateTime().toString( "hh:mm:ss" );
+	QString timestamp = QDateTime::currentDateTime().toString( QStringLiteral("hh:mm:ss") );
 	ui->chatHistoryList->addItem( QString( QStringLiteral("[%1] You: %2") ).arg( timestamp, message ) );
 	ui->chatInputEdit->clear();
 	
@@ -335,17 +335,17 @@ void ClassWatchMessagePanel::populateMessageHistory()
 		item->setText( 0, msg[QStringLiteral("timestamp")].toString() );
 		item->setText( 1, type );
 		item->setText( 2, msg[QStringLiteral("recipientId")].toString() );
-		item->setText( 3, msg[QStringLiteral("message")].toString().left( 50 ) + ( msg[QStringLiteral("message")].toString().length() > 50 ? "..." : "" ) );
+		item->setText( 3, msg[QStringLiteral("message")].toString().left( 50 ) + ( msg[QStringLiteral("message")].toString().length() > 50 ? QStringLiteral("...") : QStringLiteral("") ) );
 		item->setText( 4, msg[QStringLiteral("status")].toString() );
 		
 		// Set status color
 		QString status = msg[QStringLiteral("status")].toString();
 		if ( status == QStringLiteral("delivered") || status == QStringLiteral("read") ) {
-			item->setForeground( 4, QColor( "green" ) );
+			item->setForeground( 4, QColor( Qt::green ) );
 		} else if ( status == QStringLiteral("failed") ) {
-			item->setForeground( 4, QColor( "red" ) );
+			item->setForeground( 4, QColor( Qt::red ) );
 		} else if ( status == QStringLiteral("sent") ) {
-			item->setForeground( 4, QColor( "blue" ) );
+			item->setForeground( 4, QColor( Qt::blue ) );
 		}
 	}
 }
@@ -402,13 +402,13 @@ QString ClassWatchMessagePanel::getSelectedRecipient() const
 QString ClassWatchMessagePanel::getMessageType() const
 {
 	if ( ui->privateRadio->isChecked() ) {
-		return "private";
+		return QStringLiteral("private");
 	} else if ( ui->announcementRadio->isChecked() ) {
-		return "announcement";
+		return QStringLiteral("announcement");
 	} else if ( ui->broadcastRadio->isChecked() ) {
-		return "broadcast";
+		return QStringLiteral("broadcast");
 	}
-	return "private";
+	return QStringLiteral("private");
 }
 
 void ClassWatchMessagePanel::refreshAll()

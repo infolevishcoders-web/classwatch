@@ -54,7 +54,7 @@ ClassWatchComputerPanel::ClassWatchComputerPanel( VeyonMaster* master, QWidget* 
 	ui->computerTreeWidget->setColumnWidth( 4, 120 ); // User
 	
 	// Load existing registry if available
-	QString registryPath = QStandardPaths::writableLocation( QStandardPaths::AppDataLocation ) + "/classwatch_computers.json";
+	QString registryPath = QStandardPaths::writableLocation( QStandardPaths::AppDataLocation ) + QStringLiteral("/classwatch_computers.json");
 	m_classWatchManager->loadClassWatchRegistry( registryPath );
 	
 	refreshComputerList();
@@ -153,11 +153,11 @@ void ClassWatchComputerPanel::updateComputerDetails( const QString& classWatchId
 	ui->computerNameValue->setText( computer.displayName() );
 	ui->ipAddressValue->setText( computer.hostAddress().toString() );
 	ui->macAddressValue->setText( computer.macAddress() );
-	ui->windowsVersionValue->setText( computer.windowsVersion().isEmpty() ? "Unknown" : computer.windowsVersion() );
-	ui->loggedInUserValue->setText( computer.loggedInUser().isEmpty() ? "Not logged in" : computer.loggedInUser() );
+	ui->windowsVersionValue->setText( computer.windowsVersion().isEmpty() ? QStringLiteral("Unknown") : computer.windowsVersion() );
+	ui->loggedInUserValue->setText( computer.loggedInUser().isEmpty() ? QStringLiteral("Not logged in") : computer.loggedInUser() );
 	ui->connectionStatusValue->setText( computer.connectionStatus() );
-	ui->lastConnectionValue->setText( computer.lastConnectionTime().toString( "yyyy-MM-dd hh:mm:ss" ) );
-	ui->sessionTypeValue->setText( computer.sessionType().isEmpty() ? "Unknown" : computer.sessionType() );
+	ui->lastConnectionValue->setText( computer.lastConnectionTime().toString( QStringLiteral("yyyy-MM-dd hh:mm:ss") ) );
+	ui->sessionTypeValue->setText( computer.sessionType().isEmpty() ? QStringLiteral("Unknown") : computer.sessionType() );
 }
 
 void ClassWatchComputerPanel::populateComputerTree()
@@ -180,9 +180,9 @@ void ClassWatchComputerPanel::populateComputerTree()
 		
 		// Set status color
 		if ( computer.connectionStatus() == QStringLiteral("Connected") ) {
-			item->setForeground( 2, QColor( "green" ) );
+			item->setForeground( 2, QColor( Qt::green ) );
 		} else {
-			item->setForeground( 2, QColor( "red" ) );
+			item->setForeground( 2, QColor( Qt::red ) );
 		}
 		
 		// Store classWatchId as user data
@@ -208,8 +208,7 @@ void ClassWatchComputerPanel::onRegisterComputer()
 	ComputerList computers = computerManager.selectedComputers( rootIndex );
 	
 	if ( computers.isEmpty() ) {
-		QMessageBox::warning( this, QStringLiteral("No Computers Selected"), 
-								 "Please select computers in the 'Locations & Computers' panel first." );
+		QMessageBox::warning( this, QStringLiteral("No Computers Selected"), QStringLiteral("Please select computers in the 'Locations & Computers' panel first.") );
 		return;
 	}
 
@@ -227,8 +226,7 @@ void ClassWatchComputerPanel::onRegisterComputer()
 								 QString( QStringLiteral("Successfully registered %1 computer(s).") ).arg( registeredCount ) );
 		refreshComputerList();
 	} else {
-		QMessageBox::warning( this, QStringLiteral("No New Computers"), 
-								 "All selected computers are already registered." );
+		QMessageBox::warning( this, QStringLiteral("No New Computers"), QStringLiteral("All selected computers are already registered.") );
 	}
 }
 
@@ -236,7 +234,7 @@ void ClassWatchComputerPanel::onUnregisterComputer()
 {
 	QList<QTreeWidgetItem*> selectedItems = ui->computerTreeWidget->selectedItems();
 	if ( selectedItems.isEmpty() ) {
-		QMessageBox::warning( this, QStringLiteral("No Selection"), "Please select a computer to unregister." );
+		QMessageBox::warning( this, QStringLiteral("No Selection"), QStringLiteral("Please select a computer to unregister.") );
 		return;
 	}
 
@@ -260,17 +258,17 @@ void ClassWatchComputerPanel::onUnregisterComputer()
 void ClassWatchComputerPanel::onSaveRegistry()
 {
 	QString filePath = QFileDialog::getSaveFileName( this, QStringLiteral("Save ClassWatch Registry"),
-												 QStandardPaths::writableLocation( QStandardPaths::DocumentsLocation ) + "/classwatch_computers.json",
-												 "JSON Files (*.json)" );
+												 QStandardPaths::writableLocation( QStandardPaths::DocumentsLocation ) + QStringLiteral("/classwatch_computers.json"),
+												 QStringLiteral("JSON Files (*.json)") );
 	
 	if ( filePath.isEmpty() ) {
 		return;
 	}
 
 	if ( m_classWatchManager->saveClassWatchRegistry( filePath ) ) {
-		QMessageBox::warning( this, QStringLiteral("Success"), "Registry saved successfully." );
+		QMessageBox::warning( this, QStringLiteral("Success"), QStringLiteral("Registry saved successfully.") );
 	} else {
-		QMessageBox::warning( this, QStringLiteral("Error"), "Failed to save registry." );
+		QMessageBox::warning( this, QStringLiteral("Error"), QStringLiteral("Failed to save registry.") );
 	}
 }
 
@@ -278,24 +276,24 @@ void ClassWatchComputerPanel::onLoadRegistry()
 {
 	QString filePath = QFileDialog::getOpenFileName( this, QStringLiteral("Load ClassWatch Registry"),
 												 QStandardPaths::writableLocation( QStandardPaths::DocumentsLocation ),
-												 "JSON Files (*.json)" );
+												 QStringLiteral("JSON Files (*.json)") );
 	
 	if ( filePath.isEmpty() ) {
 		return;
 	}
 
 	if ( m_classWatchManager->loadClassWatchRegistry( filePath ) ) {
-		QMessageBox::warning( this, QStringLiteral("Success"), "Registry loaded successfully." );
+		QMessageBox::warning( this, QStringLiteral("Success"), QStringLiteral("Registry loaded successfully.") );
 		refreshComputerList();
 	} else {
-		QMessageBox::warning( this, QStringLiteral("Error"), "Failed to load registry." );
+		QMessageBox::warning( this, QStringLiteral("Error"), QStringLiteral("Failed to load registry.") );
 	}
 }
 
 void ClassWatchComputerPanel::onClose()
 {
 	// Save registry before closing
-	QString registryPath = QStandardPaths::writableLocation( QStandardPaths::AppDataLocation ) + "/classwatch_computers.json";
+	QString registryPath = QStandardPaths::writableLocation( QStandardPaths::AppDataLocation ) + QStringLiteral("/classwatch_computers.json");
 	m_classWatchManager->saveClassWatchRegistry( registryPath );
 	
 	this->close();

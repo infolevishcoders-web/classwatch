@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.4)
+cmake_minimum_required(VERSION 3.5)
 
 project(LibVNCServer VERSION 0.9.14 LANGUAGES C)
 include(CheckFunctionExists)
