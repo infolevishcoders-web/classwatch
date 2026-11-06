@@ -118,7 +118,7 @@
        <item row="0" column="0" colspan="2">
         <widget class="QLabel" name="label_3">
          <property name="text">
-          <string notr="true">ClassWatch - Classroom Monitoring & Management System</string>
+          <string notr="true">ClassWatch - Classroom Monitoring &amp; Management System</string>
          </property>
         </widget>
        </item>

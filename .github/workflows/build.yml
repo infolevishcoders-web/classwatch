@@ -43,17 +43,19 @@ jobs:
     - name: Build ClassWatch
       shell: msys2 {0}
       run: |
+        export PATH=/ucrt64/bin:$PATH
         export PKG_CONFIG_PATH=/ucrt64/lib/pkgconfig
         mkdir build
         cd build
-        cmake .. -G "MinGW Makefiles" -DCMAKE_BUILD_TYPE=Release -DWITH_TESTS=OFF -DWITH_BUNDLED_LIBVNC=ON -DWITH_WEBAPI=OFF -DWITH_PCH=OFF
-        cmake --build . --parallel
+        /ucrt64/bin/cmake .. -G "MinGW Makefiles" -DCMAKE_BUILD_TYPE=Release -DWITH_TESTS=OFF -DWITH_BUNDLED_LIBVNC=ON -DWITH_WEBAPI=OFF -DWITH_PCH=OFF
+        /ucrt64/bin/cmake --build . --parallel
 
     - name: Package Windows Installer
       shell: msys2 {0}
       run: |
+        export PATH=/ucrt64/bin:$PATH
         cd build
-        cpack -G NSIS
+        /ucrt64/bin/cpack -G NSIS
 
     - name: Upload Windows Installer
       uses: actions/upload-artifact@v4
@@ -140,6 +142,7 @@ jobs:
         mkdir build
         cd build
         cmake .. -DCMAKE_BUILD_TYPE=Release -DWITH_TESTS=OFF -DWITH_WEBAPI=OFF -DWITH_PCH=OFF \
+          -DCMAKE_CXX_FLAGS="-Wno-deprecated-declarations" \
           -DLdap_INCLUDE_DIRS=/opt/homebrew/opt/openldap/include \
           -DLdap_LIBRARIES=/opt/homebrew/opt/openldap/lib/libldap.dylib \
           -DLber_LIBRARIES=/opt/homebrew/opt/openldap/lib/liblber.dylib
