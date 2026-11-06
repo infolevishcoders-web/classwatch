@@ -18,16 +18,18 @@ jobs:
     - name: Setup MSYS2
       uses: msys2/setup-msys2@v2
       with:
-        msystem: MINGW64
+        msystem: UCRT64
         install: >-
-          mingw-w64-x86_64-cmake
-          mingw-w64-x86_64-gcc
-          mingw-w64-x86_64-openssl
-          mingw-w64-x86_64-qca-qt5
-          mingw-w64-x86_64-libvncserver
-          mingw-w64-x86_64-zlib
-          mingw-w64-x86_64-libjpeg-turbo
-          mingw-w64-x86_64-lzo
+          mingw-w64-ucrt-x86_64-cmake
+          mingw-w64-ucrt-x86_64-gcc
+          mingw-w64-ucrt-x86_64-openssl
+          mingw-w64-ucrt-x86_64-qca-qt6
+          mingw-w64-ucrt-x86_64-libvncserver
+          mingw-w64-ucrt-x86_64-zlib
+          mingw-w64-ucrt-x86_64-libjpeg-turbo
+          mingw-w64-ucrt-x86_64-lzo2
+          mingw-w64-ucrt-x86_64-ldap
+          mingw-w64-ucrt-x86_64-cyrus-sasl
 
     - name: Install Qt
       uses: jurplel/install-qt-action@v3
@@ -35,7 +37,7 @@ jobs:
         version: '6.5.3'
         arch: win64_mingw
         cache: true
-        modules: qtcharts qtwebsockets qtsvg qttranslations
+        modules: qtcharts qtwebsockets qtsvg qttranslations qt5compat
 
     - name: Build ClassWatch
       run: |
@@ -72,6 +74,7 @@ jobs:
           qt6-base-dev \
           qt6-tools-dev \
           qt6-translations-l10n \
+          libqt6core5compat6-dev \
           libssl-dev \
           libqca-qt6-dev \
           libvncserver-dev \
@@ -110,7 +113,7 @@ jobs:
 
     - name: Install dependencies
       run: |
-        brew install cmake qt openssl qca libvncserver
+        brew install cmake qt openssl qca libvncserver openldap cyrus-sasl
 
     - name: Build ClassWatch
       run: |
