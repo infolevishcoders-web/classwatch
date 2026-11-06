@@ -29,7 +29,7 @@
 #define FOREACH_CLASSWATCH_CONFIG_PROPERTIES(OP) \
 	OP( VeyonConfiguration, VeyonCore::config(), QString, schoolName, setSchoolName, "SchoolName", "ClassWatch", QString(), Configuration::Property::Flag::Standard ) \
 	OP( VeyonConfiguration, VeyonCore::config(), QString, laboratoryName, setLaboratoryName, "LaboratoryName", "ClassWatch", QString(), Configuration::Property::Flag::Standard ) \
-	OP( VeyonConfiguration, VeyonCore::config(), QString, classWatchIdPrefix, setClassWatchIdPrefix, "ClassWatchIdPrefix", "ClassWatch", "CW", Configuration::Property::Flag::Standard ) \
+	OP( VeyonConfiguration, VeyonCore::config(), QString, classWatchIdPrefix, setClassWatchIdPrefix, "ClassWatchIdPrefix", "ClassWatch", QStringLiteral("CW"), Configuration::Property::Flag::Standard ) \
 	OP( VeyonConfiguration, VeyonCore::config(), int, classWatchIdStartNumber, setClassWatchIdStartNumber, "ClassWatchIdStartNumber", "ClassWatch", 1, Configuration::Property::Flag::Standard ) \
 	OP( VeyonConfiguration, VeyonCore::config(), QString, classWatchRegistryPath, setClassWatchRegistryPath, "ClassWatchRegistryPath", "ClassWatch", QDir::toNativeSeparators(QStringLiteral("%APPDATA%/ClassWatch/classwatch_computers.json")), Configuration::Property::Flag::Standard ) \
 	OP( VeyonConfiguration, VeyonCore::config(), bool, autoRegisterComputers, setAutoRegisterComputers, "AutoRegisterComputers", "ClassWatch", true, Configuration::Property::Flag::Standard ) \
