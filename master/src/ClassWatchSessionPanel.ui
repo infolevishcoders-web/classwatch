@@ -1,0 +1,267 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>ClassWatchSessionPanel</class>
+ <widget class="QWidget" name="ClassWatchSessionPanel">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>500</width>
+    <height>600</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>ClassWatch Sessions</string>
+  </property>
+  <layout class="QVBoxLayout" name="mainLayout">
+   <item>
+    <widget class="QGroupBox" name="sessionListGroup">
+     <property name="title">
+      <string>Active Sessions</string>
+     </property>
+     <layout class="QVBoxLayout" name="sessionListLayout">
+      <item>
+       <widget class="QTreeWidget" name="sessionTreeWidget">
+        <property name="headerLabels">
+         <stringlist>
+          <string>Session ID</string>
+          <string>Type</string>
+          <string>User</string>
+          <string>Student</string>
+          <string>Uptime</string>
+          <string>Status</string>
+         </stringlist>
+        </property>
+        <property name="rootIsDecorated">
+         <bool>false</bool>
+        </property>
+        <property name="uniformRowHeights">
+         <bool>true</bool>
+        </property>
+        <property name="alternatingRowColors">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="sessionListButtonsLayout">
+        <item>
+         <widget class="QPushButton" name="refreshButton">
+          <property name="text">
+           <string>Refresh</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="assignStudentButton">
+          <property name="text">
+           <string>Assign Student</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="removeStudentButton">
+          <property name="text">
+           <string>Remove Student</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="sessionDetailsGroup">
+     <property name="title">
+      <string>Session Details</string>
+     </property>
+     <layout class="QFormLayout" name="sessionDetailsLayout">
+      <item row="0" column="0">
+       <widget class="QLabel" name="sessionIdLabel">
+        <property name="text">
+         <string>Session ID:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QLabel" name="sessionIdValue">
+        <property name="text">
+         <string>-</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="sessionTypeLabel">
+        <property name="text">
+         <string>Session Type:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="QLabel" name="sessionTypeValue">
+        <property name="text">
+         <string>-</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0">
+       <widget class="QLabel" name="userNameLabel">
+        <property name="text">
+         <string>User Name:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="1">
+       <widget class="QLabel" name="userNameValue">
+        <property name="text">
+         <string>-</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="0">
+       <widget class="QLabel" name="clientAddressLabel">
+        <property name="text">
+         <string>Client Address:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="1">
+       <widget class="QLabel" name="clientAddressValue">
+        <property name="text">
+         <string>-</string>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="0">
+       <widget class="QLabel" name="clientNameLabel">
+        <property name="text">
+         <string>Client Name:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="1">
+       <widget class="QLabel" name="clientNameValue">
+        <property name="text">
+         <string>-</string>
+        </property>
+       </widget>
+      </item>
+      <item row="5" column="0">
+       <widget class="QLabel" name="hostNameLabel">
+        <property name="text">
+         <string>Host Name:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="5" column="1">
+       <widget class="QLabel" name="hostNameValue">
+        <property name="text">
+         <string>-</string>
+        </property>
+       </widget>
+      </item>
+      <item row="6" column="0">
+       <widget class="QLabel" name="uptimeLabel">
+        <property name="text">
+         <string>Uptime:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="6" column="1">
+       <widget class="QLabel" name="uptimeValue">
+        <property name="text">
+         <string>-</string>
+        </property>
+       </widget>
+      </item>
+      <item row="7" column="0">
+       <widget class="QLabel" name="assignedStudentLabel">
+        <property name="text">
+         <string>Assigned Student:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="7" column="1">
+       <widget class="QLineEdit" name="assignedStudentEdit">
+        <property name="placeholderText">
+         <string>Enter student ID</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="sessionHistoryGroup">
+     <property name="title">
+      <string>Session History</string>
+     </property>
+     <layout class="QVBoxLayout" name="sessionHistoryLayout">
+      <item>
+       <widget class="QListWidget" name="sessionHistoryList">
+        <property name="alternatingRowColors">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="historyButtonsLayout">
+        <item>
+         <widget class="QPushButton" name="clearHistoryButton">
+          <property name="text">
+           <string>Clear History</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="exportHistoryButton">
+          <property name="text">
+           <string>Export History</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="bottomButtonsLayout">
+     <item>
+      <widget class="QPushButton" name="monitorToggleButton">
+       <property name="text">
+        <string>Start Monitoring</string>
+       </property>
+       <property name="checkable">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="horizontalSpacer">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QPushButton" name="closeButton">
+       <property name="text">
+        <string>Close</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
