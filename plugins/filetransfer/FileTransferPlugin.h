@@ -38,9 +38,7 @@ class FileTransferPlugin : public QObject, FeatureProviderInterface, PluginInter
 {
 	Q_OBJECT
 	Q_PLUGIN_METADATA(IID "io.veyon.Veyon.Plugins.FileTransfer")
-	Q_INTERFACES(PluginInterface
-					  FeatureProviderInterface
-						  ConfigurationPagePluginInterface)
+	Q_INTERFACES(PluginInterface FeatureProviderInterface ConfigurationPagePluginInterface)
 public:
 	enum class FeatureCommand
 	{

@@ -20,11 +20,7 @@ class LdapPlugin : public QObject, PluginInterface,
 {
 	Q_OBJECT
 	Q_PLUGIN_METADATA(IID "io.veyon.Veyon.Plugins.Ldap")
-	Q_INTERFACES(PluginInterface
-				 CommandLinePluginInterface
-				 NetworkObjectDirectoryPluginInterface
-				 UserGroupsBackendInterface
-				 ConfigurationPagePluginInterface)
+	Q_INTERFACES(PluginInterface CommandLinePluginInterface NetworkObjectDirectoryPluginInterface UserGroupsBackendInterface ConfigurationPagePluginInterface)
 public:
 	explicit LdapPlugin( QObject* parent = nullptr );
 	~LdapPlugin() override;

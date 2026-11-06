@@ -42,10 +42,7 @@ class BuiltinDirectoryPlugin : public QObject,
 {
 	Q_OBJECT
 	Q_PLUGIN_METADATA(IID "io.veyon.Veyon.Plugins.BuiltinDirectory")
-	Q_INTERFACES(PluginInterface
-				 NetworkObjectDirectoryPluginInterface
-				 ConfigurationPagePluginInterface
-				 CommandLinePluginInterface)
+	Q_INTERFACES(PluginInterface NetworkObjectDirectoryPluginInterface ConfigurationPagePluginInterface CommandLinePluginInterface)
 public:
 	explicit BuiltinDirectoryPlugin( QObject* paren = nullptr );
 	~BuiltinDirectoryPlugin() override = default;

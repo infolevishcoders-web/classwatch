@@ -43,19 +43,19 @@ jobs:
     - name: Build ClassWatch
       shell: msys2 {0}
       run: |
-        export PATH=/ucrt64/bin:$PATH
-        export PKG_CONFIG_PATH=/ucrt64/lib/pkgconfig
+        which cmake
+        which mingw32-make
+        cmake --version
         mkdir build
         cd build
-        /ucrt64/bin/cmake .. -G "MinGW Makefiles" -DCMAKE_BUILD_TYPE=Release -DWITH_TESTS=OFF -DWITH_BUNDLED_LIBVNC=ON -DWITH_WEBAPI=OFF -DWITH_PCH=OFF
-        /ucrt64/bin/cmake --build . --parallel
+        cmake .. -G "MinGW Makefiles" -DCMAKE_BUILD_TYPE=Release -DWITH_TESTS=OFF -DWITH_BUNDLED_LIBVNC=ON -DWITH_WEBAPI=OFF -DWITH_PCH=OFF
+        cmake --build . --parallel
 
     - name: Package Windows Installer
       shell: msys2 {0}
       run: |
-        export PATH=/ucrt64/bin:$PATH
         cd build
-        /ucrt64/bin/cpack -G NSIS
+        cpack -G NSIS
 
     - name: Upload Windows Installer
       uses: actions/upload-artifact@v4

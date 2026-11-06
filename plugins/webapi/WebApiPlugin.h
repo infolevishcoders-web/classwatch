@@ -36,9 +36,7 @@ class WebApiPlugin : public QObject, PluginInterface, CommandLinePluginInterface
 {
 	Q_OBJECT
 	Q_PLUGIN_METADATA(IID "io.veyon.Veyon.Plugins.WebApi")
-	Q_INTERFACES(PluginInterface
-					  CommandLinePluginInterface
-						  ConfigurationPagePluginInterface)
+	Q_INTERFACES(PluginInterface CommandLinePluginInterface ConfigurationPagePluginInterface)
 public:
 	explicit WebApiPlugin( QObject* parent = nullptr );
 	~WebApiPlugin() override;

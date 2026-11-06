@@ -38,9 +38,7 @@ class AuthKeysPlugin : public QObject,
 {
 	Q_OBJECT
 	Q_PLUGIN_METADATA(IID "io.veyon.Veyon.Plugins.AuthKeys")
-	Q_INTERFACES(PluginInterface
-				 CommandLinePluginInterface
-				 ConfigurationPagePluginInterface)
+	Q_INTERFACES(PluginInterface CommandLinePluginInterface ConfigurationPagePluginInterface)
 public:
 	explicit AuthKeysPlugin( QObject* parent = nullptr );
 	~AuthKeysPlugin() override = default;

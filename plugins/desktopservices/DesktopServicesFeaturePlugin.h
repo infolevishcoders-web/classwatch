@@ -35,9 +35,7 @@ class DesktopServicesFeaturePlugin : public QObject, PluginInterface,
 {
 	Q_OBJECT
 	Q_PLUGIN_METADATA(IID "io.veyon.Veyon.Plugins.DesktopServices")
-	Q_INTERFACES(PluginInterface
-				 FeatureProviderInterface
-				 ConfigurationPagePluginInterface)
+	Q_INTERFACES(PluginInterface FeatureProviderInterface ConfigurationPagePluginInterface)
 public:
 	enum class Argument
 	{
