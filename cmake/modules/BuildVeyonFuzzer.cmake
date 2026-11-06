@@ -8,7 +8,7 @@ macro(build_veyon_fuzzer FUZZER_NAME)
 	set_default_target_properties(${FUZZER_NAME})
 	target_compile_options(${FUZZER_NAME} PRIVATE "-g;-fsanitize=fuzzer")
 	target_link_options(${FUZZER_NAME} PRIVATE "-g;-fsanitize=fuzzer")
-	target_link_libraries(${FUZZER_NAME} veyon-core)
+	target_link_libraries(${FUZZER_NAME} classwatch-core)
 	add_test(NAME ${FUZZER_NAME} COMMAND ${FUZZER_NAME} -max_total_time=60)
 endmacro()
 

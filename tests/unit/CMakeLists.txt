@@ -22,7 +22,7 @@ if(WITH_TESTS AND VEYON_BUILD_LINUX)
 	target_link_libraries(LinuxKeyboardMappingTest PRIVATE
 		Qt${QT_MAJOR_VERSION}::Test
 		Qt${QT_MAJOR_VERSION}::Core
-		veyon-core
+		classwatch-core
 		${X11_LIBRARIES}
 		${X11_XTest_LIB}
 	)
@@ -51,7 +51,7 @@ if(WITH_TESTS AND VEYON_BUILD_LINUX)
 	target_link_libraries(VncProtocolRobustnessTest PRIVATE
 		Qt${QT_MAJOR_VERSION}::Test
 		Qt${QT_MAJOR_VERSION}::Core
-		veyon-core
+		classwatch-core
 	)
 
 	add_test(NAME VncProtocolRobustnessTest COMMAND VncProtocolRobustnessTest)
