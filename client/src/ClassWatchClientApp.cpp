@@ -24,9 +24,14 @@
 
 #include "ClassWatchClientApp.h"
 #include "ClassWatchClientStatus.h"
+#include <QAction>
 #include <QHostInfo>
+#include <QIcon>
+#include <QMenu>
 #include <QMessageBox>
 #include <QStyle>
+#include <QSystemTrayIcon>
+#include <QTimer>
 
 ClassWatchClientApp::ClassWatchClientApp( int& argc, char** argv ) :
 	QApplication( argc, argv ),

@@ -32,7 +32,7 @@
 #include <QTimer>
 #include <QSet>
 
-class ClassWatchSessionManager : public QObject
+class VEYON_CORE_EXPORT ClassWatchSessionManager : public QObject
 {
 	Q_OBJECT
 public:

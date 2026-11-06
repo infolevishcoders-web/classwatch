@@ -28,7 +28,9 @@
 #include <QString>
 #include <QMap>
 
-class ClassWatchIdGenerator : public QObject
+#include "VeyonCore.h"
+
+class VEYON_CORE_EXPORT ClassWatchIdGenerator : public QObject
 {
 	Q_OBJECT
 public:

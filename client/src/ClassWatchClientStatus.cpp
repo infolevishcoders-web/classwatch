@@ -24,9 +24,18 @@
 
 #include "ClassWatchClientStatus.h"
 #include <QApplication>
-#include <QHostInfo>
 #include <QDateTime>
+#include <QDialog>
+#include <QFormLayout>
+#include <QFrame>
+#include <QGroupBox>
+#include <QHostInfo>
+#include <QLabel>
+#include <QPushButton>
 #include <QStyle>
+#include <QTimer>
+#include <QVBoxLayout>
+#include <QWidget>
 
 ClassWatchClientStatus::ClassWatchClientStatus( QWidget* parent ) :
 	QDialog( parent ),

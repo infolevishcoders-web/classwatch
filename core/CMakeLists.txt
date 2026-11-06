@@ -17,7 +17,7 @@ set(core_RESOURCES
 
 add_library(classwatch-core SHARED ${veyoncore_SOURCES} ${core_RESOURCES} ${libvncclient_SOURCES})
 
-target_compile_definitions(classwatch-core PRIVATE XK_KOREAN)
+target_compile_definitions(classwatch-core PRIVATE XK_KOREAN veyon_core_EXPORTS)
 
 set_default_target_properties(classwatch-core)
 

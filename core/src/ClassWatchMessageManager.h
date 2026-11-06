@@ -31,7 +31,7 @@
 #include <QJsonObject>
 #include <QJsonArray>
 
-class ClassWatchMessageManager : public QObject
+class VEYON_CORE_EXPORT ClassWatchMessageManager : public QObject
 {
 	Q_OBJECT
 public:

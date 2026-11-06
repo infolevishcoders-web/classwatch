@@ -48,7 +48,7 @@ jobs:
         cmake --version
         mkdir build
         cd build
-        cmake .. -G "MinGW Makefiles" -DCMAKE_BUILD_TYPE=Release -DWITH_TESTS=OFF -DWITH_BUNDLED_LIBVNC=OFF -DWITH_WEBAPI=OFF -DWITH_PCH=OFF
+        cmake .. -G "MinGW Makefiles" -DCMAKE_BUILD_TYPE=Release -DWITH_TESTS=OFF -DWITH_BUNDLED_LIBVNC=OFF -DWITH_WEBAPI=OFF -DWITH_PCH=OFF -DWITH_TRANSLATIONS=OFF
         cmake --build . --parallel
 
     - name: Package Windows Installer
@@ -106,7 +106,7 @@ jobs:
       run: |
         mkdir build
         cd build
-        cmake .. -DCMAKE_BUILD_TYPE=Release -DWITH_TESTS=OFF -DWITH_WEBAPI=OFF -DWITH_PCH=OFF
+        cmake .. -DCMAKE_BUILD_TYPE=Release -DWITH_TESTS=OFF -DWITH_WEBAPI=OFF -DWITH_PCH=OFF -DWITH_TRANSLATIONS=OFF
         cmake --build . --parallel $(nproc)
 
     - name: Package Linux
@@ -141,7 +141,7 @@ jobs:
       run: |
         mkdir build
         cd build
-        cmake .. -DCMAKE_BUILD_TYPE=Release -DWITH_TESTS=OFF -DWITH_WEBAPI=OFF -DWITH_PCH=OFF \
+        cmake .. -DCMAKE_BUILD_TYPE=Release -DWITH_TESTS=OFF -DWITH_WEBAPI=OFF -DWITH_PCH=OFF -DWITH_TRANSLATIONS=OFF \
           -DCMAKE_CXX_FLAGS="-Wno-deprecated-declarations" \
           -DLdap_INCLUDE_DIRS=/opt/homebrew/opt/openldap/include \
           -DLdap_LIBRARIES=/opt/homebrew/opt/openldap/lib/libldap.dylib \
