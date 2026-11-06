@@ -36,10 +36,10 @@ ClassWatchClientApp::ClassWatchClientApp( int& argc, char** argv ) :
 	m_isConnected( false )
 {
 	// Set application properties
-	setApplicationName( "ClassWatch Client" );
+	setApplicationName( QStringLiteral("ClassWatch Client") );
 	setApplicationVersion( VeyonCore::versionString() );
-	setOrganizationName( "Levish Coders" );
-	setWindowIcon( QIcon( ":/core/icon64.png" ) );
+	setOrganizationName( QStringLiteral("Levish Coders") );
+	setWindowIcon( QIcon( QStringLiteral(":/core/icon64.png") ) );
 	
 	// Initialize VeyonCore
 	VeyonCore::setupApplicationParameters();
@@ -65,7 +65,7 @@ void ClassWatchClientApp::setupTrayIcon()
 {
 	m_trayIcon = new QSystemTrayIcon( this );
 	m_trayIcon->setIcon( style()->standardIcon( QStyle::SP_ComputerIcon ) );
-	m_trayIcon->setToolTip( "ClassWatch Client" );
+	m_trayIcon->setToolTip( QStringLiteral("ClassWatch Client") );
 	m_trayIcon->show();
 	
 	connect( m_trayIcon, &QSystemTrayIcon::activated, this, [this]( QSystemTrayIcon::ActivationReason reason ) {
@@ -80,14 +80,14 @@ void ClassWatchClientApp::setupMenu()
 	m_trayMenu = new QMenu( this );
 	
 	// Status action
-	auto* statusAction = new QAction( "Show Status", this );
+	auto* statusAction = new QAction( QStringLiteral("Show Status"), this );
 	connect( statusAction, &QAction::triggered, this, &ClassWatchClientApp::showStatusDialog );
 	m_trayMenu->addAction( statusAction );
 	
 	m_trayMenu->addSeparator();
 	
 	// Quit action
-	auto* quitAction = new QAction( "Quit", this );
+	auto* quitAction = new QAction( QStringLiteral("Quit"), this );
 	connect( quitAction, &QAction::triggered, this, &ClassWatchClientApp::onQuit );
 	m_trayMenu->addAction( quitAction );
 	
@@ -106,14 +106,14 @@ void ClassWatchClientApp::updateTrayIcon()
 	QString status = getConnectionStatus();
 	
 	// Update tooltip
-	QString tooltip = QString( "ClassWatch Client\nID: %1\nStatus: %2" ).arg( classWatchId, status );
+	QString tooltip = QString( QStringLiteral("ClassWatch Client\nID: %1\nStatus: %2") ).arg( classWatchId, status );
 	m_trayIcon->setToolTip( tooltip );
 	
 	// Update icon based on status
-	if ( status == "Connected" ) {
+	if ( status == QStringLiteral("Connected") ) {
 		m_trayIcon->setIcon( style()->standardIcon( QStyle::SP_DialogApplyButton ) );
 		m_isConnected = true;
-	} else if ( status == "Connecting..." ) {
+	} else if ( status == QStringLiteral("Connecting...") ) {
 		m_trayIcon->setIcon( style()->standardIcon( QStyle::SP_MessageBoxInformation ) );
 		m_isConnected = false;
 	} else {
@@ -125,9 +125,8 @@ void ClassWatchClientApp::updateTrayIcon()
 void ClassWatchClientApp::onQuit()
 {
 	// Confirm quit
-	int result = QMessageBox::question( nullptr, "Quit ClassWatch Client",
-									   "Are you sure you want to quit ClassWatch Client?\n"
-									   "The client will continue to run as a service.",
+	int result = QMessageBox::question( nullptr, QStringLiteral("Quit ClassWatch Client"),
+									   QStringLiteral("Are you sure you want to quit ClassWatch Client?\nThe client will continue to run as a service."),
 									   QMessageBox::Yes | QMessageBox::No );
 	
 	if ( result == QMessageBox::Yes ) {
@@ -146,7 +145,7 @@ QString ClassWatchClientApp::getClassWatchId()
 	int startNumber = config.classWatchIdStartNumber();
 	
 	// For now, return a placeholder ID
-	return QString( "%1-%2" ).arg( prefix ).arg( startNumber, 3, 10, QChar( '0' ) );
+	return QString( QStringLiteral("%1-%2") ).arg( prefix ).arg( startNumber, 3, 10, QChar( u\'0\' ) );
 }
 
 QString ClassWatchClientApp::getConnectionStatus()
@@ -156,5 +155,5 @@ QString ClassWatchClientApp::getConnectionStatus()
 	// to the ClassWatch Master
 	
 	// For now, return a placeholder status
-	return m_isConnected ? "Connected" : "Disconnected";
+	return m_isConnected ? QStringLiteral("Connected") : QStringLiteral("Disconnected");
 }

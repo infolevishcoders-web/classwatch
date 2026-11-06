@@ -327,14 +327,14 @@ void ClassWatchSessionPanel::onMonitorToggle()
 	
 	VeyonConfiguration& config = VeyonCore::config();
 	config.setEnableMultiSessionSupport( enabled );
-	config.save();
-	
+	config.flushStore();
+
 	if ( enabled ) {
 		m_sessionManager->startSessionMonitoring();
-		ui->monitorToggleButton->setText( QStringLiteral(QStringLiteral("Stop Monitoring")) );
+		ui->monitorToggleButton->setText( QStringLiteral("Stop Monitoring") );
 	} else {
 		m_sessionManager->stopSessionMonitoring();
-		ui->monitorToggleButton->setText( QStringLiteral(QStringLiteral("Start Monitoring")) );
+		ui->monitorToggleButton->setText( QStringLiteral("Start Monitoring") );
 	}
 	
 	refreshSessionList();
@@ -348,16 +348,16 @@ void ClassWatchSessionPanel::onClose()
 QString ClassWatchSessionPanel::formatUptime( int seconds ) const
 {
 	if ( seconds < 0 ) {
-		return "-";
+		return QStringLiteral("-");
 	}
-	
+
 	int hours = seconds / 3600;
 	int minutes = ( seconds % 3600 ) / 60;
 	int secs = seconds % 60;
-	
+
 	if ( hours > 0 ) {
-		return QString( QStringLiteral("%1:%2:%3") ).arg( hours ).arg( minutes, 2, 10, QChar( '0' ) ).arg( secs, 2, 10, QChar( '0' ) );
+		return QString( QStringLiteral("%1:%2:%3") ).arg( hours ).arg( minutes, 2, 10, QChar( u'0' ) ).arg( secs, 2, 10, QChar( u'0' ) );
 	} else {
-		return QString( QStringLiteral("%1:%2") ).arg( minutes ).arg( secs, 2, 10, QChar( '0' ) );
+		return QString( QStringLiteral("%1:%2") ).arg( minutes ).arg( secs, 2, 10, QChar( u'0' ) );
 	}
 }

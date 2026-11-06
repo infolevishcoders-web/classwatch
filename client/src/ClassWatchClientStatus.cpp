@@ -40,7 +40,7 @@ ClassWatchClientStatus::ClassWatchClientStatus( QWidget* parent ) :
 	setupUI();
 	
 	// Set window properties
-	setWindowTitle( "ClassWatch Client Status" );
+	setWindowTitle( QStringLiteral("ClassWatch Client Status") );
 	setWindowFlags( Qt::Window | Qt::WindowTitleHint | Qt::WindowCloseButtonHint );
 	setFixedSize( 400, 300 );
 	
@@ -64,8 +64,8 @@ void ClassWatchClientStatus::setupUI()
 	mainLayout->setContentsMargins( 20, 20, 20, 20 );
 	
 	// Title
-	auto* titleLabel = new QLabel( "ClassWatch Client", this );
-	titleLabel->setStyleSheet( "font-size: 18px; font-weight: bold; color: #2c3e50;" );
+	auto* titleLabel = new QLabel( QStringLiteral("ClassWatch Client"), this );
+	titleLabel->setStyleSheet( QStringLiteral("font-size: 18px; font-weight: bold; color: #2c3e50;") );
 	titleLabel->setAlignment( Qt::AlignCenter );
 	mainLayout->addWidget( titleLabel );
 	
@@ -76,31 +76,31 @@ void ClassWatchClientStatus::setupUI()
 	mainLayout->addWidget( separator );
 	
 	// Computer info group
-	auto* computerGroup = new QGroupBox( "Computer Information", this );
+	auto* computerGroup = new QGroupBox( QStringLiteral("Computer Information"), this );
 	auto* computerLayout = new QFormLayout( computerGroup );
 	
 	m_computerLabel = new QLabel( this );
-	computerLayout->addRow( "Computer Name:", m_computerLabel );
+	computerLayout->addRow( QStringLiteral("Computer Name:"), m_computerLabel );
 	
 	m_userLabel = new QLabel( this );
-	computerLayout->addRow( "Logged In User:", m_userLabel );
+	computerLayout->addRow( QStringLiteral("Logged In User:"), m_userLabel );
 	
 	auto* ipLabel = new QLabel( QHostInfo::localHostName(), this );
-	computerLayout->addRow( "Hostname:", ipLabel );
+	computerLayout->addRow( QStringLiteral("Hostname:"), ipLabel );
 	
 	mainLayout->addWidget( computerGroup );
 	
 	// ClassWatch info group
-	auto* classWatchGroup = new QGroupBox( "ClassWatch Information", this );
+	auto* classWatchGroup = new QGroupBox( QStringLiteral("ClassWatch Information"), this );
 	auto* classWatchLayout = new QFormLayout( classWatchGroup );
 	
 	m_idLabel = new QLabel( this );
-	m_idLabel->setStyleSheet( "font-weight: bold; color: #3498db;" );
-	classWatchLayout->addRow( "ClassWatch ID:", m_idLabel );
+	m_idLabel->setStyleSheet( QStringLiteral("font-weight: bold; color: #3498db;") );
+	classWatchLayout->addRow( QStringLiteral("ClassWatch ID:"), m_idLabel );
 	
 	m_statusLabel = new QLabel( this );
-	m_statusLabel->setStyleSheet( "font-weight: bold;" );
-	classWatchLayout->addRow( "Status:", m_statusLabel );
+	m_statusLabel->setStyleSheet( QStringLiteral("font-weight: bold;") );
+	classWatchLayout->addRow( QStringLiteral("Status:"), m_statusLabel );
 	
 	mainLayout->addWidget( classWatchGroup );
 	
@@ -108,7 +108,7 @@ void ClassWatchClientStatus::setupUI()
 	mainLayout->addStretch();
 	
 	// Close button
-	m_closeButton = new QPushButton( "Close", this );
+	m_closeButton = new QPushButton( QStringLiteral("Close"), this );
 	m_closeButton->setDefault( true );
 	connect( m_closeButton, &QPushButton::clicked, this, &ClassWatchClientStatus::onClose );
 	mainLayout->addWidget( m_closeButton );
@@ -121,23 +121,23 @@ void ClassWatchClientStatus::updateStatus()
 	
 	// Update user (this is a simplified version - in real implementation,
 	// we'd get the actual logged-in user from the system)
-	m_userLabel->setText( "Current User" );
+	m_userLabel->setText( QStringLiteral("Current User") );
 	
 	// Get ClassWatch ID from configuration
 	QString classWatchId = getClassWatchId();
-	m_idLabel->setText( classWatchId.isEmpty() ? "Not Registered" : classWatchId );
+	m_idLabel->setText( classWatchId.isEmpty() ? QStringLiteral("Not Registered") : classWatchId );
 	
 	// Get connection status
 	QString status = getConnectionStatus();
 	m_statusLabel->setText( status );
 	
 	// Set status color
-	if ( status == "Connected" ) {
-		m_statusLabel->setStyleSheet( "font-weight: bold; color: green;" );
-	} else if ( status == "Connecting..." ) {
-		m_statusLabel->setStyleSheet( "font-weight: bold; color: orange;" );
+	if ( status == QStringLiteral("Connected") ) {
+		m_statusLabel->setStyleSheet( QStringLiteral("font-weight: bold; color: green;") );
+	} else if ( status == QStringLiteral("Connecting...") ) {
+		m_statusLabel->setStyleSheet( QStringLiteral("font-weight: bold; color: orange;") );
 	} else {
-		m_statusLabel->setStyleSheet( "font-weight: bold; color: red;" );
+		m_statusLabel->setStyleSheet( QStringLiteral("font-weight: bold; color: red;") );
 	}
 }
 
@@ -153,7 +153,7 @@ QString ClassWatchClientStatus::getClassWatchId()
 	
 	// For now, return a placeholder ID
 	// In real implementation, this would be looked up from the registry
-	return QString( "%1-%2" ).arg( prefix ).arg( startNumber, 3, 10, QChar( '0' ) );
+	return QString( QStringLiteral("%1-%2") ).arg( prefix ).arg( startNumber, 3, 10, QChar( u\'0\' ) );
 }
 
 QString ClassWatchClientStatus::getConnectionStatus()
@@ -163,7 +163,7 @@ QString ClassWatchClientStatus::getConnectionStatus()
 	// to the ClassWatch Master
 	
 	// For now, return a placeholder status
-	return "Connected";
+	return QStringLiteral("Connected");
 }
 
 void ClassWatchClientStatus::onClose()
