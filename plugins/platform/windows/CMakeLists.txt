@@ -75,3 +75,4 @@ target_compile_definitions(windows-platform PRIVATE ULTRAVNC_VEYON_SUPPORT INTER
 target_compile_options(windows-platform PRIVATE
 	"-Wno-unknown-pragmas;-flarge-source-files;-Wno-misleading-indentation;-Wno-unused-but-set-variable;-Wno-error=unused-but-set-variable;-DGWL_USERDATA=GWLP_USERDATA;-DGWL_WNDPROC=GWLP_WNDPROC;-DGWL_HINSTANCE=GWLP_HINSTANCE;-DGWL_STYLE=GWLP_STYLE;-DGWL_EXSTYLE=GWLP_EXSTYLE")
 set_source_files_properties(WindowsNetworkFunctions.cpp PROPERTIES SKIP_UNITY_BUILD_INCLUSION TRUE SKIP_PRECOMPILE_HEADERS TRUE)
+set_target_properties(windows-platform PROPERTIES UNITY_BUILD OFF)

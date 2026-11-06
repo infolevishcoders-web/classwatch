@@ -43,19 +43,19 @@ DashboardPanel::DashboardPanel( VeyonMaster& master, QWidget *parent ) :
 	ui->setupUi(this);
 
 	// Connect quick action buttons
-	connect(ui->monitorAllButton, &QPushButton::clicked, this, [this]() {
+	connect(ui->monitorAllButton, &QPushButton::clicked, this, []() {
 		// TODO: Implement monitor all computers feature
 	});
 
-	connect(ui->lockAllButton, &QPushButton::clicked, this, [this]() {
+	connect(ui->lockAllButton, &QPushButton::clicked, this, []() {
 		// TODO: Implement lock all screens feature
 	});
 
-	connect(ui->messageAllButton, &QPushButton::clicked, this, [this]() {
+	connect(ui->messageAllButton, &QPushButton::clicked, this, []() {
 		// TODO: Implement send message to all feature
 	});
 
-	connect(ui->powerOffButton, &QPushButton::clicked, this, [this]() {
+	connect(ui->powerOffButton, &QPushButton::clicked, this, []() {
 		// TODO: Implement power off selected computers
 	});
 
