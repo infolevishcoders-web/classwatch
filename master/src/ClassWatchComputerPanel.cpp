@@ -121,15 +121,15 @@ void ClassWatchComputerPanel::onComputerSelectionChanged()
 	QList<QTreeWidgetItem*> selectedItems = ui->computerTreeWidget->selectedItems();
 	if ( selectedItems.isEmpty() ) {
 		// Clear details
-		ui->classWatchIdValue->setText( "-" );
-		ui->computerNameValue->setText( "-" );
-		ui->ipAddressValue->setText( "-" );
-		ui->macAddressValue->setText( "-" );
-		ui->windowsVersionValue->setText( "-" );
-		ui->loggedInUserValue->setText( "-" );
-		ui->connectionStatusValue->setText( "-" );
-		ui->lastConnectionValue->setText( "-" );
-		ui->sessionTypeValue->setText( "-" );
+		ui->classWatchIdValue->setText( QStringLiteral("-") );
+		ui->computerNameValue->setText( QStringLiteral("-") );
+		ui->ipAddressValue->setText( QStringLiteral("-") );
+		ui->macAddressValue->setText( QStringLiteral("-") );
+		ui->windowsVersionValue->setText( QStringLiteral("-") );
+		ui->loggedInUserValue->setText( QStringLiteral("-") );
+		ui->connectionStatusValue->setText( QStringLiteral("-") );
+		ui->lastConnectionValue->setText( QStringLiteral("-") );
+		ui->sessionTypeValue->setText( QStringLiteral("-") );
 		return;
 	}
 
@@ -179,7 +179,7 @@ void ClassWatchComputerPanel::populateComputerTree()
 		item->setText( 4, computer.loggedInUser() );
 		
 		// Set status color
-		if ( computer.connectionStatus() == "Connected" ) {
+		if ( computer.connectionStatus() == QStringLiteral("Connected") ) {
 			item->setForeground( 2, QColor( "green" ) );
 		} else {
 			item->setForeground( 2, QColor( "red" ) );
@@ -208,7 +208,7 @@ void ClassWatchComputerPanel::onRegisterComputer()
 	ComputerList computers = computerManager.selectedComputers( rootIndex );
 	
 	if ( computers.isEmpty() ) {
-		QMessageBox::information( this, "No Computers Selected", 
+		QMessageBox::warning( this, QStringLiteral("No Computers Selected"), 
 								 "Please select computers in the 'Locations & Computers' panel first." );
 		return;
 	}
@@ -223,11 +223,11 @@ void ClassWatchComputerPanel::onRegisterComputer()
 	}
 
 	if ( registeredCount > 0 ) {
-		QMessageBox::information( this, "Computers Registered", 
-								 QString( "Successfully registered %1 computer(s)." ).arg( registeredCount ) );
+		QMessageBox::warning( this, QStringLiteral("Computers Registered"), 
+								 QString( QStringLiteral("Successfully registered %1 computer(s).") ).arg( registeredCount ) );
 		refreshComputerList();
 	} else {
-		QMessageBox::information( this, "No New Computers", 
+		QMessageBox::warning( this, QStringLiteral("No New Computers"), 
 								 "All selected computers are already registered." );
 	}
 }
@@ -236,7 +236,7 @@ void ClassWatchComputerPanel::onUnregisterComputer()
 {
 	QList<QTreeWidgetItem*> selectedItems = ui->computerTreeWidget->selectedItems();
 	if ( selectedItems.isEmpty() ) {
-		QMessageBox::warning( this, "No Selection", "Please select a computer to unregister." );
+		QMessageBox::warning( this, QStringLiteral("No Selection"), "Please select a computer to unregister." );
 		return;
 	}
 
@@ -247,8 +247,8 @@ void ClassWatchComputerPanel::onUnregisterComputer()
 		classWatchId = item->text( 0 );
 	}
 
-	int result = QMessageBox::question( this, "Confirm Unregister",
-									   QString( "Are you sure you want to unregister computer %1?" ).arg( classWatchId ),
+	int result = QMessageBox::warning( this, QStringLiteral("Confirm Unregister"),
+									   QString( QStringLiteral("Are you sure you want to unregister computer %1?") ).arg( classWatchId ),
 									   QMessageBox::Yes | QMessageBox::No );
 	
 	if ( result == QMessageBox::Yes ) {
@@ -259,7 +259,7 @@ void ClassWatchComputerPanel::onUnregisterComputer()
 
 void ClassWatchComputerPanel::onSaveRegistry()
 {
-	QString filePath = QFileDialog::getSaveFileName( this, "Save ClassWatch Registry",
+	QString filePath = QFileDialog::getSaveFileName( this, QStringLiteral("Save ClassWatch Registry"),
 												 QStandardPaths::writableLocation( QStandardPaths::DocumentsLocation ) + "/classwatch_computers.json",
 												 "JSON Files (*.json)" );
 	
@@ -268,15 +268,15 @@ void ClassWatchComputerPanel::onSaveRegistry()
 	}
 
 	if ( m_classWatchManager->saveClassWatchRegistry( filePath ) ) {
-		QMessageBox::information( this, "Success", "Registry saved successfully." );
+		QMessageBox::warning( this, QStringLiteral("Success"), "Registry saved successfully." );
 	} else {
-		QMessageBox::warning( this, "Error", "Failed to save registry." );
+		QMessageBox::warning( this, QStringLiteral("Error"), "Failed to save registry." );
 	}
 }
 
 void ClassWatchComputerPanel::onLoadRegistry()
 {
-	QString filePath = QFileDialog::getOpenFileName( this, "Load ClassWatch Registry",
+	QString filePath = QFileDialog::getOpenFileName( this, QStringLiteral("Load ClassWatch Registry"),
 												 QStandardPaths::writableLocation( QStandardPaths::DocumentsLocation ),
 												 "JSON Files (*.json)" );
 	
@@ -285,10 +285,10 @@ void ClassWatchComputerPanel::onLoadRegistry()
 	}
 
 	if ( m_classWatchManager->loadClassWatchRegistry( filePath ) ) {
-		QMessageBox::information( this, "Success", "Registry loaded successfully." );
+		QMessageBox::warning( this, QStringLiteral("Success"), "Registry loaded successfully." );
 		refreshComputerList();
 	} else {
-		QMessageBox::warning( this, "Error", "Failed to load registry." );
+		QMessageBox::warning( this, QStringLiteral("Error"), "Failed to load registry." );
 	}
 }
 

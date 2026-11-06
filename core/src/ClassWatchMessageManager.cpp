@@ -70,19 +70,19 @@ QString ClassWatchMessageManager::sendPrivateMessage( const QString& recipientId
 	QString actualSenderId = senderId.isEmpty() ? getDefaultSenderId() : senderId;
 	
 	QJsonObject msgObj;
-	msgObj["id"] = messageId;
-	msgObj["type"] = "private";
-	msgObj["senderId"] = actualSenderId;
-	msgObj["recipientId"] = recipientId;
-	msgObj["message"] = message;
-	msgObj["timestamp"] = QDateTime::currentDateTime().toString( Qt::ISODate );
-	msgObj["status"] = "pending";
-	msgObj["readReceipts"] = m_enableReadReceipts;
+	msgObj[QStringLiteral("id")] = messageId;
+	msgObj[QStringLiteral("type")] = QStringLiteral("private");
+	msgObj[QStringLiteral("senderId")] = actualSenderId;
+	msgObj[QStringLiteral("recipientId")] = recipientId;
+	msgObj[QStringLiteral("message")] = message;
+	msgObj[QStringLiteral("timestamp")] = QDateTime::currentDateTime().toString( Qt::ISODate );
+	msgObj[QStringLiteral("status")] = QStringLiteral("pending");
+	msgObj[QStringLiteral("readReceipts")] = m_enableReadReceipts;
 	
 	m_messages[messageId] = msgObj;
 	m_messageQueue.append( messageId );
 	
-	logMessageEvent( messageId, "message_created", QString( "Private message to %1" ).arg( recipientId ) );
+	logMessageEvent( messageId, "message_created", QString( QStringLiteral("Private message to %1") ).arg( recipientId ) );
 	processMessageQueue();
 	
 	return messageId;
@@ -98,14 +98,14 @@ QString ClassWatchMessageManager::sendAnnouncement( const QString& message, cons
 	QString actualSenderId = senderId.isEmpty() ? getDefaultSenderId() : senderId;
 	
 	QJsonObject msgObj;
-	msgObj["id"] = messageId;
-	msgObj["type"] = "announcement";
-	msgObj["senderId"] = actualSenderId;
-	msgObj["recipientId"] = "all"; // Broadcast to all
-	msgObj["message"] = message;
-	msgObj["timestamp"] = QDateTime::currentDateTime().toString( Qt::ISODate );
-	msgObj["status"] = "pending";
-	msgObj["readReceipts"] = m_enableReadReceipts;
+	msgObj[QStringLiteral("id")] = messageId;
+	msgObj[QStringLiteral("type")] = QStringLiteral("announcement");
+	msgObj[QStringLiteral("senderId")] = actualSenderId;
+	msgObj[QStringLiteral("recipientId")] = QStringLiteral("all"); // Broadcast to all
+	msgObj[QStringLiteral("message")] = message;
+	msgObj[QStringLiteral("timestamp")] = QDateTime::currentDateTime().toString( Qt::ISODate );
+	msgObj[QStringLiteral("status")] = QStringLiteral("pending");
+	msgObj[QStringLiteral("readReceipts")] = m_enableReadReceipts;
 	
 	m_messages[messageId] = msgObj;
 	m_messageQueue.append( messageId );
@@ -126,15 +126,15 @@ QString ClassWatchMessageManager::sendBroadcast( const QString& message, const Q
 	QString actualSenderId = senderId.isEmpty() ? getDefaultSenderId() : senderId;
 	
 	QJsonObject msgObj;
-	msgObj["id"] = messageId;
-	msgObj["type"] = "broadcast";
-	msgObj["senderId"] = actualSenderId;
-	msgObj["recipientId"] = "all";
-	msgObj["message"] = message;
-	msgObj["timestamp"] = QDateTime::currentDateTime().toString( Qt::ISODate );
-	msgObj["status"] = "pending";
-	msgObj["readReceipts"] = m_enableReadReceipts;
-	msgObj["priority"] = "high";
+	msgObj[QStringLiteral("id")] = messageId;
+	msgObj[QStringLiteral("type")] = QStringLiteral("broadcast");
+	msgObj[QStringLiteral("senderId")] = actualSenderId;
+	msgObj[QStringLiteral("recipientId")] = QStringLiteral("all");
+	msgObj[QStringLiteral("message")] = message;
+	msgObj[QStringLiteral("timestamp")] = QDateTime::currentDateTime().toString( Qt::ISODate );
+	msgObj[QStringLiteral("status")] = QStringLiteral("pending");
+	msgObj[QStringLiteral("readReceipts")] = m_enableReadReceipts;
+	msgObj[QStringLiteral("priority")] = QStringLiteral("high");
 	
 	m_messages[messageId] = msgObj;
 	m_messageQueue.append( messageId );
@@ -154,19 +154,19 @@ QString ClassWatchMessageManager::sendSystemMessage( const QString& message, con
 	QString messageId = generateMessageId();
 	
 	QJsonObject msgObj;
-	msgObj["id"] = messageId;
-	msgObj["type"] = "system";
-	msgObj["senderId"] = "system";
-	msgObj["recipientId"] = targetId.isEmpty() ? "all" : targetId;
-	msgObj["message"] = message;
-	msgObj["timestamp"] = QDateTime::currentDateTime().toString( Qt::ISODate );
-	msgObj["status"] = "pending";
-	msgObj["readReceipts"] = false; // System messages don't need read receipts
+	msgObj[QStringLiteral("id")] = messageId;
+	msgObj[QStringLiteral("type")] = QStringLiteral("system");
+	msgObj[QStringLiteral("senderId")] = QStringLiteral("system");
+	msgObj[QStringLiteral("recipientId")] = targetId.isEmpty() ? "all" : targetId;
+	msgObj[QStringLiteral("message")] = message;
+	msgObj[QStringLiteral("timestamp")] = QDateTime::currentDateTime().toString( Qt::ISODate );
+	msgObj[QStringLiteral("status")] = QStringLiteral("pending");
+	msgObj[QStringLiteral("readReceipts")] = false; // System messages don't need read receipts
 	
 	m_messages[messageId] = msgObj;
 	m_messageQueue.append( messageId );
 	
-	logMessageEvent( messageId, "message_created", QString( "System message to %1" ).arg( targetId.isEmpty() ? "all" : targetId ) );
+	logMessageEvent( messageId, "message_created", QString( QStringLiteral("System message to %1") ).arg( targetId.isEmpty() ? "all" : targetId ) );
 	processMessageQueue();
 	
 	return messageId;
@@ -179,10 +179,10 @@ void ClassWatchMessageManager::cancelMessage( const QString& messageId )
 	}
 	
 	QJsonObject& msgObj = m_messages[messageId];
-	QString status = msgObj["status"].toString();
+	QString status = msgObj[QStringLiteral("status")].toString();
 	
-	if ( status == "pending" || status == "sent" ) {
-		msgObj["status"] = "cancelled";
+	if ( status == QStringLiteral("pending") || status == QStringLiteral("sent") ) {
+		msgObj[QStringLiteral("status")] = QStringLiteral("cancelled");
 		m_messageQueue.removeAll( messageId );
 		logMessageEvent( messageId, "message_cancelled", "Message cancelled by user" );
 	}
@@ -207,9 +207,9 @@ QList<QJsonObject> ClassWatchMessageManager::getMessages( const QString& recipie
 	
 	for ( auto it = m_messages.begin(); it != m_messages.end(); ++it ) {
 		const QJsonObject& msgObj = it.value();
-		QString msgRecipient = msgObj["recipientId"].toString();
+		QString msgRecipient = msgObj[QStringLiteral("recipientId")].toString();
 		
-		if ( recipientId.isEmpty() || msgRecipient == recipientId || msgRecipient == "all" ) {
+		if ( recipientId.isEmpty() || msgRecipient == recipientId || msgRecipient == QStringLiteral("all") ) {
 			result.append( msgObj );
 			if ( result.size() >= limit ) {
 				break;
@@ -226,7 +226,7 @@ QList<QJsonObject> ClassWatchMessageManager::getPendingMessages() const
 	
 	for ( auto it = m_messages.begin(); it != m_messages.end(); ++it ) {
 		const QJsonObject& msgObj = it.value();
-		if ( msgObj["status"].toString() == "pending" ) {
+		if ( msgObj[QStringLiteral("status")].toString() == QStringLiteral("pending") ) {
 			result.append( msgObj );
 		}
 	}
@@ -240,7 +240,7 @@ QList<QJsonObject> ClassWatchMessageManager::getFailedMessages() const
 	
 	for ( auto it = m_messages.begin(); it != m_messages.end(); ++it ) {
 		const QJsonObject& msgObj = it.value();
-		if ( msgObj["status"].toString() == "failed" ) {
+		if ( msgObj[QStringLiteral("status")].toString() == QStringLiteral("failed") ) {
 			result.append( msgObj );
 		}
 	}
@@ -268,10 +268,10 @@ QString ClassWatchMessageManager::createChatRoom( const QStringList& participant
 	QString chatId = generateChatId();
 	
 	QJsonObject chatObj;
-	chatObj["id"] = chatId;
-	chatObj["participants"] = QJsonArray::fromStringList( participants );
-	chatObj["created"] = QDateTime::currentDateTime().toString( Qt::ISODate );
-	chatObj["isActive"] = true;
+	chatObj[QStringLiteral("id")] = chatId;
+	chatObj[QStringLiteral("participants")] = QJsonArray::fromStringList( participants );
+	chatObj[QStringLiteral("created")] = QDateTime::currentDateTime().toString( Qt::ISODate );
+	chatObj[QStringLiteral("isActive")] = true;
 	
 	m_chatRooms[chatId] = chatObj;
 	m_chatHistory[chatId] = QList<QJsonObject>();
@@ -286,11 +286,11 @@ void ClassWatchMessageManager::addParticipantToChat( const QString& chatId, cons
 	}
 	
 	QJsonObject& chatObj = m_chatRooms[chatId];
-	QJsonArray participants = chatObj["participants"].toArray();
+	QJsonArray participants = chatObj[QStringLiteral("participants")].toArray();
 	
 	if ( !participants.contains( participantId ) ) {
 		participants.append( participantId );
-		chatObj["participants"] = participants;
+		chatObj[QStringLiteral("participants")] = participants;
 	}
 }
 
@@ -301,7 +301,7 @@ void ClassWatchMessageManager::removeParticipantFromChat( const QString& chatId,
 	}
 	
 	QJsonObject& chatObj = m_chatRooms[chatId];
-	QJsonArray participants = chatObj["participants"].toArray();
+	QJsonArray participants = chatObj[QStringLiteral("participants")].toArray();
 	
 	for ( int i = 0; i < participants.size(); ++i ) {
 		if ( participants[i].toString() == participantId ) {
@@ -310,7 +310,7 @@ void ClassWatchMessageManager::removeParticipantFromChat( const QString& chatId,
 		}
 	}
 	
-	chatObj["participants"] = participants;
+	chatObj[QStringLiteral("participants")] = participants;
 }
 
 QList<QJsonObject> ClassWatchMessageManager::getChatHistory( const QString& chatId, int limit ) const
@@ -333,7 +333,7 @@ QStringList ClassWatchMessageManager::getChatParticipants( const QString& chatId
 	}
 	
 	QJsonObject chatObj = m_chatRooms[chatId];
-	QJsonArray participants = chatObj["participants"].toArray();
+	QJsonArray participants = chatObj[QStringLiteral("participants")].toArray();
 	
 	QStringList result;
 	for ( const QJsonValue& value : participants ) {
@@ -354,21 +354,21 @@ QString ClassWatchMessageManager::sendFile( const QString& recipientId, const QS
 	QFileInfo fileInfo( filePath );
 	
 	QJsonObject transferObj;
-	transferObj["id"] = transferId;
-	transferObj["type"] = "file";
-	transferObj["senderId"] = actualSenderId;
-	transferObj["recipientId"] = recipientId;
-	transferObj["filePath"] = filePath;
-	transferObj["fileName"] = fileInfo.fileName();
-	transferObj["fileSize"] = fileInfo.size();
-	transferObj["timestamp"] = QDateTime::currentDateTime().toString( Qt::ISODate );
-	transferObj["status"] = "pending";
-	transferObj["progress"] = 0;
+	transferObj[QStringLiteral("id")] = transferId;
+	transferObj[QStringLiteral("type")] = QStringLiteral("file");
+	transferObj[QStringLiteral("senderId")] = actualSenderId;
+	transferObj[QStringLiteral("recipientId")] = recipientId;
+	transferObj[QStringLiteral("filePath")] = filePath;
+	transferObj[QStringLiteral("fileName")] = fileInfo.fileName();
+	transferObj[QStringLiteral("fileSize")] = fileInfo.size();
+	transferObj[QStringLiteral("timestamp")] = QDateTime::currentDateTime().toString( Qt::ISODate );
+	transferObj[QStringLiteral("status")] = QStringLiteral("pending");
+	transferObj[QStringLiteral("progress")] = 0;
 	
 	m_fileTransfers[transferId] = transferObj;
 	
 	Q_EMIT fileTransferStarted( transferId, filePath );
-	logMessageEvent( transferId, "file_transfer_started", QString( "File %1 to %2" ).arg( fileInfo.fileName() ).arg( recipientId ) );
+	logMessageEvent( transferId, "file_transfer_started", QString( QStringLiteral("File %1 to %2") ).arg( fileInfo.fileName() ).arg( recipientId ) );
 	
 	return transferId;
 }
@@ -401,7 +401,7 @@ void ClassWatchMessageManager::cancelFileTransfer( const QString& transferId )
 	}
 	
 	QJsonObject& transferObj = m_fileTransfers[transferId];
-	transferObj["status"] = "cancelled";
+	transferObj[QStringLiteral("status")] = QStringLiteral("cancelled");
 	logMessageEvent( transferId, "file_transfer_cancelled", "File transfer cancelled" );
 }
 
@@ -416,9 +416,9 @@ QList<QJsonObject> ClassWatchMessageManager::getFileTransfers( const QString& re
 	
 	for ( auto it = m_fileTransfers.begin(); it != m_fileTransfers.end(); ++it ) {
 		const QJsonObject& transferObj = it.value();
-		QString transferRecipient = transferObj["recipientId"].toString();
+		QString transferRecipient = transferObj[QStringLiteral("recipientId")].toString();
 		
-		if ( recipientId.isEmpty() || transferRecipient == recipientId || transferRecipient == "all" ) {
+		if ( recipientId.isEmpty() || transferRecipient == recipientId || transferRecipient == QStringLiteral("all") ) {
 			result.append( transferObj );
 		}
 	}
@@ -463,13 +463,13 @@ void ClassWatchMessageManager::onMessageTimeout()
 	
 	for ( auto it = m_messages.begin(); it != m_messages.end(); ++it ) {
 		QJsonObject& msgObj = it.value();
-		QString status = msgObj["status"].toString();
+		QString status = msgObj[QStringLiteral("status")].toString();
 		
-		if ( status == "pending" || status == "sent" ) {
-			QDateTime timestamp = QDateTime::fromString( msgObj["timestamp"].toString(), Qt::ISODate );
+		if ( status == QStringLiteral("pending") || status == QStringLiteral("sent") ) {
+			QDateTime timestamp = QDateTime::fromString( msgObj[QStringLiteral("timestamp")].toString(), Qt::ISODate );
 			if ( timestamp.msecsTo( now ) > 30000 ) { // 30 seconds timeout
-				msgObj["status"] = "failed";
-				msgObj["error"] = "Message delivery timeout";
+				msgObj[QStringLiteral("status")] = QStringLiteral("failed");
+				msgObj[QStringLiteral("error")] = QStringLiteral("Message delivery timeout");
 				logMessageEvent( it.key(), "message_failed", "Delivery timeout" );
 			}
 		}
@@ -484,17 +484,17 @@ void ClassWatchMessageManager::onCleanupTimer()
 
 QString ClassWatchMessageManager::generateMessageId()
 {
-	return QString( "MSG-%1-%2" ).arg( QDateTime::currentDateTime().toString( "yyyyMMdd-hhmmss" ) ).arg( ++m_messageCounter );
+	return QString( QStringLiteral("MSG-%1-%2") ).arg( QDateTime::currentDateTime().toString( "yyyyMMdd-hhmmss" ) ).arg( ++m_messageCounter );
 }
 
 QString ClassWatchMessageManager::generateTransferId()
 {
-	return QString( "FILE-%1-%2" ).arg( QDateTime::currentDateTime().toString( "yyyyMMdd-hhmmss" ) ).arg( ++m_transferCounter );
+	return QString( QStringLiteral("FILE-%1-%2") ).arg( QDateTime::currentDateTime().toString( "yyyyMMdd-hhmmss" ) ).arg( ++m_transferCounter );
 }
 
 QString ClassWatchMessageManager::generateChatId()
 {
-	return QString( "CHAT-%1-%2" ).arg( QDateTime::currentDateTime().toString( "yyyyMMdd-hhmmss" ) ).arg( ++m_chatCounter );
+	return QString( QStringLiteral("CHAT-%1-%2") ).arg( QDateTime::currentDateTime().toString( "yyyyMMdd-hhmmss" ) ).arg( ++m_chatCounter );
 }
 
 void ClassWatchMessageManager::processMessageQueue()
@@ -508,15 +508,15 @@ void ClassWatchMessageManager::processMessageQueue()
 		}
 		
 		QJsonObject& msgObj = m_messages[messageId];
-		if ( msgObj["status"].toString() != "pending" ) {
+		if ( msgObj[QStringLiteral("status")].toString() != QStringLiteral("pending") ) {
 			continue;
 		}
 		
 		// Simulate sending (in real implementation, this would use Veyon features)
-		msgObj["status"] = "sent";
-		msgObj["sentTime"] = QDateTime::currentDateTime().toString( Qt::ISODate );
+		msgObj[QStringLiteral("status")] = QStringLiteral("sent");
+		msgObj[QStringLiteral("sentTime")] = QDateTime::currentDateTime().toString( Qt::ISODate );
 		
-		Q_EMIT messageSent( messageId, msgObj["recipientId"].toString() );
+		Q_EMIT messageSent( messageId, msgObj[QStringLiteral("recipientId")].toString() );
 		logMessageEvent( messageId, "message_sent", "Message sent successfully" );
 	}
 	
@@ -531,7 +531,7 @@ void ClassWatchMessageManager::cleanupOldMessages()
 	
 	for ( auto it = m_messages.begin(); it != m_messages.end(); ++it ) {
 		QJsonObject msgObj = it.value();
-		QDateTime timestamp = QDateTime::fromString( msgObj["timestamp"].toString(), Qt::ISODate );
+		QDateTime timestamp = QDateTime::fromString( msgObj[QStringLiteral("timestamp")].toString(), Qt::ISODate );
 		
 		if ( timestamp < cutoff ) {
 			messagesToRemove.append( it.key() );
@@ -550,9 +550,9 @@ void ClassWatchMessageManager::cleanupOldTransfers()
 	
 	for ( auto it = m_fileTransfers.begin(); it != m_fileTransfers.end(); ++it ) {
 		QJsonObject transferObj = it.value();
-		QDateTime timestamp = QDateTime::fromString( transferObj["timestamp"].toString(), Qt::ISODate );
+		QDateTime timestamp = QDateTime::fromString( transferObj[QStringLiteral("timestamp")].toString(), Qt::ISODate );
 		
-		if ( timestamp < cutoff && transferObj["status"].toString() != "pending" ) {
+		if ( timestamp < cutoff && transferObj[QStringLiteral("status")].toString() != QStringLiteral("pending") ) {
 			transfersToRemove.append( it.key() );
 		}
 	}
@@ -572,21 +572,21 @@ void ClassWatchMessageManager::updateMessageStatus( const QString& messageId, Me
 	QString statusStr;
 	
 	switch ( status ) {
-	case MessageStatus::Pending: statusStr = "pending"; break;
-	case MessageStatus::Sent: statusStr = "sent"; break;
-	case MessageStatus::Delivered: statusStr = "delivered"; break;
-	case MessageStatus::Read: statusStr = "read"; break;
-	case MessageStatus::Failed: statusStr = "failed"; break;
+	case MessageStatus::Pending: statusStr = QStringLiteral("pending"); break;
+	case MessageStatus::Sent: statusStr = QStringLiteral("sent"); break;
+	case MessageStatus::Delivered: statusStr = QStringLiteral("delivered"); break;
+	case MessageStatus::Read: statusStr = QStringLiteral("read"); break;
+	case MessageStatus::Failed: statusStr = QStringLiteral("failed"); break;
 	}
 	
-	msgObj["status"] = statusStr;
-	msgObj["statusTime"] = QDateTime::currentDateTime().toString( Qt::ISODate );
+	msgObj[QStringLiteral("status")] = statusStr;
+	msgObj[QStringLiteral("statusTime")] = QDateTime::currentDateTime().toString( Qt::ISODate );
 	
 	if ( !details.isEmpty() ) {
-		msgObj["details"] = details;
+		msgObj[QStringLiteral("details")] = details;
 	}
 	
-	logMessageEvent( messageId, QString( "message_%1" ).arg( statusStr ), details );
+	logMessageEvent( messageId, QString( QStringLiteral("message_%1") ).arg( statusStr ), details );
 	
 	switch ( status ) {
 	case MessageStatus::Delivered:
@@ -606,10 +606,10 @@ void ClassWatchMessageManager::updateMessageStatus( const QString& messageId, Me
 void ClassWatchMessageManager::logMessageEvent( const QString& messageId, const QString& eventType, const QString& details )
 {
 	QJsonObject event;
-	event["timestamp"] = QDateTime::currentDateTime().toString( Qt::ISODate );
-	event["messageId"] = messageId;
-	event["eventType"] = eventType;
-	event["details"] = details;
+	event[QStringLiteral("timestamp")] = QDateTime::currentDateTime().toString( Qt::ISODate );
+	event[QStringLiteral("messageId")] = messageId;
+	event[QStringLiteral("eventType")] = eventType;
+	event[QStringLiteral("details")] = details;
 	
 	// In a real implementation, this would be stored in a database or file
 	qDebug() << "Message Event:" << event;

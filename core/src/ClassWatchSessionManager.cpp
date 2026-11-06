@@ -124,17 +124,17 @@ QString ClassWatchSessionManager::getSessionType( int sessionId ) const
 	if ( m_sessionTypes.contains( sessionId ) ) {
 		return m_sessionTypes[sessionId];
 	}
-	return "unknown";
+	return QStringLiteral("unknown");
 }
 
 bool ClassWatchSessionManager::isConsoleSession( int sessionId ) const
 {
-	return getSessionType( sessionId ) == "console";
+	return getSessionType( sessionId ) == QStringLiteral("console");
 }
 
 bool ClassWatchSessionManager::isRdpSession( int sessionId ) const
 {
-	return getSessionType( sessionId ) == "rdp";
+	return getSessionType( sessionId ) == QStringLiteral("rdp");
 }
 
 bool ClassWatchSessionManager::isActiveSession( int sessionId ) const
@@ -152,15 +152,15 @@ void ClassWatchSessionManager::assignStudentToSession( int sessionId, const QStr
 	m_studentAssignments[sessionId] = studentId;
 	
 	QJsonObject event;
-	event["timestamp"] = QDateTime::currentDateTime().toString( Qt::ISODate );
-	event["sessionId"] = sessionId;
-	event["eventType"] = "student_assigned";
-	event["studentId"] = studentId;
-	event["oldStudentId"] = oldStudent;
+	event[QStringLiteral("timestamp")] = QDateTime::currentDateTime().toString( Qt::ISODate );
+	event[QStringLiteral("sessionId")] = sessionId;
+	event[QStringLiteral("eventType")] = QStringLiteral("student_assigned");
+	event[QStringLiteral("studentId")] = studentId;
+	event[QStringLiteral("oldStudentId")] = oldStudent;
 	m_sessionHistory.append( event );
 	
 	Q_EMIT studentAssigned( sessionId, studentId );
-	Q_EMIT sessionEvent( sessionId, "student_assigned", QString( "Student %1 assigned to session %2" ).arg( studentId ).arg( sessionId ) );
+	Q_EMIT sessionEvent( sessionId, QStringLiteral("student_assigned"), QString( QStringLiteral("Student %1 assigned to session %2") ).arg( studentId ).arg( sessionId ) );
 }
 
 QString ClassWatchSessionManager::getStudentForSession( int sessionId ) const
@@ -178,14 +178,14 @@ void ClassWatchSessionManager::removeStudentFromSession( int sessionId )
 	m_studentAssignments.remove( sessionId );
 	
 	QJsonObject event;
-	event["timestamp"] = QDateTime::currentDateTime().toString( Qt::ISODate );
-	event["sessionId"] = sessionId;
-	event["eventType"] = "student_removed";
-	event["studentId"] = studentId;
+	event[QStringLiteral("timestamp")] = QDateTime::currentDateTime().toString( Qt::ISODate );
+	event[QStringLiteral("sessionId")] = sessionId;
+	event[QStringLiteral("eventType")] = QStringLiteral("student_removed");
+	event[QStringLiteral("studentId")] = studentId;
 	m_sessionHistory.append( event );
 	
 	Q_EMIT studentRemoved( sessionId );
-	Q_EMIT sessionEvent( sessionId, "student_removed", QString( "Student %1 removed from session %2" ).arg( studentId ).arg( sessionId ) );
+	Q_EMIT sessionEvent( sessionId, QStringLiteral("student_removed"), QString( QStringLiteral("Student %1 removed from session %2") ).arg( studentId ).arg( sessionId ) );
 }
 
 QMap<int, QString> ClassWatchSessionManager::getAllStudentAssignments() const
@@ -196,10 +196,10 @@ QMap<int, QString> ClassWatchSessionManager::getAllStudentAssignments() const
 void ClassWatchSessionManager::recordSessionEvent( int sessionId, const QString& eventType, const QString& details )
 {
 	QJsonObject event;
-	event["timestamp"] = QDateTime::currentDateTime().toString( Qt::ISODate );
-	event["sessionId"] = sessionId;
-	event["eventType"] = eventType;
-	event["details"] = details;
+	event[QStringLiteral("timestamp")] = QDateTime::currentDateTime().toString( Qt::ISODate );
+	event[QStringLiteral("sessionId")] = sessionId;
+	event[QStringLiteral("eventType")] = eventType;
+	event[QStringLiteral("details")] = details;
 	m_sessionHistory.append( event );
 	
 	// Keep only last 1000 events
@@ -215,7 +215,7 @@ QList<QJsonObject> ClassWatchSessionManager::getSessionHistory( int sessionId, i
 	QList<QJsonObject> filteredHistory;
 	
 	for ( const QJsonObject& event : m_sessionHistory ) {
-		if ( sessionId == -1 || event["sessionId"].toInt() == sessionId ) {
+		if ( sessionId == -1 || event[QStringLiteral("sessionId")].toInt() == sessionId ) {
 			filteredHistory.append( event );
 			if ( filteredHistory.size() >= limit ) {
 				break;
@@ -306,10 +306,10 @@ void ClassWatchSessionManager::updateSessionInfo( int sessionId, const PlatformS
 		Q_EMIT sessionDetected( sessionId, info );
 		
 		QJsonObject event;
-		event["timestamp"] = QDateTime::currentDateTime().toString( Qt::ISODate );
-		event["sessionId"] = sessionId;
-		event["eventType"] = "session_detected";
-		event["sessionType"] = determineSessionType( sessionId );
+		event[QStringLiteral("timestamp")] = QDateTime::currentDateTime().toString( Qt::ISODate );
+		event[QStringLiteral("sessionId")] = sessionId;
+		event[QStringLiteral("eventType")] = QStringLiteral("session_detected");
+		event[QStringLiteral("sessionType")] = determineSessionType( sessionId );
 		m_sessionHistory.append( event );
 	}
 	
@@ -319,7 +319,7 @@ void ClassWatchSessionManager::updateSessionInfo( int sessionId, const PlatformS
 void ClassWatchSessionManager::classifySession( int sessionId )
 {
 	QString newType = determineSessionType( sessionId );
-	QString oldType = m_sessionTypes.value( sessionId, "unknown" );
+	QString oldType = m_sessionTypes.value( sessionId, QStringLiteral("unknown") );
 	
 	if ( newType != oldType ) {
 		m_sessionTypes[sessionId] = newType;
@@ -350,9 +350,9 @@ void ClassWatchSessionManager::checkSessionTimeouts()
 		Q_EMIT sessionLost( sessionId );
 		
 		QJsonObject event;
-		event["timestamp"] = QDateTime::currentDateTime().toString( Qt::ISODate );
-		event["sessionId"] = sessionId;
-		event["eventType"] = "session_lost";
+		event[QStringLiteral("timestamp")] = QDateTime::currentDateTime().toString( Qt::ISODate );
+		event[QStringLiteral("sessionId")] = sessionId;
+		event[QStringLiteral("eventType")] = QStringLiteral("session_lost");
 		m_sessionHistory.append( event );
 	}
 }
@@ -366,17 +366,17 @@ QString ClassWatchSessionManager::determineSessionType( int sessionId ) const
 	PlatformSessionFunctions& sessionFunctions = VeyonCore::platform().sessionFunctions();
 	QString sessionType = sessionFunctions.currentSessionType();
 	
-	if ( sessionType.contains( "rdp", Qt::CaseInsensitive ) ||
-		 sessionType.contains( "remote", Qt::CaseInsensitive ) ) {
-		return "rdp";
+	if ( sessionType.contains( QStringLiteral("rdp"), Qt::CaseInsensitive ) ||
+		 sessionType.contains( QStringLiteral("remote"), Qt::CaseInsensitive ) ) {
+		return QStringLiteral("rdp");
 	}
 	
-	if ( sessionType.contains( "console", Qt::CaseInsensitive ) ||
+	if ( sessionType.contains( QStringLiteral("console"), Qt::CaseInsensitive ) ||
 		 sessionType.isEmpty() ) {
-		return "console";
+		return QStringLiteral("console");
 	}
 	
-	return "unknown";
+	return QStringLiteral("unknown");
 }
 
 bool ClassWatchSessionManager::validateSessionId( int sessionId ) const

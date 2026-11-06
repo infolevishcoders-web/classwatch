@@ -33,7 +33,8 @@ class VEYON_CORE_EXPORT ClassWatchComputer : public Computer
 {
 	Q_GADGET
 public:
-	explicit ClassWatchComputer( const Computer& computer = {} );
+	explicit ClassWatchComputer( const Computer& computer );
+	ClassWatchComputer();
 
 	// ClassWatch ID (CW-001, CW-002, etc.)
 	void setClassWatchId( const QString& classWatchId )

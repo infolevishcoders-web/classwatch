@@ -45,7 +45,7 @@ QString ClassWatchIdGenerator::generateId( const QStringList& existingIds )
 
 bool ClassWatchIdGenerator::isValidId( const QString& id )
 {
-	QRegularExpression regex( "^CW-\\d{3,}$" );
+	QRegularExpression regex( QStringLiteral("^CW-\\d{3,}$") );
 	return regex.match( id ).hasMatch();
 }
 
@@ -61,7 +61,7 @@ int ClassWatchIdGenerator::parseIdNumber( const QString& id )
 
 QString ClassWatchIdGenerator::formatId( int number )
 {
-	return QString( "CW-%1" ).arg( number, 3, 10, QChar( '0' ) );
+	return QString( QStringLiteral("CW-%1") ).arg( number, 3, 10, QLatin1Char('0') );
 }
 
 QString ClassWatchIdGenerator::getNextAvailableId( const QStringList& existingIds )

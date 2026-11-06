@@ -61,7 +61,7 @@ ClassWatchSessionPanel::ClassWatchSessionPanel( VeyonMaster* master, QWidget* pa
 	// Set monitor button state based on configuration
 	VeyonConfiguration& config = VeyonCore::config();
 	ui->monitorToggleButton->setChecked( config.enableMultiSessionSupport() );
-	ui->monitorToggleButton->setText( config.enableMultiSessionSupport() ? "Stop Monitoring" : "Start Monitoring" );
+	ui->monitorToggleButton->setText( config.enableMultiSessionSupport() ? QStringLiteral("Stop Monitoring") : QStringLiteral("Start Monitoring") );
 	
 	refreshSessionList();
 }
@@ -134,13 +134,13 @@ void ClassWatchSessionPanel::onSessionSelectionChanged()
 	QList<QTreeWidgetItem*> selectedItems = ui->sessionTreeWidget->selectedItems();
 	if ( selectedItems.isEmpty() ) {
 		// Clear details
-		ui->sessionIdValue->setText( "-" );
-		ui->sessionTypeValue->setText( "-" );
-		ui->userNameValue->setText( "-" );
-		ui->clientAddressValue->setText( "-" );
-		ui->clientNameValue->setText( "-" );
-		ui->hostNameValue->setText( "-" );
-		ui->uptimeValue->setText( "-" );
+		ui->sessionIdValue->setText( QStringLiteral("-") );
+		ui->sessionTypeValue->setText( QStringLiteral("-") );
+		ui->userNameValue->setText( QStringLiteral("-") );
+		ui->clientAddressValue->setText( QStringLiteral("-") );
+		ui->clientNameValue->setText( QStringLiteral("-") );
+		ui->hostNameValue->setText( QStringLiteral("-") );
+		ui->uptimeValue->setText( QStringLiteral("-") );
 		ui->assignedStudentEdit->clear();
 		return;
 	}
@@ -190,13 +190,13 @@ void ClassWatchSessionPanel::populateSessionTree()
 		item->setText( 2, info.clientName );
 		item->setText( 3, m_sessionManager->getStudentForSession( info.id ) );
 		item->setText( 4, formatUptime( info.uptime ) );
-		item->setText( 5, m_sessionManager->isActiveSession( info.id ) ? "Active" : "Inactive" );
-		
+		item->setText( 5, m_sessionManager->isActiveSession( info.id ) ? QStringLiteral("Active") : QStringLiteral("Inactive") );
+
 		// Set status color
 		if ( m_sessionManager->isActiveSession( info.id ) ) {
-			item->setForeground( 5, QColor( "green" ) );
+			item->setForeground( 5, QColor( Qt::green ) );
 		} else {
-			item->setForeground( 5, QColor( "red" ) );
+			item->setForeground( 5, QColor( Qt::red ) );
 		}
 		
 		// Store session ID as user data
@@ -222,14 +222,14 @@ void ClassWatchSessionPanel::populateSessionHistory()
 	QList<QJsonObject> history = m_sessionManager->getSessionHistory( -1, 50 ); // Last 50 events
 	
 	for ( const QJsonObject& event : history ) {
-		QString timestamp = event["timestamp"].toString();
-		QString eventType = event["eventType"].toString();
-		QString details = event["details"].toString();
-		int sessionId = event["sessionId"].toInt();
+		QString timestamp = event[QStringLiteral("timestamp")].toString();
+		QString eventType = event[QStringLiteral("eventType")].toString();
+		QString details = event[QStringLiteral("details")].toString();
+		int sessionId = event[QStringLiteral("sessionId")].toInt();
 		
-		QString displayText = QString( "[%1] Session %2: %3" ).arg( timestamp, QString::number( sessionId ), eventType );
+		QString displayText = QString( QStringLiteral("[%1] Session %2: %3") ).arg( timestamp, QString::number( sessionId ), eventType );
 		if ( !details.isEmpty() ) {
-			displayText += QString( " - %1" ).arg( details );
+			displayText += QString( QStringLiteral(" - %1") ).arg( details );
 		}
 		
 		ui->sessionHistoryList->addItem( displayText );
@@ -240,13 +240,13 @@ void ClassWatchSessionPanel::onAssignStudent()
 {
 	QList<QTreeWidgetItem*> selectedItems = ui->sessionTreeWidget->selectedItems();
 	if ( selectedItems.isEmpty() ) {
-		QMessageBox::warning( this, "No Selection", "Please select a session first." );
+		QMessageBox::warning( this, QStringLiteral("No Selection"), QStringLiteral("Please select a session first.") );
 		return;
 	}
 
 	QString studentId = ui->assignedStudentEdit->text().trimmed();
 	if ( studentId.isEmpty() ) {
-		QMessageBox::warning( this, "Invalid Input", "Please enter a student ID." );
+		QMessageBox::warning( this, QStringLiteral("Invalid Input"), QStringLiteral("Please enter a student ID.") );
 		return;
 	}
 
@@ -256,14 +256,14 @@ void ClassWatchSessionPanel::onAssignStudent()
 	m_sessionManager->assignStudentToSession( sessionId, studentId );
 	refreshSessionList();
 	
-	QMessageBox::information( this, "Success", QString( "Student %1 assigned to session %2." ).arg( studentId ).arg( sessionId ) );
+	QMessageBox::warning( this, QStringLiteral("Success"), QString( QStringLiteral("Student %1 assigned to session %2.") ).arg( studentId ).arg( sessionId ) );
 }
 
 void ClassWatchSessionPanel::onRemoveStudent()
 {
 	QList<QTreeWidgetItem*> selectedItems = ui->sessionTreeWidget->selectedItems();
 	if ( selectedItems.isEmpty() ) {
-		QMessageBox::warning( this, "No Selection", "Please select a session first." );
+		QMessageBox::warning( this, QStringLiteral("No Selection"), QStringLiteral("Please select a session first.") );
 		return;
 	}
 
@@ -273,13 +273,13 @@ void ClassWatchSessionPanel::onRemoveStudent()
 	m_sessionManager->removeStudentFromSession( sessionId );
 	refreshSessionList();
 	
-	QMessageBox::information( this, "Success", QString( "Student removed from session %1." ).arg( sessionId ) );
+	QMessageBox::warning( this, QStringLiteral("Success"), QString( QStringLiteral("Student removed from session %1.") ).arg( sessionId ) );
 }
 
 void ClassWatchSessionPanel::onClearHistory()
 {
-	int result = QMessageBox::question( this, "Confirm Clear",
-									   "Are you sure you want to clear all session history?",
+	int result = QMessageBox::warning( this, QStringLiteral("Confirm Clear"),
+									   QStringLiteral("Are you sure you want to clear all session history?"),
 									   QMessageBox::Yes | QMessageBox::No );
 	
 	if ( result == QMessageBox::Yes ) {
@@ -290,9 +290,9 @@ void ClassWatchSessionPanel::onClearHistory()
 
 void ClassWatchSessionPanel::onExportHistory()
 {
-	QString filePath = QFileDialog::getSaveFileName( this, "Export Session History",
-												 QStandardPaths::writableLocation( QStandardPaths::DocumentsLocation ) + "/classwatch_session_history.json",
-												 "JSON Files (*.json)" );
+	QString filePath = QFileDialog::getSaveFileName( this, QStringLiteral("Export Session History"),
+												 QStandardPaths::writableLocation( QStandardPaths::DocumentsLocation ) + QStringLiteral("/classwatch_session_history.json"),
+												 QStringLiteral("JSON Files (*.json)") );
 	
 	if ( filePath.isEmpty() ) {
 		return;
@@ -305,9 +305,9 @@ void ClassWatchSessionPanel::onExportHistory()
 	}
 
 	QJsonObject rootObj;
-	rootObj["exportTime"] = QDateTime::currentDateTime().toString( Qt::ISODate );
-	rootObj["sessionCount"] = m_sessionManager->sessionCount();
-	rootObj["history"] = historyArray;
+	rootObj[QStringLiteral("exportTime")] = QDateTime::currentDateTime().toString( Qt::ISODate );
+	rootObj[QStringLiteral("sessionCount")] = m_sessionManager->sessionCount();
+	rootObj[QStringLiteral("history")] = historyArray;
 
 	QJsonDocument doc( rootObj );
 	QFile file( filePath );
@@ -315,9 +315,9 @@ void ClassWatchSessionPanel::onExportHistory()
 	if ( file.open( QIODevice::WriteOnly ) ) {
 		file.write( doc.toJson() );
 		file.close();
-		QMessageBox::information( this, "Success", "Session history exported successfully." );
+		QMessageBox::warning( this, QStringLiteral("Success"), QStringLiteral("Session history exported successfully.") );
 	} else {
-		QMessageBox::warning( this, "Error", "Failed to export session history." );
+		QMessageBox::warning( this, QStringLiteral("Error"), QStringLiteral("Failed to export session history.") );
 	}
 }
 
@@ -331,10 +331,10 @@ void ClassWatchSessionPanel::onMonitorToggle()
 	
 	if ( enabled ) {
 		m_sessionManager->startSessionMonitoring();
-		ui->monitorToggleButton->setText( "Stop Monitoring" );
+		ui->monitorToggleButton->setText( QStringLiteral(QStringLiteral("Stop Monitoring")) );
 	} else {
 		m_sessionManager->stopSessionMonitoring();
-		ui->monitorToggleButton->setText( "Start Monitoring" );
+		ui->monitorToggleButton->setText( QStringLiteral(QStringLiteral("Start Monitoring")) );
 	}
 	
 	refreshSessionList();
@@ -356,8 +356,8 @@ QString ClassWatchSessionPanel::formatUptime( int seconds ) const
 	int secs = seconds % 60;
 	
 	if ( hours > 0 ) {
-		return QString( "%1:%2:%3" ).arg( hours ).arg( minutes, 2, 10, QChar( '0' ) ).arg( secs, 2, 10, QChar( '0' ) );
+		return QString( QStringLiteral("%1:%2:%3") ).arg( hours ).arg( minutes, 2, 10, QChar( '0' ) ).arg( secs, 2, 10, QChar( '0' ) );
 	} else {
-		return QString( "%1:%2" ).arg( minutes ).arg( secs, 2, 10, QChar( '0' ) );
+		return QString( QStringLiteral("%1:%2") ).arg( minutes ).arg( secs, 2, 10, QChar( '0' ) );
 	}
 }

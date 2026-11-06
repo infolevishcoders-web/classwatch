@@ -126,7 +126,7 @@ void ClassWatchComputerManager::updateConnectionStatus( const QString& classWatc
 	QString oldStatus = computer.connectionStatus();
 	computer.setConnectionStatus( status );
 	
-	if ( status == "Connected" ) {
+	if ( status == QStringLiteral("Connected") ) {
 		computer.setLastConnectionTime( QDateTime::currentDateTime() );
 	}
 
@@ -167,7 +167,7 @@ ClassWatchComputerList ClassWatchComputerManager::getConnectedComputers() const
 {
 	ClassWatchComputerList list;
 	for ( auto it = m_computers.begin(); it != m_computers.end(); ++it ) {
-		if ( it.value().connectionStatus() == "Connected" ) {
+		if ( it.value().connectionStatus() == QStringLiteral("Connected") ) {
 			list.append( it.value() );
 		}
 	}
@@ -178,7 +178,7 @@ ClassWatchComputerList ClassWatchComputerManager::getOfflineComputers() const
 {
 	ClassWatchComputerList list;
 	for ( auto it = m_computers.begin(); it != m_computers.end(); ++it ) {
-		if ( it.value().connectionStatus() != "Connected" ) {
+		if ( it.value().connectionStatus() != QStringLiteral("Connected") ) {
 			list.append( it.value() );
 		}
 	}
@@ -234,27 +234,27 @@ bool ClassWatchComputerManager::saveRegistry( const QString& filePath )
 		const ClassWatchComputer& computer = it.value();
 		
 		QJsonObject computerObj;
-		computerObj["classWatchId"] = computer.classWatchId();
-		computerObj["displayName"] = computer.displayName();
-		computerObj["hostAddress"] = computer.hostAddress().toString();
-		computerObj["macAddress"] = computer.macAddress();
-		computerObj["location"] = computer.location();
-		computerObj["windowsVersion"] = computer.windowsVersion();
-		computerObj["loggedInUser"] = computer.loggedInUser();
-		computerObj["domainName"] = computer.domainName();
-		computerObj["connectionStatus"] = computer.connectionStatus();
-		computerObj["sessionType"] = computer.sessionType();
-		computerObj["cpuInfo"] = computer.cpuInfo();
-		computerObj["ramInfo"] = computer.ramInfo();
-		computerObj["gpuInfo"] = computer.gpuInfo();
-		computerObj["lastConnectionTime"] = computer.lastConnectionTime().toString(Qt::ISODate);
+		computerObj[QStringLiteral("classWatchId")] = computer.classWatchId();
+		computerObj[QStringLiteral("displayName")] = computer.displayName();
+		computerObj[QStringLiteral("hostAddress")] = computer.hostAddress().toString();
+		computerObj[QStringLiteral("macAddress")] = computer.macAddress();
+		computerObj[QStringLiteral("location")] = computer.location();
+		computerObj[QStringLiteral("windowsVersion")] = computer.windowsVersion();
+		computerObj[QStringLiteral("loggedInUser")] = computer.loggedInUser();
+		computerObj[QStringLiteral("domainName")] = computer.domainName();
+		computerObj[QStringLiteral("connectionStatus")] = computer.connectionStatus();
+		computerObj[QStringLiteral("sessionType")] = computer.sessionType();
+		computerObj[QStringLiteral("cpuInfo")] = computer.cpuInfo();
+		computerObj[QStringLiteral("ramInfo")] = computer.ramInfo();
+		computerObj[QStringLiteral("gpuInfo")] = computer.gpuInfo();
+		computerObj[QStringLiteral("lastConnectionTime")] = computer.lastConnectionTime().toString(Qt::ISODate);
 		
 		computersArray.append( computerObj );
 	}
 	
 	QJsonObject rootObj;
-	rootObj["version"] = "1.0";
-	rootObj["computers"] = computersArray;
+	rootObj[QStringLiteral("version")] = QStringLiteral("1.0");
+	rootObj[QStringLiteral("computers")] = computersArray;
 	
 	QJsonDocument doc( rootObj );
 	QFile file( filePath );
@@ -291,7 +291,7 @@ bool ClassWatchComputerManager::loadRegistry( const QString& filePath )
 	}
 	
 	QJsonObject rootObj = doc.object();
-	QJsonArray computersArray = rootObj["computers"].toArray();
+	QJsonArray computersArray = rootObj[QStringLiteral("computers")].toArray();
 	
 	m_computers.clear();
 	m_networkObjectToClassWatchId.clear();
@@ -300,21 +300,21 @@ bool ClassWatchComputerManager::loadRegistry( const QString& filePath )
 		QJsonObject computerObj = value.toObject();
 		
 		ClassWatchComputer computer;
-		computer.setClassWatchId( computerObj["classWatchId"].toString() );
-		computer.setDisplayName( computerObj["displayName"].toString() );
-		computer.setHostAddress( computerObj["hostAddress"].toString() );
-		computer.setMacAddress( computerObj["macAddress"].toString() );
-		computer.setLocation( computerObj["location"].toString() );
-		computer.setWindowsVersion( computerObj["windowsVersion"].toString() );
-		computer.setLoggedInUser( computerObj["loggedInUser"].toString() );
-		computer.setDomainName( computerObj["domainName"].toString() );
-		computer.setConnectionStatus( computerObj["connectionStatus"].toString() );
-		computer.setSessionType( computerObj["sessionType"].toString() );
-		computer.setCpuInfo( computerObj["cpuInfo"].toString() );
-		computer.setRamInfo( computerObj["ramInfo"].toString() );
-		computer.setGpuInfo( computerObj["gpuInfo"].toString() );
+		computer.setClassWatchId( computerObj[QStringLiteral("classWatchId")].toString() );
+		computer.setDisplayName( computerObj[QStringLiteral("displayName")].toString() );
+		computer.setHostAddress( computerObj[QStringLiteral("hostAddress")].toString() );
+		computer.setMacAddress( computerObj[QStringLiteral("macAddress")].toString() );
+		computer.setLocation( computerObj[QStringLiteral("location")].toString() );
+		computer.setWindowsVersion( computerObj[QStringLiteral("windowsVersion")].toString() );
+		computer.setLoggedInUser( computerObj[QStringLiteral("loggedInUser")].toString() );
+		computer.setDomainName( computerObj[QStringLiteral("domainName")].toString() );
+		computer.setConnectionStatus( computerObj[QStringLiteral("connectionStatus")].toString() );
+		computer.setSessionType( computerObj[QStringLiteral("sessionType")].toString() );
+		computer.setCpuInfo( computerObj[QStringLiteral("cpuInfo")].toString() );
+		computer.setRamInfo( computerObj[QStringLiteral("ramInfo")].toString() );
+		computer.setGpuInfo( computerObj[QStringLiteral("gpuInfo")].toString() );
 		
-		QString timeStr = computerObj["lastConnectionTime"].toString();
+		QString timeStr = computerObj[QStringLiteral("lastConnectionTime")].toString();
 		computer.setLastConnectionTime( QDateTime::fromString( timeStr, Qt::ISODate ) );
 		
 		QString classWatchId = computer.classWatchId();

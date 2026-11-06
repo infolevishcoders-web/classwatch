@@ -24,6 +24,21 @@
 
 #include "ClassWatchComputer.h"
 
+ClassWatchComputer::ClassWatchComputer() :
+	Computer(),
+	m_classWatchId(),
+	m_windowsVersion(),
+	m_loggedInUser(),
+	m_domainName(),
+	m_connectionStatus(),
+	m_lastConnectionTime(),
+	m_sessionType(),
+	m_cpuInfo(),
+	m_ramInfo(),
+	m_gpuInfo()
+{
+}
+
 ClassWatchComputer::ClassWatchComputer( const Computer& computer ) :
 	Computer( computer ),
 	m_classWatchId(),
