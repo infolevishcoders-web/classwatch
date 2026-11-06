@@ -384,7 +384,7 @@ QString ClassWatchMessageManager::sendFileToMultiple( const QStringList& recipie
 		}
 	}
 	
-	return transferIds.join( "," );
+	return transferIds.join( QStringLiteral(",") );
 }
 
 QString ClassWatchMessageManager::sendFileToAll( const QString& filePath, const QString& senderId )
@@ -484,17 +484,17 @@ void ClassWatchMessageManager::onCleanupTimer()
 
 QString ClassWatchMessageManager::generateMessageId()
 {
-	return QString( QStringLiteral("MSG-%1-%2") ).arg( QDateTime::currentDateTime().toString( "yyyyMMdd-hhmmss" ) ).arg( ++m_messageCounter );
+	return QString( QStringLiteral("MSG-%1-%2") ).arg( QDateTime::currentDateTime().toString( QStringLiteral("yyyyMMdd-hhmmss") ) ).arg( ++m_messageCounter );
 }
 
 QString ClassWatchMessageManager::generateTransferId()
 {
-	return QString( QStringLiteral("FILE-%1-%2") ).arg( QDateTime::currentDateTime().toString( "yyyyMMdd-hhmmss" ) ).arg( ++m_transferCounter );
+	return QString( QStringLiteral("FILE-%1-%2") ).arg( QDateTime::currentDateTime().toString( QStringLiteral("yyyyMMdd-hhmmss") ) ).arg( ++m_transferCounter );
 }
 
 QString ClassWatchMessageManager::generateChatId()
 {
-	return QString( QStringLiteral("CHAT-%1-%2") ).arg( QDateTime::currentDateTime().toString( "yyyyMMdd-hhmmss" ) ).arg( ++m_chatCounter );
+	return QString( QStringLiteral("CHAT-%1-%2") ).arg( QDateTime::currentDateTime().toString( QStringLiteral("yyyyMMdd-hhmmss") ) ).arg( ++m_chatCounter );
 }
 
 void ClassWatchMessageManager::processMessageQueue()
