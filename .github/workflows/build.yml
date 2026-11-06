@@ -39,7 +39,7 @@ jobs:
         version: '6.5.3'
         arch: win64_mingw
         cache: true
-        modules: qtcharts qtwebsockets qtsvg qttranslations qt5compat
+        modules: qtcharts qtwebsockets
 
     - name: Build ClassWatch
       run: |
@@ -87,7 +87,17 @@ jobs:
           liblzo2-dev \
           libldap2-dev \
           libsasl2-dev \
-          libpam0g-dev
+          libpam0g-dev \
+          libprocps-dev \
+          libfakekey-dev \
+          libxtst-dev \
+          xorg-dev \
+          libxrandr-dev \
+          libxinerama-dev \
+          libxcursor-dev \
+          libxdamage-dev \
+          libxcomposite-dev \
+          libxfixes-dev
 
     - name: Build ClassWatch
       run: |
@@ -124,13 +134,16 @@ jobs:
 
     - name: Build ClassWatch
       env:
-        PKG_CONFIG_PATH: /opt/homebrew/opt/openldap/lib/pkgconfig:/opt/homebrew/opt/cyrus-sasl/lib/pkgconfig:/opt/homebrew/lib/pkgconfig
-        LDFLAGS: -L/opt/homebrew/opt/openldap/lib -L/opt/homebrew/opt/cyrus-sasl/lib
-        CPPFLAGS: -I/opt/homebrew/opt/openldap/include -I/opt/homebrew/opt/cyrus-sasl/include
+        PKG_CONFIG_PATH: /opt/homebrew/opt/openldap/lib/pkgconfig:/opt/homebrew/opt/cyrus-sasl/lib/pkgconfig:/opt/homebrew/lib/pkgconfig:/opt/homebrew/opt/openssl@3/lib/pkgconfig
+        LDFLAGS: -L/opt/homebrew/opt/openldap/lib -L/opt/homebrew/opt/cyrus-sasl/lib -L/opt/homebrew/opt/openssl@3/lib
+        CPPFLAGS: -I/opt/homebrew/opt/openldap/include -I/opt/homebrew/opt/cyrus-sasl/include -I/opt/homebrew/opt/openssl@3/include
       run: |
         mkdir build
         cd build
-        cmake .. -DCMAKE_BUILD_TYPE=Release -DWITH_TESTS=OFF
+        cmake .. -DCMAKE_BUILD_TYPE=Release -DWITH_TESTS=OFF \
+          -DLDAP_INCLUDE_DIR=/opt/homebrew/opt/openldap/include \
+          -DLDAP_LIBRARY=/opt/homebrew/opt/openldap/lib/libldap.dylib \
+          -DLBER_LIBRARY=/opt/homebrew/opt/openldap/lib/liblber.dylib
         cmake --build . --parallel
 
     - name: Package macOS
