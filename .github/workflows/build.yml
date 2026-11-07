@@ -105,7 +105,23 @@ jobs:
           done < <(objdump -p "$f" 2>/dev/null | awk '/DLL Name/{print $3}')
         done
         echo "bundled ${#CW_SEEN[@]} runtime dlls"
-        ls "$STAGE" | wc -l
+        # supplementary runtime DLLs - the import walk can miss versioned
+        # MinGW/Qt helper libraries; copy every matching runtime that exists
+        for pat in \
+          'libb2-*.dll' 'libdouble-conversion.dll' 'libmd4c.dll' \
+          'libfreetype-*.dll' 'libharfbuzz-*.dll' 'libglib-2.0-*.dll' \
+          'libgraphite2.dll' 'libicu*.dll' 'libpcre2-*.dll' 'libzstd.dll' \
+          'libjpeg-*.dll' 'libgcrypt-*.dll' 'libgpg-error-*.dll' \
+          'libgnutls-*.dll' 'libnettle-*.dll' 'libhogweed-*.dll' \
+          'libgmp-*.dll' 'libtasn1-*.dll' 'libidn2-*.dll' \
+          'libunistring-*.dll' 'libp11-kit-*.dll' 'libffi-*.dll' \
+          'libbrotli*.dll' 'libexpat-*.dll' 'libiconv-*.dll' 'libintl-*.dll' \
+          'libpcre-*.dll' 'libb2*.dll' 'libmd4c*.dll'; do
+          for f in /ucrt64/bin/$pat; do
+            [ -f "$f" ] && cp "$f" "$STAGE/"
+          done
+        done
+        ls "$STAGE"/*.dll | wc -l
         # QCA crypto plugin (location varies between MSYS2 package layouts)
         [ -f /ucrt64/lib/qca-qt6/crypto/libqca-ossl.dll ] && cp /ucrt64/lib/qca-qt6/crypto/libqca-ossl.dll "$STAGE/crypto/"
         if [ ! -f "$STAGE/crypto/libqca-ossl.dll" ]; then
@@ -113,11 +129,15 @@ jobs:
           [ -n "$QCA_DLL" ] && cp "$QCA_DLL" "$STAGE/crypto/"
         fi
         find /ucrt64 -name "*qca*" 2>/dev/null | head -10
-        # Qt plugins
-        [ -f "$QTPLUG/imageformats/qjpeg.dll" ] && cp "$QTPLUG/imageformats/qjpeg.dll" "$STAGE/imageformats/"
-        [ -f "$QTPLUG/platforms/qwindows.dll" ] && cp "$QTPLUG/platforms/qwindows.dll" "$STAGE/platforms/"
-        cp "$QTPLUG"/styles/*.dll "$STAGE/styles/" 2>/dev/null || true
-        [ -f "$QTPLUG/tls/qopensslbackend.dll" ] && cp "$QTPLUG/tls/qopensslbackend.dll" "$STAGE/tls/"
+        # Qt plugins - locate dynamically; MSYS2 plugin dir layout varies
+        for spec in "imageformats:qjpeg.dll" "platforms:qwindows.dll" "tls:qopensslbackend.dll"; do
+          qdir="${spec%%:*}"; qname="${spec##*:}"
+          qsrc=$(find /ucrt64 -name "$qname" 2>/dev/null | head -1)
+          if [ -n "$qsrc" ]; then cp "$qsrc" "$STAGE/$qdir/"; else echo "MISSING QT PLUGIN: $qname"; fi
+        done
+        qstyle=$(find /ucrt64 -name 'qwindowsvistastyle.dll' -o -name 'qmodernwindowsstyle.dll' 2>/dev/null | head -1)
+        if [ -n "$qstyle" ]; then cp "$(dirname "$qstyle")"/*.dll "$STAGE/styles/" 2>/dev/null || true; fi
+        ls "$STAGE"/platforms "$STAGE"/imageformats "$STAGE"/styles "$STAGE"/tls 2>/dev/null
         # interception driver files, desktop duplication engine, docs, installer script
         cp -r ../3rdparty/interception/* "$STAGE/interception/"
         [ -f ../3rdparty/ddengine/ddengine64.dll ] && cp ../3rdparty/ddengine/ddengine64.dll "$STAGE/"
@@ -136,7 +156,7 @@ jobs:
         sed -i \
           -e "s|!define LICENSE_TXT \"COPYING\"|!define LICENSE_TXT \"${ESC_STAGE}\\\\COPYING\"|" \
           -e "s|\"nsis/|\"${ESC_STAGE}\\\\nsis\\\\|g" \
-          -e "s|File \"\([^\"]*\)\"|File \"${ESC_STAGE}\\\\\1\"|g" \
+          -e "s|^File \"\([^\"]*\)\"|File \"${ESC_STAGE}\\\\\1\"|g" \
           -e "/File \".*translations/d" \
           "$NSI_FILE"
         # normalize remaining forward slashes inside File paths to backslashes
