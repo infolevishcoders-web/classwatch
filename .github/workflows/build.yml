@@ -151,6 +151,7 @@ jobs:
     - name: Package macOS
       run: |
         cd build
+        mkdir -p _CPack_Packages/Darwin/DragNDrop/ALL_IN_ONE
         cpack -G DragNDrop
 
     - name: Upload macOS Package

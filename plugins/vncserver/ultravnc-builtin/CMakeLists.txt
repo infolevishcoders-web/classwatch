@@ -115,13 +115,17 @@ set(ULTRAVNC_COMPILER_FLAGS
 	-Wno-unknown-pragmas -Wno-unused-variable -Wno-unused-value
 	-Wno-unused-but-set-variable -Wno-deprecated-declarations
 	-Wno-format-zero-length -Wno-sign-compare -Wno-int-to-pointer-cast
-	-Wno-old-style-definition -Wno-error=unused-but-set-variable
-	-Wno-error=old-style-definition -fexceptions
-	-DGWL_USERDATA=GWLP_USERDATA -DGWL_WNDPROC=GWLP_WNDPROC
-	-DGWL_HINSTANCE=GWLP_HINSTANCE -DGWL_STYLE=GWLP_STYLE
-	-DGWL_EXSTYLE=GWLP_EXSTYLE -DDWL_MSGRESULT=DWLP_MSGRESULT
+	-Wno-error=unused-but-set-variable -Wno-unused-label
+	-Wno-error=unused-label -fexceptions
+)
+
+target_compile_definitions(builtin-ultravnc-server PRIVATE
+	GWL_USERDATA=GWLP_USERDATA GWL_WNDPROC=GWLP_WNDPROC
+	GWL_HINSTANCE=GWLP_HINSTANCE GWL_STYLE=GWLP_STYLE
+	GWL_EXSTYLE=GWLP_EXSTYLE DWL_MSGRESULT=DWLP_MSGRESULT
 )
 
 target_compile_options(builtin-ultravnc-server PRIVATE ${ULTRAVNC_COMPILER_FLAGS})
+target_compile_options(builtin-ultravnc-server PRIVATE $<$<COMPILE_LANGUAGE:C>:-Wno-old-style-definition;-Wno-error=old-style-definition>)
 target_compile_options(builtin-ultravnc-server PRIVATE $<$<COMPILE_LANGUAGE:CXX>:-Wno-terminate;-Wno-conversion-null>)
 set_target_properties(builtin-ultravnc-server PROPERTIES UNITY_BUILD OFF)

@@ -26,6 +26,7 @@
 
 #include <thread>
 
+#include <QObject>
 #include <QMutex>
 #include <QQueue>
 #include <QWaitCondition>

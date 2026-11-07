@@ -22,6 +22,9 @@ extern Fn fn;
 #define fprintf(x, ...) qCritical(__VA_ARGS__)
 #endif
 
+#ifndef _MSC_VER
+#define __try
+#endif
 #define __leave goto cleanup
 #define __finally cleanup:
 

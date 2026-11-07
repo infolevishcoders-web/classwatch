@@ -71,8 +71,13 @@ target_include_directories(windows-platform PRIVATE
 
 target_link_libraries(windows-platform PRIVATE -lws2_32 -lwtsapi32 -lnetapi32 -luserenv -limm32 -lntdll -liphlpapi -lsetupapi -lsecur32)
 target_link_libraries(windows-platform PRIVATE Qt6::GuiPrivate)
-target_compile_definitions(windows-platform PRIVATE ULTRAVNC_VEYON_SUPPORT INTERCEPTION_STATIC)
+target_compile_definitions(windows-platform PRIVATE ULTRAVNC_VEYON_SUPPORT INTERCEPTION_STATIC
+	GWL_USERDATA=GWLP_USERDATA GWL_WNDPROC=GWLP_WNDPROC GWL_HINSTANCE=GWLP_HINSTANCE
+	GWL_STYLE=GWLP_STYLE GWL_EXSTYLE=GWLP_EXSTYLE DWL_MSGRESULT=DWLP_MSGRESULT)
+if(VEYON_BUILD_WIN64)
+	target_compile_definitions(windows-platform PRIVATE _X64)
+endif()
 target_compile_options(windows-platform PRIVATE
-	"-Wno-unknown-pragmas;-flarge-source-files;-Wno-misleading-indentation;-Wno-unused-but-set-variable;-Wno-error=unused-but-set-variable;-DGWL_USERDATA=GWLP_USERDATA;-DGWL_WNDPROC=GWLP_WNDPROC;-DGWL_HINSTANCE=GWLP_HINSTANCE;-DGWL_STYLE=GWLP_STYLE;-DGWL_EXSTYLE=GWLP_EXSTYLE")
+	"-Wno-unknown-pragmas;-flarge-source-files;-Wno-misleading-indentation;-Wno-unused-variable;-Wno-unused-label;-Wno-unused-but-set-variable;-Wno-error=unused-but-set-variable;-Wno-error=unused-variable;-Wno-error=unused-label")
 set_source_files_properties(WindowsNetworkFunctions.cpp PROPERTIES SKIP_UNITY_BUILD_INCLUSION TRUE SKIP_PRECOMPILE_HEADERS TRUE)
 set_target_properties(windows-platform PROPERTIES UNITY_BUILD OFF)

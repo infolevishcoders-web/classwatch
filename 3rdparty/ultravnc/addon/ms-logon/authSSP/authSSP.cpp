@@ -15,6 +15,9 @@
 
 #include "authSSP.h"
 
+#ifndef _MSC_VER
+#define __try
+#endif
 #define __leave goto cleanup
 #define __finally cleanup:
 
