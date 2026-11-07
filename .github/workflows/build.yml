@@ -88,10 +88,13 @@ jobs:
         cp ../COPYING "$STAGE/COPYING"
         cp ../README.md "$STAGE/README.TXT"
         cp nsis/classwatch.nsi "$STAGE/"
-        ls -la "$STAGE/nsis"
-        # build the installer (pass script path with directory so NSIS resolves
-        # relative File paths against the staging dir, like upstream does)
+        # flatten nsis assets to payload root and point the script at them
+        # directly - avoids NSIS relative-path resolution issues with subdirs
+        cp "$STAGE"/nsis/*.ico "$STAGE"/nsis/*.bmp "$STAGE/"
+        sed -i 's|"nsis/|"./|g' "$STAGE/classwatch.nsi"
+        # build the installer
         cd "$STAGE"
+        pwd -W
         makensis "$(cygpath -m "$PWD")/classwatch.nsi"
         mv classwatch-*-setup.exe ..
 
