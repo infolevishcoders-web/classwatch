@@ -13,6 +13,7 @@
 #include <windows.h>
 #include "vncOSVersion.h"
 #include "stdhdrs.h"
+#include "ultravnc_mingw_compat.h"
 #include "dwmapi.h"
 #ifndef SUCCEEDED
 #define SUCCEEDED(hr) (((HRESULT)(hr)) >= 0)

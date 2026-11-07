@@ -10,6 +10,7 @@
 
 
 #include "winvnc.h"
+#include "ultravnc_mingw_compat.h"
 #include "vncserver.h"
 #include "vncdesktop.h"
 #include <string.h>

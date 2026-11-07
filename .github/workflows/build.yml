@@ -113,7 +113,6 @@ jobs:
       run: |
         cd build
         cpack -G DEB
-        cpack -G TGZ
 
     - name: Upload Linux Packages
       uses: actions/upload-artifact@v4
@@ -151,8 +150,11 @@ jobs:
     - name: Package macOS
       run: |
         cd build
-        mkdir -p _CPack_Packages/Darwin/DragNDrop/ALL_IN_ONE
-        cpack -G DragNDrop
+        rm -rf _dmg_src
+        mkdir -p _dmg_src
+        cmake --install . --prefix "$PWD/_dmg_src"
+        ln -sfn /Applications _dmg_src/Applications
+        hdiutil create -volname "classwatch-1.0.0.0" -srcfolder _dmg_src -ov -format UDZO classwatch-1.0.0.0-Darwin.dmg
 
     - name: Upload macOS Package
       uses: actions/upload-artifact@v4

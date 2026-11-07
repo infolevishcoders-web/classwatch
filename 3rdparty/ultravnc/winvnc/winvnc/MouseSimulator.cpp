@@ -10,6 +10,7 @@
 
 
 #include "stdhdrs.h"
+#include "ultravnc_mingw_compat.h"
 #include "MouseSimulator.h"
 #include "resource.h"
 HINSTANCE CursorColorManager::hInst = NULL;

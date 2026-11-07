@@ -16,10 +16,16 @@
 #include "authSSP.h"
 
 #ifndef _MSC_VER
+#ifndef __try
 #define __try
 #endif
+#ifndef __leave
 #define __leave goto cleanup
+#endif
+#ifndef __finally
 #define __finally cleanup:
+#endif
+#endif
 
 /*
  *  AuthSSP.cpp: Domainuser could be 'domain\user', just 'user' or

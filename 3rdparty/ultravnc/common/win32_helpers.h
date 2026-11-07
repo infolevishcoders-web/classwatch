@@ -12,6 +12,7 @@
 #if !defined(UVNC_COMMON_H)
 #define UVNC_COMMON_H
 
+#include "ultravnc_mingw_compat.h"
 #include <commctrl.h>
 
 namespace helper {

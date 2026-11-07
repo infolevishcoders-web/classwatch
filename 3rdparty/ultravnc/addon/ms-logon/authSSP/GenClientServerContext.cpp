@@ -23,10 +23,16 @@ extern Fn fn;
 #endif
 
 #ifndef _MSC_VER
+#ifndef __try
 #define __try
 #endif
+#ifndef __leave
 #define __leave goto cleanup
+#endif
+#ifndef __finally
 #define __finally cleanup:
+#endif
+#endif
 
 BOOL APIENTRY DllMain( HANDLE hModule, 
                        DWORD  ul_reason_for_call, 
