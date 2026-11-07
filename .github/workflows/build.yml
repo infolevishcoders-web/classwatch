@@ -59,6 +59,8 @@ jobs:
     - name: Package Windows Installer
       shell: msys2 {0}
       run: |
+        echo "shell=$0 BASH=$BASH_VERSION"
+        trap 'echo "=== STEP FAILED near line $LINENO ==="; ls -la "$STAGE" 2>/dev/null | head -30; [ -f NSISOutput.log ] && tail -40 NSISOutput.log' ERR
         export PATH="/ucrt64/bin:$PATH"
         pacman -S --needed --noconfirm mingw-w64-ucrt-x86_64-interception 2>/dev/null || true
         cd build
@@ -71,6 +73,8 @@ jobs:
         find plugins/ -name '*.dll' -exec cp {} "$STAGE/plugins/" \;
         mv "$STAGE"/plugins/lib*.dll "$STAGE/" 2>/dev/null || true
         [ -f "$STAGE/plugins/vnchooks.dll" ] && mv "$STAGE/plugins/vnchooks.dll" "$STAGE/"
+        # interception runtime library expected at install root by upstream layout
+        find /ucrt64/bin /ucrt64/lib -maxdepth 1 -iname 'interception.dll' -exec cp {} "$STAGE/" \; 2>/dev/null || true
         # translations (disabled in CI - keep dir for installer script)
         cp translations/*.qm "$STAGE/translations/" 2>/dev/null || true
         QTPLUG=/ucrt64/lib/qt6/plugins
@@ -101,6 +105,7 @@ jobs:
           done < <(objdump -p "$f" 2>/dev/null | awk '/DLL Name/{print $3}')
         done
         echo "bundled ${#CW_SEEN[@]} runtime dlls"
+        ls "$STAGE" | wc -l
         # QCA crypto plugin (location varies between MSYS2 package layouts)
         [ -f /ucrt64/lib/qca-qt6/crypto/libqca-ossl.dll ] && cp /ucrt64/lib/qca-qt6/crypto/libqca-ossl.dll "$STAGE/crypto/"
         if [ ! -f "$STAGE/crypto/libqca-ossl.dll" ]; then
@@ -120,6 +125,8 @@ jobs:
         cp ../COPYING "$STAGE/LICENSE.TXT"
         cp ../COPYING "$STAGE/COPYING"
         cp ../README.md "$STAGE/README.TXT"
+        echo "=== generated nsi ==="
+        ls -la nsis/classwatch.nsi || find . -name 'classwatch.nsi' -ls
         cp nsis/classwatch.nsi "$STAGE/"
         # rewrite every compile-time file reference to a backslash-absolute
         # Windows path - NSIS File does not accept "D:/" forward-slash drives
@@ -139,8 +146,16 @@ jobs:
         sed -i '/File ".*crypto\\\|File ".*imageformats\\\|File ".*platforms\\\|File ".*styles\\\|File ".*tls\\\|File ".*interception/s|File "|File /nonfatal "|' "$NSI_FILE"
         grep -n 'File "' "$NSI_FILE" | head -8
         # build the installer with native makensis
-        "/c/Program Files (x86)/NSIS/makensis.exe" "$(cygpath -w "$PWD/$STAGE/classwatch.nsi")"
+        echo "=== running makensis ==="
+        if ! "/c/Program Files (x86)/NSIS/makensis.exe" "$(cygpath -w "$PWD/$STAGE/classwatch.nsi")"; then
+          echo "=== MAKENSIS FAILED ==="
+          cat NSISOutput.log 2>/dev/null | tail -50
+          exit 1
+        fi
+        echo "=== makensis done ==="
+        ls -la "$STAGE"/*setup*.exe ./*setup*.exe 2>/dev/null
         mv "$STAGE"/classwatch-*-setup.exe . 2>/dev/null || mv classwatch-*-setup.exe . 2>/dev/null || true
+        ls -la ./*.exe | head
 
     - name: Upload Windows Installer
       uses: actions/upload-artifact@v4
