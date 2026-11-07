@@ -52,6 +52,10 @@ jobs:
         cmake .. -G "MinGW Makefiles" -DCMAKE_BUILD_TYPE=Release -DWITH_TESTS=OFF -DWITH_BUNDLED_LIBVNC=OFF -DWITH_WEBAPI=OFF -DWITH_PCH=OFF -DWITH_TRANSLATIONS=OFF
         cmake --build . --parallel
 
+    - name: Install NSIS
+      shell: pwsh
+      run: choco install nsis -y --no-progress
+
     - name: Package Windows Installer
       shell: msys2 {0}
       run: |
@@ -89,9 +93,9 @@ jobs:
         cp ../README.md "$STAGE/README.TXT"
         cp nsis/classwatch.nsi "$STAGE/"
         # rewrite every compile-time file reference in the generated NSIS
-        # script to an absolute MSYS-style path - the msys2 makensis binary
-        # resolves paths with POSIX semantics, so Windows "D:/..." paths fail
-        WIN_STAGE="$PWD/$STAGE"
+        # script to an absolute Windows path and build with the native NSIS
+        # compiler - the msys2 makensis mishandles paths under this shell
+        WIN_STAGE=$(cygpath -m "$PWD/$STAGE")
         NSI_FILE="$STAGE/classwatch.nsi"
         sed -i \
           -e "s|!define LICENSE_TXT \"COPYING\"|!define LICENSE_TXT \"${WIN_STAGE}/COPYING\"|" \
@@ -99,8 +103,8 @@ jobs:
           -e "s|File \"\([^\"]*\)\"|File \"${WIN_STAGE}/\1\"|g" \
           -e "/translations\/\*/d" \
           "$NSI_FILE"
-        # build the installer (output lands in build/ = upload artifact path)
-        makensis "$WIN_STAGE/classwatch.nsi"
+        # build the installer with native makensis (output lands in build/)
+        "/c/Program Files (x86)/NSIS/makensis.exe" "$(cygpath -w "$PWD/$STAGE/classwatch.nsi")"
 
     - name: Upload Windows Installer
       uses: actions/upload-artifact@v4
