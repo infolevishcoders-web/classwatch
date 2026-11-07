@@ -50,7 +50,7 @@ jobs:
         mkdir build
         cd build
         cmake .. -G "MinGW Makefiles" -DCMAKE_BUILD_TYPE=Release -DWITH_TESTS=OFF -DWITH_BUNDLED_LIBVNC=OFF -DWITH_WEBAPI=OFF -DWITH_PCH=OFF -DWITH_TRANSLATIONS=OFF
-        cmake --build . --parallel
+        cmake --build . --parallel 2
 
     - name: Install NSIS
       shell: pwsh
