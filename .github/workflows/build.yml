@@ -38,6 +38,7 @@ jobs:
           mingw-w64-ucrt-x86_64-cyrus-sasl
           mingw-w64-ucrt-x86_64-pkgconf
           mingw-w64-ucrt-x86_64-libvncserver
+          mingw-w64-ucrt-x86_64-nsis
 
     - name: Build ClassWatch
       shell: msys2 {0}
@@ -54,6 +55,7 @@ jobs:
     - name: Package Windows Installer
       shell: msys2 {0}
       run: |
+        export PATH="/ucrt64/bin:$PATH"
         cd build
         cpack -G NSIS
 
