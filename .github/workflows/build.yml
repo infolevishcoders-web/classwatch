@@ -88,16 +88,19 @@ jobs:
         cp ../COPYING "$STAGE/COPYING"
         cp ../README.md "$STAGE/README.TXT"
         cp nsis/classwatch.nsi "$STAGE/"
-        # flatten nsis assets to payload root and point the script at them
-        # directly - avoids NSIS relative-path resolution issues with subdirs
-        cp -v "$STAGE"/nsis/*.ico "$STAGE"/nsis/*.bmp "$STAGE/"
-        sed -i 's|"nsis/|"./|g' "$STAGE/classwatch.nsi"
-        ls -la "$STAGE" | grep -E "bmp|ico|nsi|COPYING"
-        # build the installer
-        cd "$STAGE"
-        pwd -W
-        makensis "$(cygpath -m "$PWD")/classwatch.nsi"
-        mv classwatch-*-setup.exe ..
+        # rewrite every compile-time file reference in the generated NSIS
+        # script to an absolute path - relative File resolution is unreliable
+        # when makensis is launched through the msys2 wrapper shell
+        WIN_STAGE=$(cygpath -m "$PWD/$STAGE")
+        NSI_FILE="$STAGE/classwatch.nsi"
+        sed -i \
+          -e "s|!define LICENSE_TXT \"COPYING\"|!define LICENSE_TXT \"${WIN_STAGE}/COPYING\"|" \
+          -e "s|\"nsis/|\"${WIN_STAGE}/nsis/|g" \
+          -e "s|File \"\([^\"]*\)\"|File \"${WIN_STAGE}/\1\"|g" \
+          -e "/translations\/\*/d" \
+          "$NSI_FILE"
+        # build the installer (output lands in build/ = upload artifact path)
+        makensis "$WIN_STAGE/classwatch.nsi"
 
     - name: Upload Windows Installer
       uses: actions/upload-artifact@v4
