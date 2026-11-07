@@ -69,7 +69,7 @@ jobs:
         # translations (disabled in CI - keep dir for installer script)
         cp translations/*.qm "$STAGE/translations/" 2>/dev/null || true
         # MSYS2 runtime DLLs
-        for d in Qt6Core Qt6Gui Qt6Widgets Qt6Network Qt6Concurrent Qt6Core5Compat Qt6WebSockets Qt6Svg Qt6OpenGL Qt6OpenGLWidgets libjpeg-62 libpng16-16 libcrypto-3-x64 libssl-3-x64 libqca-qt6 libsasl2-3 libldap liblber liblzo2-2 libvncclient libvncserver zlib1 libwinpthread-1 libstdc++-6 libgcc_s_seh-1 libssp-0; do
+        for d in Qt6Core Qt6Gui Qt6Widgets Qt6Network Qt6Concurrent Qt6Core5Compat Qt6WebSockets Qt6HttpServer Qt6Svg Qt6OpenGL Qt6OpenGLWidgets libjpeg-62 libpng16-16 libcrypto-3-x64 libssl-3-x64 libqca-qt6 libsasl2-3 libldap liblber liblzo2-2 libvncclient libvncserver interception zlib1 libwinpthread-1 libstdc++-6 libgcc_s_seh-1 libssp-0; do
           [ -f "/ucrt64/bin/$d.dll" ] && cp "/ucrt64/bin/$d.dll" "$STAGE/"
         done
         # QCA crypto plugin
@@ -83,7 +83,10 @@ jobs:
         # interception driver files, desktop duplication engine, docs, installer script
         cp -r ../3rdparty/interception/* "$STAGE/interception/"
         [ -f ../3rdparty/ddengine/ddengine64.dll ] && cp ../3rdparty/ddengine/ddengine64.dll "$STAGE/"
+        mkdir -p "$STAGE/nsis"
+        cp ../nsis/installer.ico ../nsis/uninstaller.ico ../nsis/welcome-page.bmp ../nsis/header.bmp "$STAGE/nsis/"
         cp ../COPYING "$STAGE/LICENSE.TXT"
+        cp ../COPYING "$STAGE/COPYING"
         cp ../README.md "$STAGE/README.TXT"
         cp nsis/classwatch.nsi "$STAGE/"
         # build the installer
