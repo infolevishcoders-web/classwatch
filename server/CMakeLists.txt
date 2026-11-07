@@ -36,11 +36,11 @@ configure_file(
 install(
 	FILES "${CMAKE_CURRENT_BINARY_DIR}/data/io.levish.classwatch-server.desktop"
 	DESTINATION "${CMAKE_INSTALL_DATADIR}/applications"
-	COMPONENT pipewire-vnc-server
+	COMPONENT pipewire_vnc_server
 )
 
 install(
 	FILES "${CMAKE_CURRENT_BINARY_DIR}/data/io.levish.classwatch-server.service"
 	DESTINATION "${CMAKE_INSTALL_DATADIR}/dbus-1/services"
-	COMPONENT pipewire-vnc-server
+	COMPONENT pipewire_vnc_server
 )
