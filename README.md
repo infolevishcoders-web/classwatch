@@ -35,6 +35,26 @@ Copyright (c) 2026 Levish Coders.
 See the file COPYING for the GNU GENERAL PUBLIC LICENSE.
 This project is licensed under GPL-2.0.
 
+Original Veyon source: Copyright (c) 2004-2026 Tobias Junghans / Veyon Solutions.
+ClassWatch modifications and branding: Copyright (c) 2026 Levish Coders.
+
+
+## Contact
+
+**Levish Coders**
+- Website: https://levishcoders.com
+- Email: info.levishcoders@gmail.com
+- Phone/WhatsApp: +256 743 199 780
+
+For commercial licensing, customization, training, or deployment support,
+contact Levish Coders.
+
+
+## Documentation
+
+See [docs/CLASSWATCH.md](docs/CLASSWATCH.md) for a complete overview of the
+ClassWatch source code, architecture, features, and build instructions.
+
 
 ## Installation and configuration
 
