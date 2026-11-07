@@ -92,13 +92,21 @@ jobs:
         cp ../COPYING "$STAGE/COPYING"
         cp ../README.md "$STAGE/README.TXT"
         cp nsis/classwatch.nsi "$STAGE/"
-        # drop the translations payload line - CI builds without .qm files
-        sed -i '/File "translations/d' "$STAGE/classwatch.nsi"
-        # build with native makensis from inside the payload dir so all
-        # relative File paths resolve against it (upstream windows-binaries flow)
-        cd "$STAGE"
-        "/c/Program Files (x86)/NSIS/makensis.exe" classwatch.nsi
-        mv classwatch-*-setup.exe ..
+        # rewrite every compile-time file reference to a backslash-absolute
+        # Windows path - NSIS File does not accept "D:/" forward-slash drives
+        WIN_STAGE=$(cygpath -w "$PWD/$STAGE")
+        ESC_STAGE=$(printf '%s' "$WIN_STAGE" | sed 's/\\/\\\\/g')
+        NSI_FILE="$STAGE/classwatch.nsi"
+        sed -i \
+          -e "s|!define LICENSE_TXT \"COPYING\"|!define LICENSE_TXT \"${ESC_STAGE}\\\\COPYING\"|" \
+          -e "s|\"nsis/|\"${ESC_STAGE}\\\\nsis/|g" \
+          -e "s|File \"\([^\"]*\)\"|File \"${ESC_STAGE}\\\\\1\"|g" \
+          -e "/File \".*translations/d" \
+          "$NSI_FILE"
+        grep -n 'File "' "$NSI_FILE" | head -8
+        # build the installer with native makensis
+        "/c/Program Files (x86)/NSIS/makensis.exe" "$(cygpath -w "$PWD/$STAGE/classwatch.nsi")"
+        mv "$STAGE"/classwatch-*-setup.exe . 2>/dev/null || mv classwatch-*-setup.exe . 2>/dev/null || true
 
     - name: Upload Windows Installer
       uses: actions/upload-artifact@v4
