@@ -99,6 +99,12 @@ jobs:
           -e "s|File \"\([^\"]*\)\"|File \"${WIN_STAGE}/\1\"|g" \
           -e "/translations\/\*/d" \
           "$NSI_FILE"
+        # isolate NSIS file resolution: minimal script with one absolute File
+        makensis /VERSION || true
+        printf 'OutFile "nsis-test.exe"\nSection\nSetOutPath "$TEMP"\nFile "%s"\nSectionEnd\n' "$WIN_STAGE/nsis/welcome-page.bmp" > "$STAGE/test.nsi"
+        cat "$STAGE/test.nsi"
+        ls -la "$WIN_STAGE/nsis/"
+        makensis "$WIN_STAGE/test.nsi" || true
         # build the installer (output lands in build/ = upload artifact path)
         makensis "$WIN_STAGE/classwatch.nsi"
 
