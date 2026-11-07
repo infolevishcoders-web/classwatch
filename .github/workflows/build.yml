@@ -92,6 +92,8 @@ jobs:
         cp ../COPYING "$STAGE/COPYING"
         cp ../README.md "$STAGE/README.TXT"
         cp nsis/classwatch.nsi "$STAGE/"
+        ls -laR "$STAGE/nsis" || true
+        find "$STAGE" -name "*.bmp" -o -name "*.ico" | head -20
         # rewrite every compile-time file reference in the generated NSIS
         # script to an absolute Windows path and build with the native NSIS
         # compiler - the msys2 makensis mishandles paths under this shell
