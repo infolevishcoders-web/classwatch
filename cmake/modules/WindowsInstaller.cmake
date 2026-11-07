@@ -71,14 +71,14 @@ add_custom_target(windows-binaries
 )
 
 add_custom_target(create-windows-installer
-	COMMAND makensis ${WINDOWS_INSTALL_FILES}/veyon.nsi
-	COMMAND mv ${WINDOWS_INSTALL_FILES}/veyon-*setup.exe .
+	COMMAND makensis ${WINDOWS_INSTALL_FILES}/classwatch.nsi
+	COMMAND mv ${WINDOWS_INSTALL_FILES}/classwatch-*setup.exe .
 	COMMAND rm -rf ${WINDOWS_INSTALL_FILES}
 	DEPENDS windows-binaries
 )
 
 add_custom_target(prepare-dev-nsi
-	COMMAND sed -i ${WINDOWS_INSTALL_FILES}/veyon.nsi -e "s,/SOLID lzma,zlib,g"
+	COMMAND sed -i ${WINDOWS_INSTALL_FILES}/classwatch.nsi -e "s,/SOLID lzma,zlib,g"
 	DEPENDS windows-binaries)
 
 add_custom_target(dev-nsi

@@ -57,7 +57,39 @@ jobs:
       run: |
         export PATH="/ucrt64/bin:$PATH"
         cd build
-        cpack -G NSIS || (cat _CPack_Packages/win64/NSIS/NSISOutput.log 2>/dev/null; exit 1)
+        STAGE="classwatch-win64-1.0.0.0"
+        rm -rf "$STAGE"
+        mkdir -p "$STAGE"/{plugins,translations,crypto,imageformats,platforms,styles,tls,interception}
+        # application binaries
+        find . -mindepth 2 -name 'classwatch-*.exe' -exec cp {} "$STAGE/" \;
+        cp core/classwatch-core.dll "$STAGE/"
+        find plugins/ -name '*.dll' -exec cp {} "$STAGE/plugins/" \;
+        mv "$STAGE"/plugins/lib*.dll "$STAGE/" 2>/dev/null || true
+        [ -f "$STAGE/plugins/vnchooks.dll" ] && mv "$STAGE/plugins/vnchooks.dll" "$STAGE/"
+        # translations (disabled in CI - keep dir for installer script)
+        cp translations/*.qm "$STAGE/translations/" 2>/dev/null || true
+        # MSYS2 runtime DLLs
+        for d in Qt6Core Qt6Gui Qt6Widgets Qt6Network Qt6Concurrent Qt6Core5Compat Qt6WebSockets Qt6Svg Qt6OpenGL Qt6OpenGLWidgets libjpeg-62 libpng16-16 libcrypto-3-x64 libssl-3-x64 libqca-qt6 libsasl2-3 libldap liblber liblzo2-2 libvncclient libvncserver zlib1 libwinpthread-1 libstdc++-6 libgcc_s_seh-1 libssp-0; do
+          [ -f "/ucrt64/bin/$d.dll" ] && cp "/ucrt64/bin/$d.dll" "$STAGE/"
+        done
+        # QCA crypto plugin
+        [ -f /ucrt64/lib/qca-qt6/crypto/libqca-ossl.dll ] && cp /ucrt64/lib/qca-qt6/crypto/libqca-ossl.dll "$STAGE/crypto/"
+        # Qt plugins
+        QTPLUG=/ucrt64/lib/qt6/plugins
+        [ -f "$QTPLUG/imageformats/qjpeg.dll" ] && cp "$QTPLUG/imageformats/qjpeg.dll" "$STAGE/imageformats/"
+        [ -f "$QTPLUG/platforms/qwindows.dll" ] && cp "$QTPLUG/platforms/qwindows.dll" "$STAGE/platforms/"
+        cp "$QTPLUG"/styles/*.dll "$STAGE/styles/" 2>/dev/null || true
+        [ -f "$QTPLUG/tls/qopensslbackend.dll" ] && cp "$QTPLUG/tls/qopensslbackend.dll" "$STAGE/tls/"
+        # interception driver files, desktop duplication engine, docs, installer script
+        cp -r ../3rdparty/interception/* "$STAGE/interception/"
+        [ -f ../3rdparty/ddengine/ddengine64.dll ] && cp ../3rdparty/ddengine/ddengine64.dll "$STAGE/"
+        cp ../COPYING "$STAGE/LICENSE.TXT"
+        cp ../README.md "$STAGE/README.TXT"
+        cp nsis/classwatch.nsi "$STAGE/"
+        # build the installer
+        cd "$STAGE"
+        makensis classwatch.nsi
+        mv classwatch-*-setup.exe ..
 
     - name: Upload Windows Installer
       uses: actions/upload-artifact@v4
