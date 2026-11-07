@@ -72,10 +72,17 @@ jobs:
         [ -f "$STAGE/plugins/vnchooks.dll" ] && mv "$STAGE/plugins/vnchooks.dll" "$STAGE/"
         # translations (disabled in CI - keep dir for installer script)
         cp translations/*.qm "$STAGE/translations/" 2>/dev/null || true
-        # MSYS2 runtime DLLs
-        for d in Qt6Core Qt6Gui Qt6Widgets Qt6Network Qt6Concurrent Qt6Core5Compat Qt6WebSockets Qt6HttpServer Qt6Svg Qt6OpenGL Qt6OpenGLWidgets libjpeg-62 libpng16-16 libcrypto-3-x64 libssl-3-x64 libqca-qt6 libsasl2-3 libldap liblber liblzo2-2 libvncclient libvncserver interception zlib1 libwinpthread-1 libstdc++-6 libgcc_s_seh-1 libssp-0; do
-          [ -f "/ucrt64/bin/$d.dll" ] && cp "/ucrt64/bin/$d.dll" "$STAGE/"
-        done
+        QTPLUG=/ucrt64/lib/qt6/plugins
+        # MSYS2 runtime DLLs - collect the full transitive dependency set via
+        # ldd so no MinGW/Qt helper DLL is missed (ICU, harfbuzz, pcre2, etc.)
+        {
+          find . -name 'classwatch-*.exe'
+          find core plugins -name '*.dll' 2>/dev/null
+          find "$QTPLUG" -name '*.dll' 2>/dev/null
+        } | while read -r f; do ldd "$f" 2>/dev/null; done \
+          | grep -oE '/ucrt64/(bin|lib)/[^ ]+\.dll' | sort -u > /tmp/cw-deps.txt
+        while read -r dll; do cp "$dll" "$STAGE/"; done < /tmp/cw-deps.txt
+        wc -l /tmp/cw-deps.txt
         # QCA crypto plugin (location varies between MSYS2 package layouts)
         [ -f /ucrt64/lib/qca-qt6/crypto/libqca-ossl.dll ] && cp /ucrt64/lib/qca-qt6/crypto/libqca-ossl.dll "$STAGE/crypto/"
         if [ ! -f "$STAGE/crypto/libqca-ossl.dll" ]; then
@@ -84,7 +91,6 @@ jobs:
         fi
         find /ucrt64 -name "*qca*" 2>/dev/null | head -10
         # Qt plugins
-        QTPLUG=/ucrt64/lib/qt6/plugins
         [ -f "$QTPLUG/imageformats/qjpeg.dll" ] && cp "$QTPLUG/imageformats/qjpeg.dll" "$STAGE/imageformats/"
         [ -f "$QTPLUG/platforms/qwindows.dll" ] && cp "$QTPLUG/platforms/qwindows.dll" "$STAGE/platforms/"
         cp "$QTPLUG"/styles/*.dll "$STAGE/styles/" 2>/dev/null || true
