@@ -150,7 +150,7 @@ MainWindow::MainWindow( VeyonMaster &masterCore, QWidget* parent ) :
 	for( auto* splitter : { slideshowSpotlightSplitter, monitoringSplitter, mainSplitter } )
 	{
 		splitter->setHandleWidth( 7 );
-		splitter->setStyleSheet( QStringLiteral("QSplitter::handle:hover{background-color:#66a0b3;}") );
+		splitter->setStyleSheet( QStringLiteral("QSplitter::handle:hover{background-color:#198cb3;}") );
 
 		splitter->installEventFilter( this );
 
@@ -279,6 +279,7 @@ MainWindow::MainWindow( VeyonMaster &masterCore, QWidget* parent ) :
 		ui->alignComputersButton->setIcon(QIcon(QStringLiteral(":/master/align-grid-dark.png")));
 		ui->useCustomComputerPositionsButton->setIcon(QIcon(QStringLiteral(":/master/exchange-positions-zorder-dark.png")));
 		ui->filterPoweredOnComputersButton->setIcon(QIcon(QStringLiteral(":/master/powered-on-dark.png")));
+		ui->classWatchComputerPanelButton->setIcon(QIcon(QStringLiteral(":/master/user-group-new-dark.png")));
 	}
 
 	// create the main toolbar

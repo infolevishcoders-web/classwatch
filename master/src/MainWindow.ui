@@ -258,6 +258,9 @@ Press and hold to load arrangement from a file or save current arrangement to a 
         </property>
         <item>
          <widget class="QToolButton" name="dashboardPanelButton">
+          <property name="toolTip">
+           <string>Dashboard</string>
+          </property>
           <property name="text">
            <string>Dashboard</string>
           </property>
@@ -269,7 +272,7 @@ Press and hold to load arrangement from a file or save current arrangement to a 
            <bool>true</bool>
           </property>
           <property name="toolButtonStyle">
-           <enum>Qt::ToolButtonStyle::ToolButtonTextBesideIcon</enum>
+           <enum>Qt::ToolButtonStyle::ToolButtonIconOnly</enum>
           </property>
           <attribute name="buttonGroup">
            <string notr="true">buttonGroup</string>
@@ -278,6 +281,9 @@ Press and hold to load arrangement from a file or save current arrangement to a 
         </item>
         <item>
          <widget class="QToolButton" name="computerSelectPanelButton">
+          <property name="toolTip">
+           <string>Locations &amp;&amp; computers</string>
+          </property>
           <property name="text">
            <string>Locations &amp;&amp; computers</string>
           </property>
@@ -289,7 +295,7 @@ Press and hold to load arrangement from a file or save current arrangement to a 
            <bool>true</bool>
           </property>
           <property name="toolButtonStyle">
-           <enum>Qt::ToolButtonStyle::ToolButtonTextBesideIcon</enum>
+           <enum>Qt::ToolButtonStyle::ToolButtonIconOnly</enum>
           </property>
           <attribute name="buttonGroup">
            <string notr="true">buttonGroup</string>
@@ -298,6 +304,9 @@ Press and hold to load arrangement from a file or save current arrangement to a 
         </item>
         <item>
          <widget class="QToolButton" name="screenshotManagementPanelButton">
+          <property name="toolTip">
+           <string>Screenshots</string>
+          </property>
           <property name="text">
            <string>Screenshots</string>
           </property>
@@ -309,7 +318,7 @@ Press and hold to load arrangement from a file or save current arrangement to a 
            <bool>true</bool>
           </property>
           <property name="toolButtonStyle">
-           <enum>Qt::ToolButtonStyle::ToolButtonTextBesideIcon</enum>
+           <enum>Qt::ToolButtonStyle::ToolButtonIconOnly</enum>
           </property>
           <attribute name="buttonGroup">
            <string notr="true">buttonGroup</string>
@@ -318,18 +327,21 @@ Press and hold to load arrangement from a file or save current arrangement to a 
         </item>
         <item>
          <widget class="QToolButton" name="classWatchComputerPanelButton">
+          <property name="toolTip">
+           <string>ClassWatch IDs</string>
+          </property>
           <property name="text">
            <string>ClassWatch IDs</string>
           </property>
           <property name="icon">
            <iconset resource="../resources/master.qrc">
-            <normaloff>:/master/computers.png</normaloff>:/master/computers.png</iconset>
+            <normaloff>:/master/user-group-new.png</normaloff>:/master/user-group-new.png</iconset>
           </property>
           <property name="checkable">
            <bool>true</bool>
           </property>
           <property name="toolButtonStyle">
-           <enum>Qt::ToolButtonStyle::ToolButtonTextBesideIcon</enum>
+           <enum>Qt::ToolButtonStyle::ToolButtonIconOnly</enum>
           </property>
           <attribute name="buttonGroup">
            <string notr="true">buttonGroup</string>
@@ -338,18 +350,21 @@ Press and hold to load arrangement from a file or save current arrangement to a 
         </item>
         <item>
          <widget class="QToolButton" name="classWatchSessionPanelButton">
+          <property name="toolTip">
+           <string>Sessions</string>
+          </property>
           <property name="text">
            <string>Sessions</string>
           </property>
           <property name="icon">
            <iconset resource="../resources/master.qrc">
-            <normaloff>:/master/computer-slideshow.png</normaloff>:/master/computer-slideshow.png</iconset>
+            <normaloff>:/master/media-record.png</normaloff>:/master/media-record.png</iconset>
           </property>
           <property name="checkable">
            <bool>true</bool>
           </property>
           <property name="toolButtonStyle">
-           <enum>Qt::ToolButtonStyle::ToolButtonTextBesideIcon</enum>
+           <enum>Qt::ToolButtonStyle::ToolButtonIconOnly</enum>
           </property>
           <attribute name="buttonGroup">
            <string notr="true">buttonGroup</string>
@@ -358,6 +373,9 @@ Press and hold to load arrangement from a file or save current arrangement to a 
         </item>
         <item>
          <widget class="QToolButton" name="classWatchMessagePanelButton">
+          <property name="toolTip">
+           <string>Messages</string>
+          </property>
           <property name="text">
            <string>Messages</string>
           </property>
@@ -369,7 +387,7 @@ Press and hold to load arrangement from a file or save current arrangement to a 
            <bool>true</bool>
           </property>
           <property name="toolButtonStyle">
-           <enum>Qt::ToolButtonStyle::ToolButtonTextBesideIcon</enum>
+           <enum>Qt::ToolButtonStyle::ToolButtonIconOnly</enum>
           </property>
           <attribute name="buttonGroup">
            <string notr="true">buttonGroup</string>
@@ -378,6 +396,9 @@ Press and hold to load arrangement from a file or save current arrangement to a 
         </item>
         <item>
          <widget class="QToolButton" name="slideshowPanelButton">
+          <property name="toolTip">
+           <string>Slideshow</string>
+          </property>
           <property name="text">
            <string>Slideshow</string>
           </property>
@@ -389,12 +410,15 @@ Press and hold to load arrangement from a file or save current arrangement to a 
            <bool>true</bool>
           </property>
           <property name="toolButtonStyle">
-           <enum>Qt::ToolButtonStyle::ToolButtonTextBesideIcon</enum>
+           <enum>Qt::ToolButtonStyle::ToolButtonIconOnly</enum>
           </property>
          </widget>
         </item>
         <item>
          <widget class="QToolButton" name="spotlightPanelButton">
+          <property name="toolTip">
+           <string>Spotlight</string>
+          </property>
           <property name="text">
            <string>Spotlight</string>
           </property>
@@ -406,7 +430,7 @@ Press and hold to load arrangement from a file or save current arrangement to a 
            <bool>true</bool>
           </property>
           <property name="toolButtonStyle">
-           <enum>Qt::ToolButtonStyle::ToolButtonTextBesideIcon</enum>
+           <enum>Qt::ToolButtonStyle::ToolButtonIconOnly</enum>
           </property>
          </widget>
         </item>
