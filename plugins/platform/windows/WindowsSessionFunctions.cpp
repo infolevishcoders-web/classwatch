@@ -200,7 +200,7 @@ void WindowsSessionFunctions::inspectDesktopWindows()
 
 WINBOOL WindowsSessionFunctions::inspectDesktopWindow(HWND window)
 {
-	const auto windowStyle = GetWindowLong(window, GWLP_EXSTYLE);
+	const auto windowStyle = GetWindowLong(window, GWL_EXSTYLE);
 	if (windowStyle & (WS_EX_TOPMOST | WS_EX_TRANSPARENT | WS_EX_LAYERED)) {
 		COLORREF crKey;
 		BYTE alpha;
@@ -215,7 +215,7 @@ WINBOOL WindowsSessionFunctions::inspectDesktopWindow(HWND window)
 			case InterferingWindowHandling::FixWindowAttributes:
 				vDebug() << "fixing attributes of interfering window" << window << windowTitle << flags << crKey << alpha;
 				SetLayeredWindowAttributes(window, 0, 255, LWA_COLORKEY | LWA_ALPHA);
-				SetWindowLong(window, GWLP_EXSTYLE,
+				SetWindowLong(window, GWL_EXSTYLE,
 							  windowStyle & ~(WS_EX_TRANSPARENT | WS_EX_LAYERED | WS_EX_TOPMOST));
 				RedrawWindow(window, NULL, NULL, RDW_ERASE | RDW_INVALIDATE | RDW_FRAME | RDW_ALLCHILDREN);
 				ShowWindow(window, SW_HIDE);
