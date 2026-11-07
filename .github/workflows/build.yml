@@ -83,12 +83,12 @@ jobs:
         # interception driver files, desktop duplication engine, docs, installer script
         cp -r ../3rdparty/interception/* "$STAGE/interception/"
         [ -f ../3rdparty/ddengine/ddengine64.dll ] && cp ../3rdparty/ddengine/ddengine64.dll "$STAGE/"
-        mkdir -p "$STAGE/nsis"
-        cp ../nsis/installer.ico ../nsis/uninstaller.ico ../nsis/welcome-page.bmp ../nsis/header.bmp "$STAGE/nsis/"
+        cp -r ../nsis "$STAGE/"
         cp ../COPYING "$STAGE/LICENSE.TXT"
         cp ../COPYING "$STAGE/COPYING"
         cp ../README.md "$STAGE/README.TXT"
         cp nsis/classwatch.nsi "$STAGE/"
+        ls -la "$STAGE/nsis"
         # build the installer
         cd "$STAGE"
         makensis classwatch.nsi
