@@ -89,9 +89,10 @@ jobs:
         cp ../README.md "$STAGE/README.TXT"
         cp nsis/classwatch.nsi "$STAGE/"
         ls -la "$STAGE/nsis"
-        # build the installer
+        # build the installer (pass script path with directory so NSIS resolves
+        # relative File paths against the staging dir, like upstream does)
         cd "$STAGE"
-        makensis classwatch.nsi
+        makensis "$(cygpath -m "$PWD")/classwatch.nsi"
         mv classwatch-*-setup.exe ..
 
     - name: Upload Windows Installer
