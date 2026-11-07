@@ -5,6 +5,14 @@ endif()
 set(CPACK_PACKAGE_VERSION "${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}.${VERSION_BUILD}")
 
 set(CPACK_PACKAGING_INSTALL_PREFIX "${CMAKE_INSTALL_PREFIX}")
+if(WIN32)
+	# The NSIS generator cannot handle drive-letter prefixes when creating
+	# staging directories. Use a neutral prefix and let NSIS place files
+	# under the standard Program Files directory instead.
+	set(CPACK_PACKAGING_INSTALL_PREFIX "/")
+	set(CPACK_NSIS_INSTALL_ROOT "$PROGRAMFILES64")
+	set(CPACK_NSIS_DISPLAY_NAME "ClassWatch ${CPACK_PACKAGE_VERSION}")
+endif()
 set(CPACK_PACKAGE_CONTACT "Levish Coders <info@levishcoders.com>")
 set(CPACK_PACKAGE_HOMEPAGE "https://levishcoders.com")
 set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "ClassWatch - Classroom Monitoring & Management System")
