@@ -57,7 +57,7 @@ jobs:
       run: |
         export PATH="/ucrt64/bin:$PATH"
         cd build
-        cpack -G NSIS
+        cpack -G NSIS || (cat _CPack_Packages/win64/NSIS/NSISOutput.log 2>/dev/null; exit 1)
 
     - name: Upload Windows Installer
       uses: actions/upload-artifact@v4
