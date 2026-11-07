@@ -32,4 +32,26 @@
 #define DWL_MSGRESULT 0
 #endif
 
+#ifndef GWLP_WNDPROC
+#define GWLP_WNDPROC (-4)
+#endif
+#ifndef GWLP_HINSTANCE
+#define GWLP_HINSTANCE (-6)
+#endif
+#ifndef GWLP_STYLE
+#define GWLP_STYLE (-16)
+#endif
+#ifndef GWLP_EXSTYLE
+#define GWLP_EXSTYLE (-20)
+#endif
+#ifndef GWLP_USERDATA
+#define GWLP_USERDATA (-21)
+#endif
+#ifndef DWLP_MSGRESULT
+#define DWLP_MSGRESULT 0
+#endif
+#ifndef DWLP_DLGPROC
+#define DWLP_DLGPROC 0
+#endif
+
 #endif // ULTRAVNC_MINGW_COMPAT_H
