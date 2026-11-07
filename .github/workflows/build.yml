@@ -173,9 +173,11 @@ jobs:
           exit 1
         fi
         echo "=== makensis done ==="
-        ls -la "$STAGE"/*setup*.exe ./*setup*.exe 2>/dev/null
-        mv "$STAGE"/classwatch-*-setup.exe . 2>/dev/null || mv classwatch-*-setup.exe . 2>/dev/null || true
-        ls -la ./*.exe | head
+        find . -maxdepth 2 -name 'classwatch-*-setup.exe' | while read -r f; do
+          b=$(basename "$f")
+          [ -f "./$b" ] || mv "$f" "./$b"
+        done
+        ls -la ./*setup*.exe 2>/dev/null || ls -la "$STAGE"/*setup*.exe
 
     - name: Upload Windows Installer
       uses: actions/upload-artifact@v4
