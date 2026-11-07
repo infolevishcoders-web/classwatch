@@ -60,6 +60,7 @@ jobs:
       shell: msys2 {0}
       run: |
         export PATH="/ucrt64/bin:$PATH"
+        pacman -S --needed --noconfirm mingw-w64-ucrt-x86_64-interception 2>/dev/null || true
         cd build
         STAGE="classwatch-win64-1.0.0.0"
         rm -rf "$STAGE"
@@ -73,16 +74,33 @@ jobs:
         # translations (disabled in CI - keep dir for installer script)
         cp translations/*.qm "$STAGE/translations/" 2>/dev/null || true
         QTPLUG=/ucrt64/lib/qt6/plugins
-        # MSYS2 runtime DLLs - collect the full transitive dependency set via
-        # ldd so no MinGW/Qt helper DLL is missed (ICU, harfbuzz, pcre2, etc.)
-        {
+        # MSYS2 runtime DLLs - walk the full import-table closure with objdump
+        # so every transitive MinGW/Qt helper DLL is bundled (ICU, harfbuzz,
+        # pcre2, gnutls, etc.). ldd is unavailable in this environment.
+        declare -A CW_SEEN=()
+        CW_QUEUE=()
+        while IFS= read -r f; do CW_QUEUE+=("$f"); done < <(
           find . -name 'classwatch-*.exe'
           find core plugins -name '*.dll' 2>/dev/null
           find "$QTPLUG" -name '*.dll' 2>/dev/null
-        } | while read -r f; do ldd "$f" 2>/dev/null; done \
-          | grep -oE '/ucrt64/(bin|lib)/[^ ]+\.dll' | sort -u > /tmp/cw-deps.txt
-        while read -r dll; do cp "$dll" "$STAGE/"; done < /tmp/cw-deps.txt
-        wc -l /tmp/cw-deps.txt
+        )
+        i=0
+        while [ $i -lt ${#CW_QUEUE[@]} ]; do
+          f="${CW_QUEUE[$i]}"; i=$((i+1))
+          [ -f "$f" ] || continue
+          while IFS= read -r dll; do
+            lc=$(printf '%s' "$dll" | tr '[:upper:]' '[:lower:]')
+            case "$lc" in *.dll) ;; *) continue ;; esac
+            [ -n "${CW_SEEN[$lc]:-}" ] && continue
+            CW_SEEN[$lc]=1
+            src=$(find /ucrt64/bin /ucrt64/lib -maxdepth 1 -iname "$dll" 2>/dev/null | head -1)
+            if [ -n "$src" ]; then
+              cp "$src" "$STAGE/"
+              CW_QUEUE+=("$src")
+            fi
+          done < <(objdump -p "$f" 2>/dev/null | awk '/DLL Name/{print $3}')
+        done
+        echo "bundled ${#CW_SEEN[@]} runtime dlls"
         # QCA crypto plugin (location varies between MSYS2 package layouts)
         [ -f /ucrt64/lib/qca-qt6/crypto/libqca-ossl.dll ] && cp /ucrt64/lib/qca-qt6/crypto/libqca-ossl.dll "$STAGE/crypto/"
         if [ ! -f "$STAGE/crypto/libqca-ossl.dll" ]; then
