@@ -57,12 +57,12 @@ QString VeyonServiceControl::filePath()
 	return QDir::toNativeSeparators(
 				QCoreApplication::applicationDirPath() +
 				QDir::separator() +
-				QStringLiteral("veyon-service") + VeyonCore::executableSuffix() );
+				QStringLiteral("classwatch-service") + VeyonCore::executableSuffix() );
 }
 
 
 
 QString VeyonServiceControl::displayName()
 {
-	return tr( "Veyon Service" );
+	return tr( "ClassWatch Service" );
 }

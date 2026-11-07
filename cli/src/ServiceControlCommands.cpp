@@ -29,12 +29,12 @@
 ServiceControlCommands::ServiceControlCommands( QObject* parent ) :
 	QObject( parent ),
 	m_commands( {
-{ QStringLiteral("register"), tr( "Register Veyon Service" ) },
-{ QStringLiteral("unregister"), tr( "Unregister Veyon Service" ) },
-{ QStringLiteral("start"), tr( "Start Veyon Service" ) },
-{ QStringLiteral("stop"), tr( "Stop Veyon Service" ) },
-{ QStringLiteral("restart"), tr( "Restart Veyon Service" ) },
-{ QStringLiteral("status"), tr( "Query status of Veyon Service" ) },
+{ QStringLiteral("register"), tr( "Register ClassWatch Service" ) },
+{ QStringLiteral("unregister"), tr( "Unregister ClassWatch Service" ) },
+{ QStringLiteral("start"), tr( "Start ClassWatch Service" ) },
+{ QStringLiteral("stop"), tr( "Stop ClassWatch Service" ) },
+{ QStringLiteral("restart"), tr( "Restart ClassWatch Service" ) },
+{ QStringLiteral("status"), tr( "Query status of ClassWatch Service" ) },
 				} )
 {
 }
