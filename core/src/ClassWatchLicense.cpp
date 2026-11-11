@@ -28,7 +28,6 @@
 #include <QCryptographicHash>
 #include <QDir>
 #include <QFile>
-#include <QHmac>
 #include <QJsonDocument>
 #include <QJsonParseError>
 #include <QStandardPaths>
@@ -85,8 +84,25 @@ QString ClassWatchLicense::licensingSecret()
 
 QString ClassWatchLicense::signPayload( const QByteArray& payload )
 {
-	const QHmac hash( QCryptographicHash::Sha256, licensingSecret().toUtf8(), payload );
-	return QString::fromLatin1( urlEncode( hash.result() ) );
+	// HMAC-SHA256 implemented via QCryptographicHash so we don't depend on
+	// Qt6's QHmac module availability across platforms
+	const auto key = licensingSecret().toUtf8();
+	QByteArray k = key.left( 64 );
+	if( k.size() < 64 )
+	{
+		k.append( QByteArray( 64 - k.size(), '\0' ) );
+	}
+	for( auto& c : k )
+	{
+		c = static_cast<char>( static_cast<unsigned char>( c ) ^ 0x36 );
+	}
+	const auto inner = QCryptographicHash::hash( k + payload, QCryptographicHash::Sha256 );
+	for( auto& c : k )
+	{
+		c = static_cast<char>( static_cast<unsigned char>( c ) ^ ( 0x36 ^ 0x5c ) );
+	}
+	const auto outer = QCryptographicHash::hash( k + inner, QCryptographicHash::Sha256 );
+	return QString::fromLatin1( urlEncode( outer ) );
 }
 
 

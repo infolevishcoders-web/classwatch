@@ -206,7 +206,7 @@ void ClassWatchSecurityManager::logSecurityEvent( const QString& kind,
 		appendAuditMirror( event );
 	}
 
-	emit securityEventLogged( event );
+	Q_EMIT securityEventLogged( event );
 }
 
 

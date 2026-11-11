@@ -74,7 +74,7 @@ public:
 	static QString securityDataDirectory();
 	static QString securityEventsLogPath();
 
-signals:
+Q_SIGNALS:
 	void securityEventLogged( const QJsonObject& event );
 
 private:
