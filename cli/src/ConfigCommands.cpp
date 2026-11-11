@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2017-2026 Tobias Junghans <tobydox@veyon.io>
  *
- * This file is part of Veyon - https://veyon.io
+ * This file is part of ClassWatch - https://levishcoders.com
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -37,7 +37,7 @@
 ConfigCommands::ConfigCommands( QObject* parent ) :
 	QObject( parent ),
 	m_commands( {
-{ QStringLiteral("clear"), tr( "Clear system-wide Veyon configuration" ) },
+{ QStringLiteral("clear"), tr( "Clear system-wide ClassWatch configuration" ) },
 { QStringLiteral("list"), tr( "List all configuration keys and values" ) },
 { QStringLiteral("import"), tr( "Import configuration from given file" ) },
 { QStringLiteral("export"), tr( "Export configuration to given file" ) },

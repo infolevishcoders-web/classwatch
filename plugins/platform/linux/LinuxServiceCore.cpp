@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2017-2026 Tobias Junghans <tobydox@veyon.io>
  *
- * This file is part of Veyon - https://veyon.io
+ * This file is part of ClassWatch - https://levishcoders.com
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -404,14 +404,14 @@ void LinuxServiceCore::startServer( const QString& sessionPath )
 	// do not start server for non-graphical sessions
 	if( sessionType == LinuxSessionFunctions::Type::TTY )
 	{
-		vDebug() << "Not starting Veyon Server in TTY session";
+		vDebug() << "Not starting ClassWatch Server in TTY session";
 		return;
 	}
 
 	// do not start server for sessions with unspecified type
 	if (sessionType == LinuxSessionFunctions::Type::Unspecified)
 	{
-		vDebug() << "Not starting Veyon Server in a session with unspecified type";
+		vDebug() << "Not starting ClassWatch Server in a session with unspecified type";
 		return;
 	}
 

@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2018-2026 Tobias Junghans <tobydox@veyon.io>
  *
- * This file is part of Veyon - https://veyon.io
+ * This file is part of ClassWatch - https://levishcoders.com
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -51,12 +51,12 @@ public:
 
 	QString description() const override
 	{
-		return tr( "Interactive shell and script execution for Veyon CLI" );
+		return tr( "Interactive shell and script execution for ClassWatch CLI" );
 	}
 
 	QString vendor() const override
 	{
-		return QStringLiteral( "Veyon Community" );
+		return QStringLiteral( "Levish Coders" );
 	}
 
 	QString copyright() const override

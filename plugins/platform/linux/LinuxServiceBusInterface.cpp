@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2010-2026 Tobias Junghans <tobydox@veyon.io>
  *
- * This file is part of Veyon - https://veyon.io
+ * This file is part of ClassWatch - https://levishcoders.com
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -147,7 +147,7 @@ bool LinuxServiceBusInterface::verifyCaller() const
 	if(uid != 0 && m_sessionUserCheck(uid) == false)
 	{
 		vCritical() << "rejecting authentication request from uid" << uid
-					<< "- not an active Veyon session user";
+					<< "- not an active ClassWatch session user";
 		return false;
 	}
 

@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2004-2026 Tobias Junghans <tobydox@veyon.io>
  *
- * This file is part of Veyon - https://veyon.io
+ * This file is part of ClassWatch - https://levishcoders.com
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -321,10 +321,10 @@ bool MainWindow::initAuthentication()
 		QMessageBox::information(nullptr,
 								 tr("Authentication impossible"),
 								 tr("No authentication key files were found or your current ones "
-									"are outdated. Please create new key files using Veyon "
+									"are outdated. Please create new key files using ClassWatch "
 									"Configurator. Alternatively set up logon authentication "
-									"using Veyon Configurator. Otherwise you won't be "
-									"able to access computers using Veyon."));
+									"using ClassWatch Configurator. Otherwise you won't be "
+									"able to access computers using ClassWatch."));
 	}
 
 	return false;

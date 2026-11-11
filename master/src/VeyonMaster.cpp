@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2017-2026 Tobias Junghans <tobydox@veyon.io>
  *
- * This file is part of Veyon - https://veyon.io
+ * This file is part of ClassWatch - https://levishcoders.com
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -61,7 +61,7 @@ VeyonMaster::VeyonMaster( QObject* parent ) :
 		QMessageBox::information(nullptr,
 								 tr("No write access"),
 								 tr("Could not save your personal settings! Please check the user configuration "
-									"file path using Veyon Configurator."));
+									"file path using ClassWatch Configurator."));
 	}
 
 	connect(m_computerControlListModel, &ComputerControlListModel::modelAboutToBeReset,

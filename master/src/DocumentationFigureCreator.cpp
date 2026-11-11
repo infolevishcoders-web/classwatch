@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2019-2026 Tobias Junghans <tobydox@veyon.io>
  *
- * This file is part of Veyon - https://veyon.io
+ * This file is part of ClassWatch - https://levishcoders.com
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -329,7 +329,7 @@ void DocumentationFigureCreator::createOpenWebsiteDialogFigure()
 	scheduleUiOperation( []() {
 		auto dialog = qobject_cast<QDialog *>( QApplication::activeWindow() );
 		dialog->findChild<QLineEdit *>( QStringLiteral("websiteLineEdit") )->
-				setText( QStringLiteral("https://veyon.io") );
+				setText( QStringLiteral("https://levishcoders.com") );
 
 		grabDialog( dialog, {}, QStringLiteral("OpenWebsiteDialog.png") );
 	});

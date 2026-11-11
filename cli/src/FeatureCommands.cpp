@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2021-2026 Tobias Junghans <tobydox@veyon.io>
  *
- * This file is part of Veyon - https://veyon.io
+ * This file is part of ClassWatch - https://levishcoders.com
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -93,7 +93,7 @@ CommandLinePluginInterface::RunResult FeatureCommands::handle_help( const QStrin
 					{ { tr("ARGUMENTS"), {} } } );
 
 		printDescription( tr("Starts the specified feature on the specified host by connecting to "
-							  "the Veyon Server running remotely. The feature can be specified by name "
+							  "the ClassWatch Server running remotely. The feature can be specified by name "
 							  "or UID. Use the ``show`` command to see all available features. "
 							  "Depending on the feature, additional arguments (such as the text message to display) "
 							  "encoded as a single JSON string have to be specified. Please refer to "
@@ -123,7 +123,7 @@ CommandLinePluginInterface::RunResult FeatureCommands::handle_help( const QStrin
 					{ { tr("HOST ADDRESS"), {} }, { tr("FEATURE"), {} } }, {} );
 
 		printDescription( tr("Stops the specified feature on the specified host by connecting to "
-							  "the Veyon Server running remotely. The feature can be specified by name "
+							  "the ClassWatch Server running remotely. The feature can be specified by name "
 							  "or UID. Use the ``show`` command to see all available features.") );
 
 		printExamples( commandLineModuleName(), stopCommand(),

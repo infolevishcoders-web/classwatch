@@ -3,7 +3,7 @@
  *
  *  Copyright (c) 2006-2026 Tobias Junghans <tobydox@veyon.io>
  *
- *  This file is part of Veyon - https://veyon.io
+ *  This file is part of ClassWatch - https://levishcoders.com
  *
  *  This is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -505,11 +505,11 @@ void RemoteAccessWidget::updateRemoteAccessTitle()
 
 	if (username.isEmpty() )
 	{
-		setWindowTitle(tr("%1 - Veyon Remote Access").arg(m_computerControlInterface->computerName()));
+		setWindowTitle(tr("%1 - ClassWatch Remote Access").arg(m_computerControlInterface->computerName()));
 	}
 	else
 	{
-		setWindowTitle(tr("%1 - %2 - Veyon Remote Access").arg(username,
+		setWindowTitle(tr("%1 - %2 - ClassWatch Remote Access").arg(username,
 															m_computerControlInterface->computerName()));
 	}
 }

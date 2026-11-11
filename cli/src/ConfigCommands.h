@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2017-2026 Tobias Junghans <tobydox@veyon.io>
  *
- * This file is part of Veyon - https://veyon.io
+ * This file is part of ClassWatch - https://levishcoders.com
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -52,12 +52,12 @@ public:
 
 	QString description() const override
 	{
-		return tr( "Configure Veyon at command line" );
+		return tr( "Configure ClassWatch at command line" );
 	}
 
 	QString vendor() const override
 	{
-		return QStringLiteral( "Veyon Community" );
+		return QStringLiteral( "Levish Coders" );
 	}
 
 	QString copyright() const override
@@ -72,7 +72,7 @@ public:
 
 	QString commandLineModuleHelp() const override
 	{
-		return tr( "Commands for managing the configuration of Veyon" );
+		return tr( "Commands for managing the configuration of ClassWatch" );
 	}
 
 	QStringList commands() const override;

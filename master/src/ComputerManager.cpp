@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2017-2026 Tobias Junghans <tobydox@veyon.io>
  *
- * This file is part of Veyon - https://veyon.io
+ * This file is part of ClassWatch - https://levishcoders.com
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -62,7 +62,7 @@ ComputerManager::ComputerManager( UserConfig& config, QObject* parent ) :
 							  tr("Missing network object directory plugin"),
 							  tr("No default network object directory plugin was found. "
 								 "Please check your installation or configure a different "
-								 "network object directory backend via Veyon Configurator."));
+								 "network object directory backend via ClassWatch Configurator."));
 		qFatal( "ComputerManager: missing network object directory plugin!" );
 	}
 

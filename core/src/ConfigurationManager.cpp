@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2010-2026 Tobias Junghans <tobydox@veyon.io>
  *
- * This file is part of Veyon - https://veyon.io
+ * This file is part of ClassWatch - https://levishcoders.com
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -61,7 +61,7 @@ bool ConfigurationManager::applyConfiguration()
 	auto& network = VeyonCore::platform().networkFunctions();
 
 	if( network.configureFirewallException( VeyonCore::filesystem().serverFilePath(),
-											QStringLiteral("Veyon Server"),
+											QStringLiteral("ClassWatch Server"),
 											m_configuration.isFirewallExceptionEnabled() ) == false )
 	{
 		m_errorString = tr("Could not configure the firewall configuration for the ClassWatch Server.");
@@ -69,7 +69,7 @@ bool ConfigurationManager::applyConfiguration()
 	}
 
 	if( network.configureFirewallException( VeyonCore::filesystem().workerFilePath(),
-											QStringLiteral("Veyon Worker"),
+											QStringLiteral("ClassWatch Worker"),
 											m_configuration.isFirewallExceptionEnabled() ) == false )
 	{
 		m_errorString = tr("Could not configure the firewall configuration for the ClassWatch Worker.");

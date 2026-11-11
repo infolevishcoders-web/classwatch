@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2019-2026 Tobias Junghans <tobydox@veyon.io>
  *
- * This file is part of Veyon - https://veyon.io
+ * This file is part of ClassWatch - https://levishcoders.com
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -145,7 +145,7 @@ void LinuxKeyboardInput::initUinput()
 	usetup.id.bustype = BUS_USB;
 	usetup.id.vendor  = 0x1d6b;
 	usetup.id.product = 0x0001;
-	std::strncpy( usetup.name, "Veyon Virtual Keyboard", sizeof( usetup.name ) - 1 );
+	std::strncpy( usetup.name, "ClassWatch Virtual Keyboard", sizeof( usetup.name ) - 1 );
 
 	if( ::ioctl( m_uinputFd, UI_DEV_SETUP, &usetup ) < 0 ||
 		::ioctl( m_uinputFd, UI_DEV_CREATE ) < 0 )

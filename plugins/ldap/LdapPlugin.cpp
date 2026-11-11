@@ -1,5 +1,5 @@
 // Copyright (c) 2019-2026 Tobias Junghans <tobydox@veyon.io>
-// This file is part of Veyon - https://veyon.io
+// This file is part of ClassWatch - https://levishcoders.com
 // SPDX-License-Identifier: LGPL-2.0-or-later
 
 #include "CommandLineIO.h"

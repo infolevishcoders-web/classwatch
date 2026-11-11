@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2020-2026 Tobias Junghans <tobydox@veyon.io>
  *
- * This file is part of Veyon - https://veyon.io
+ * This file is part of ClassWatch - https://levishcoders.com
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -435,7 +435,7 @@ bool WebApiHttpServer::setupTls()
 QString WebApiHttpServer::getDebugInformation()
 {
 	const QString sysInfo =
-			QStringLiteral("Veyon WebAPI server version: %1<br/>\n").arg(VeyonCore::versionString()) +
+			QStringLiteral("ClassWatch WebAPI server version: %1<br/>\n").arg(VeyonCore::versionString()) +
 			QStringLiteral("Local hostname: %1<br/>\n").arg(HostAddress::localFQDN()) +
 			QStringLiteral("Operating system: %1 %2 %3<br/>\n").arg(QSysInfo::prettyProductName(), QSysInfo::productType(), QSysInfo::productVersion()) +
 			QStringLiteral("Kernel: %1 %2<br/>\n").arg(QSysInfo::kernelType(), QSysInfo::kernelVersion());
@@ -449,10 +449,10 @@ QString WebApiHttpServer::getDebugInformation()
 						  "<html lang=\"en-US\">\n"
 						  "<head>\n"
 						  "<meta http-equiv=\"content-type\" content=\"text/html; charset=utf-8\">\n"
-						  "<title>Veyon WebAPI Debug Information</title>\n"
+						  "<title>ClassWatch WebAPI Debug Information</title>\n"
 						  "</head>\n"
 						  "<body>\n"
-						  "<h1>Veyon WebAPI Debug Information</h1>\n"
+						  "<h1>ClassWatch WebAPI Debug Information</h1>\n"
 						  "<h2>System</h2>\n"
 						  "%1\n"
 						  "<h2>Process limits</h2>\n"

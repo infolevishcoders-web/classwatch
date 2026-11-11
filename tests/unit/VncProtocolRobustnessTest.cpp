@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2026 Tobias Junghans <tobydox@veyon.io>
  *
- * This file is part of Veyon - https://veyon.io
+ * This file is part of ClassWatch - https://levishcoders.com
  */
 
 #include <QtTest>
