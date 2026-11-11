@@ -96,12 +96,16 @@ QString ClassWatchLicense::signPayload( const QByteArray& payload )
 	{
 		c = static_cast<char>( static_cast<unsigned char>( c ) ^ 0x36 );
 	}
-	const auto inner = QCryptographicHash::hash( k + payload, QCryptographicHash::Sha256 );
+	QByteArray innerIn = k;
+	innerIn.append( payload );
+	const auto inner = QCryptographicHash::hash( innerIn, QCryptographicHash::Sha256 );
 	for( auto& c : k )
 	{
 		c = static_cast<char>( static_cast<unsigned char>( c ) ^ ( 0x36 ^ 0x5c ) );
 	}
-	const auto outer = QCryptographicHash::hash( k + inner, QCryptographicHash::Sha256 );
+	QByteArray outerIn = k;
+	outerIn.append( inner );
+	const auto outer = QCryptographicHash::hash( outerIn, QCryptographicHash::Sha256 );
 	return QString::fromLatin1( urlEncode( outer ) );
 }
 
