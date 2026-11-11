@@ -24,6 +24,7 @@
 
 #include "DashboardPanel.h"
 #include "ComputerManager.h"
+#include "ComputerControlListModel.h"
 #include "ComputerMonitoringModel.h"
 #include "VeyonMaster.h"
 #include "UserConfig.h"

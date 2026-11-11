@@ -1,5 +1,5 @@
 /*
- * classwatchconfigurationpage.h - forwarding header for uic-generated includes
+ * ClassWatchConfigurationPage.h - ClassWatch-specific configuration page
  *
  * Copyright (c) 2026 Levish Coders
  *
@@ -24,4 +24,25 @@
 
 #pragma once
 
-#include "ClassWatchConfigurationPage.h"
+#include "ConfigurationPage.h"
+
+namespace Ui { class ClassWatchConfigurationPage; }
+
+class ClassWatchConfigurationPage : public ConfigurationPage
+{
+	Q_OBJECT
+public:
+	explicit ClassWatchConfigurationPage( QWidget* parent = nullptr );
+	~ClassWatchConfigurationPage() override;
+
+	void resetWidgets() override;
+	void connectWidgetsToProperties() override;
+	void applyConfiguration() override;
+
+private Q_SLOTS:
+	void onApplyClicked();
+	void onResetClicked();
+
+private:
+	Ui::ClassWatchConfigurationPage* ui;
+};

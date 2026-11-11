@@ -31,7 +31,9 @@
 #include <QObject>
 #include <QString>
 
-class ClassWatchSecurityManager : public QObject
+#include "VeyonCore.h"
+
+class VEYON_CORE_EXPORT ClassWatchSecurityManager : public QObject
 {
 	Q_OBJECT
 

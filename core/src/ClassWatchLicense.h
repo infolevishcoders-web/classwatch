@@ -29,7 +29,9 @@
 #include <QJsonObject>
 #include <QString>
 
-class ClassWatchLicense
+#include "VeyonCore.h"
+
+class VEYON_CORE_EXPORT ClassWatchLicense
 {
 public:
 	enum class Status
