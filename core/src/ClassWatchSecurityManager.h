@@ -72,6 +72,13 @@ public:
 	bool hasPendingDeviceWarning() const;
 	QJsonObject takePendingDeviceWarning();
 
+	// web filtering: forces DNS-level content filtering on all active
+	// network interfaces (Windows only, CleanBrowsing family filter by
+	// default). Reversible - restores DHCP when disabled.
+	bool applyWebFilter();
+	bool removeWebFilter();
+	bool isWebFilterActive() const;
+
 	// filesystem locations
 	static QString securityDataDirectory();
 	static QString securityEventsLogPath();
@@ -82,4 +89,8 @@ Q_SIGNALS:
 private:
 	QString pendingWarningPath() const;
 	void appendAuditMirror( const QJsonObject& event ) const;
+	bool runNetsh( const QStringList& arguments, int* exitCode = nullptr ) const;
+	QStringList activeInterfaceNames() const;
+	QString webFilterMarkerPath() const;
+	void hardenSecurityFiles();
 };

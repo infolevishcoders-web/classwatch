@@ -25,15 +25,67 @@
 #include "ClassWatchComputerManagerExtension.h"
 #include "ComputerManager.h"
 #include "NetworkObject.h"
+#include "NetworkObjectModel.h"
+#include "Filesystem.h"
+#include "VeyonCore.h"
+#include "VeyonConfiguration.h"
 #include <QTimer>
 
 ClassWatchComputerManagerExtension::ClassWatchComputerManagerExtension( ComputerManager* computerManager, QObject* parent ) :
 	QObject( parent ),
 	m_computerManager( computerManager ),
-	m_classWatchManager( new ClassWatchComputerManager( this ) )
+	m_classWatchManager( new ClassWatchComputerManager( this ) ),
+	m_syncDebounceTimer( new QTimer( this ) ),
+	m_registrySaveTimer( new QTimer( this ) ),
+	m_periodicSyncTimer( new QTimer( this ) )
 {
 	connectToComputerManager();
-	
+
+	// Restore previously registered computers first so already-known machines
+	// keep their ClassWatch IDs when the network object directory re-discovers them.
+	loadClassWatchRegistry( VeyonCore::filesystem().expandPath(
+		VeyonCore::config().classWatchRegistryPath() ) );
+
+	// React whenever the network object tree changes (new client appears,
+	// computer removed, location updated, ...)
+	if ( m_computerManager ) {
+		if ( auto* treeModel = m_computerManager->computerTreeModel() ) {
+			connect( treeModel, &QAbstractItemModel::rowsInserted,
+					 this, &ClassWatchComputerManagerExtension::scheduleSync );
+			connect( treeModel, &QAbstractItemModel::modelReset,
+					 this, &ClassWatchComputerManagerExtension::scheduleSync );
+			connect( treeModel, &QAbstractItemModel::layoutChanged,
+					 this, &ClassWatchComputerManagerExtension::scheduleSync );
+		}
+	}
+
+	// Debounced sync: coalesce bursts of model changes into one pass
+	m_syncDebounceTimer->setSingleShot( true );
+	m_syncDebounceTimer->setInterval( 500 );
+	connect( m_syncDebounceTimer, &QTimer::timeout,
+			 this, &ClassWatchComputerManagerExtension::syncComputersFromComputerManager );
+
+	// Persist the registry automatically whenever it changes
+	m_registrySaveTimer->setSingleShot( true );
+	m_registrySaveTimer->setInterval( 2000 );
+	connect( m_registrySaveTimer, &QTimer::timeout,
+			 this, &ClassWatchComputerManagerExtension::persistRegistry );
+	const auto scheduleSave = [this]() { scheduleRegistrySave(); };
+	connect( m_classWatchManager, &ClassWatchComputerManager::computerRegistered,
+			 this, scheduleSave );
+	connect( m_classWatchManager, &ClassWatchComputerManager::computerUnregistered,
+			 this, scheduleSave );
+	connect( m_classWatchManager, &ClassWatchComputerManager::computerInfoUpdated,
+			 this, scheduleSave );
+	connect( m_classWatchManager, &ClassWatchComputerManager::connectionStatusChanged,
+			 this, scheduleSave );
+
+	// Periodic safety sync in case model signals are missed
+	m_periodicSyncTimer->setInterval( 30000 );
+	connect( m_periodicSyncTimer, &QTimer::timeout,
+			 this, &ClassWatchComputerManagerExtension::syncComputersFromComputerManager );
+	m_periodicSyncTimer->start();
+
 	// Sync computers after a short delay to ensure models are ready
 	QTimer::singleShot( 100, this, [this]() {
 		syncComputersFromComputerManager();
@@ -155,15 +207,76 @@ void ClassWatchComputerManagerExtension::syncComputersFromComputerManager()
 		return;
 	}
 
-	// Get all computers from the ComputerManager
+	if ( VeyonCore::config().autoRegisterComputers() ) {
+		// Auto-registration: every computer discovered by the network object
+		// directory gets a stable ClassWatch ID, whether or not it is checked
+		// in the "Locations & Computers" panel.
+		for ( const Computer& computer : allDiscoveredComputers() ) {
+			registerComputer( computer );
+		}
+		return;
+	}
+
+	// Manual mode: only register computers the teacher has checked
 	QModelIndex rootIndex;
 	ComputerList computers = m_computerManager->selectedComputers( rootIndex );
-	
-	// For now, we'll register all available computers
-	// In a real implementation, we'd iterate through the model
 	for ( const Computer& computer : computers ) {
 		registerComputer( computer );
 	}
+}
+
+ComputerList ClassWatchComputerManagerExtension::allDiscoveredComputers() const
+{
+	ComputerList computers;
+	if ( m_computerManager ) {
+		collectHostComputers( QModelIndex(), computers );
+	}
+	return computers;
+}
+
+void ClassWatchComputerManagerExtension::collectHostComputers( const QModelIndex& parent, ComputerList& computers ) const
+{
+	auto* model = m_computerManager->computerTreeModel();
+	const int rows = model->rowCount( parent );
+
+	for ( int i = 0; i < rows; ++i )
+	{
+		const auto entryIndex = model->index( i, 0, parent );
+		const auto objectType = NetworkObject::Type( model->data( entryIndex, NetworkObjectModel::TypeRole ).toInt() );
+
+		if ( NetworkObject::isContainer( objectType ) )
+		{
+			collectHostComputers( entryIndex, computers );
+		}
+		else if ( objectType == NetworkObject::Type::Host )
+		{
+			computers += Computer( model->data( entryIndex, NetworkObjectModel::UidRole ).toUuid(),
+								   model->data( entryIndex, NetworkObjectModel::NameRole ).toString(),
+								   model->data( entryIndex, NetworkObjectModel::HostAddressRole ).toString(),
+								   model->data( entryIndex, NetworkObjectModel::MacAddressRole ).toString(),
+								   model->data( parent, NetworkObjectModel::NameRole ).toString() );
+		}
+	}
+}
+
+void ClassWatchComputerManagerExtension::scheduleSync()
+{
+	if ( !m_syncDebounceTimer->isActive() ) {
+		m_syncDebounceTimer->start();
+	}
+}
+
+void ClassWatchComputerManagerExtension::scheduleRegistrySave()
+{
+	if ( !m_registrySaveTimer->isActive() ) {
+		m_registrySaveTimer->start();
+	}
+}
+
+void ClassWatchComputerManagerExtension::persistRegistry()
+{
+	saveClassWatchRegistry( VeyonCore::filesystem().expandPath(
+		VeyonCore::config().classWatchRegistryPath() ) );
 }
 
 bool ClassWatchComputerManagerExtension::saveClassWatchRegistry( const QString& filePath )

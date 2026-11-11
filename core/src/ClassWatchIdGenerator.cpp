@@ -23,11 +23,30 @@
  */
 
 #include "ClassWatchIdGenerator.h"
+
+#include "VeyonConfiguration.h"
+
 #include <QRegularExpression>
+
+namespace
+{
+	QString configuredPrefix()
+	{
+		QString prefix = VeyonCore::config().classWatchIdPrefix().trimmed();
+		prefix.remove( QLatin1Char('-') );
+		return prefix.isEmpty() ? QStringLiteral("CW") : prefix.toUpper();
+	}
+
+	int configuredStartNumber()
+	{
+		const int start = VeyonCore::config().classWatchIdStartNumber();
+		return start > 0 ? start : 1;
+	}
+}
 
 ClassWatchIdGenerator::ClassWatchIdGenerator( QObject* parent ) :
 	QObject( parent ),
-	m_currentNumber( 1 )
+	m_currentNumber( configuredStartNumber() )
 {
 }
 
@@ -45,7 +64,7 @@ QString ClassWatchIdGenerator::generateId( const QStringList& existingIds )
 
 bool ClassWatchIdGenerator::isValidId( const QString& id )
 {
-	QRegularExpression regex( QStringLiteral("^CW-\\d{3,}$") );
+	QRegularExpression regex( QStringLiteral("^[A-Za-z][A-Za-z0-9]{0,15}-\\d{3,}$") );
 	return regex.match( id ).hasMatch();
 }
 
@@ -54,26 +73,28 @@ int ClassWatchIdGenerator::parseIdNumber( const QString& id )
 	if ( !isValidId( id ) ) {
 		return -1;
 	}
-	
-	QString numberPart = id.mid( 3 ); // Remove "CW-" prefix
-	return numberPart.toInt();
+
+	const int separator = id.lastIndexOf( QLatin1Char('-') );
+	return id.mid( separator + 1 ).toInt();
 }
 
 QString ClassWatchIdGenerator::formatId( int number )
 {
-	return QString( QStringLiteral("CW-%1") ).arg( number, 3, 10, QLatin1Char('0') );
+	return QString( QStringLiteral("%1-%2") )
+		.arg( configuredPrefix() )
+		.arg( number, 3, 10, QLatin1Char('0') );
 }
 
 QString ClassWatchIdGenerator::getNextAvailableId( const QStringList& existingIds )
 {
-	int maxNumber = 0;
-	
+	int maxNumber = configuredStartNumber() - 1;
+
 	for ( const QString& id : existingIds ) {
-		int number = parseIdNumber( id );
+		const int number = parseIdNumber( id );
 		if ( number > maxNumber ) {
 			maxNumber = number;
 		}
 	}
-	
+
 	return formatId( maxNumber + 1 );
 }

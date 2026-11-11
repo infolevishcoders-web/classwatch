@@ -25,18 +25,26 @@
 
 #include "ClassWatchSecurityManager.h"
 
+#include <QAbstractSocket>
 #include <QCryptographicHash>
 #include <QDir>
 #include <QFile>
+#include <QHostAddress>
+#include <QJsonArray>
 #include <QJsonDocument>
 #include <QJsonParseError>
+#include <QProcess>
+#include <QRegularExpression>
 #include <QSettings>
 #include <QStandardPaths>
 #include <QSysInfo>
 #include <QTextStream>
 #include <QUuid>
 
+#include <algorithm>
+
 #include "ClassWatchConfigurationProperties.h"
+#include "Filesystem.h"
 #include "VeyonCore.h"
 
 #ifdef Q_OS_WIN
@@ -68,12 +76,27 @@ ClassWatchSecurityManager& ClassWatchSecurityManager::instance()
 void ClassWatchSecurityManager::initialize()
 {
 	auto& config = VeyonCore::config();
+	auto& manager = instance();
 	if( config.securityAutoLockdown() )
 	{
-		instance().applyTerminalLockdown();
-		instance().logSecurityEvent( QStringLiteral("lockdown_applied"),
-									  QStringLiteral("Terminal lockdown policies applied at service start") );
+		manager.applyTerminalLockdown();
+		manager.logSecurityEvent( QStringLiteral("lockdown_applied"),
+								  QStringLiteral("Terminal lockdown policies applied at service start") );
 	}
+	if( config.enableWebFiltering() )
+	{
+		if( manager.applyWebFilter() )
+		{
+			manager.logSecurityEvent( QStringLiteral("web_filter_applied"),
+									   QStringLiteral("DNS-level web filtering enabled on all active interfaces") );
+		}
+	}
+	else
+	{
+		// restores DHCP only on interfaces we previously filtered
+		manager.removeWebFilter();
+	}
+	manager.hardenSecurityFiles();
 }
 
 
@@ -289,11 +312,187 @@ QString ClassWatchSecurityManager::pendingWarningPath() const
 
 void ClassWatchSecurityManager::appendAuditMirror( const QJsonObject& event ) const
 {
-	const auto path = VeyonCore::config().auditLogPath();
+	const auto path = VeyonCore::filesystem().expandPath(
+		VeyonCore::config().auditLogPath() );
 	QFile file( path );
 	if( !file.open( QIODevice::Append | QIODevice::Text ) )
 	{
 		return;
 	}
 	file.write( QJsonDocument( event ).toJson( QJsonDocument::Compact ) + '\n' );
+}
+
+
+bool ClassWatchSecurityManager::runNetsh( const QStringList& arguments, int* exitCode ) const
+{
+#ifdef Q_OS_WIN
+	QProcess netsh;
+	netsh.start( QStringLiteral("netsh"), arguments );
+	if( !netsh.waitForFinished( 15000 ) )
+	{
+		netsh.kill();
+		return false;
+	}
+	if( exitCode )
+	{
+		*exitCode = netsh.exitCode();
+	}
+	return netsh.exitCode() == 0;
+#else
+	Q_UNUSED( arguments )
+	if( exitCode )
+	{
+		*exitCode = -1;
+	}
+	return false;
+#endif
+}
+
+
+QStringList ClassWatchSecurityManager::activeInterfaceNames() const
+{
+	QStringList names;
+#ifdef Q_OS_WIN
+	QProcess netsh;
+	netsh.start( QStringLiteral("netsh"),
+				 { QStringLiteral("interface"), QStringLiteral("ipv4"),
+				   QStringLiteral("show"), QStringLiteral("interfaces") } );
+	if( !netsh.waitForFinished( 15000 ) )
+	{
+		return names;
+	}
+	// lines look like: "  8   25   1500  connected     Ethernet"
+	const QRegularExpression lineRe(
+		QStringLiteral("^\\s*\\d+\\s+\\d+\\s+\\d+\\s+connected\\s+(.+?)\\s*$") );
+	const auto lines = QString::fromLocal8Bit( netsh.readAllStandardOutput() )
+						  .split( QLatin1Char('\n') );
+	for( const auto& line : lines )
+	{
+		const auto match = lineRe.match( line );
+		if( match.hasMatch() )
+		{
+			names.append( match.captured( 1 ) );
+		}
+	}
+#endif
+	return names;
+}
+
+
+QString ClassWatchSecurityManager::webFilterMarkerPath() const
+{
+	return securityDataDirectory() + QDir::separator() +
+		   QStringLiteral("webfilter.active.json");
+}
+
+
+bool ClassWatchSecurityManager::applyWebFilter()
+{
+#ifdef Q_OS_WIN
+	// DNS servers from configuration (comma/space separated); default is the
+	// CleanBrowsing family filter which blocks adult, malware and phishing
+	// content while keeping educational sites reachable.
+	const auto configured = VeyonCore::config().webFilterDnsServers();
+	QStringList servers = configured.split( QRegularExpression( QStringLiteral("[,;\\s]+") ),
+											Qt::SkipEmptyParts );
+	servers.erase( std::remove_if( servers.begin(), servers.end(),
+								   []( const QString& s ) {
+									   return QHostAddress( s ).protocol() != QAbstractSocket::IPv4Protocol;
+								   } ),
+				   servers.end() );
+	if( servers.isEmpty() )
+	{
+		return false;
+	}
+	servers = servers.mid( 0, 2 );
+
+	const auto interfaces = activeInterfaceNames();
+	if( interfaces.isEmpty() )
+	{
+		return false;
+	}
+
+	for( const auto& name : interfaces )
+	{
+		if( !runNetsh( { QStringLiteral("interface"), QStringLiteral("ipv4"),
+						 QStringLiteral("set"), QStringLiteral("dnsservers"),
+						 name, QStringLiteral("static"), servers.first(),
+						 QStringLiteral("primary") } ) )
+		{
+			return false;
+		}
+		if( servers.size() > 1 )
+		{
+			runNetsh( { QStringLiteral("interface"), QStringLiteral("ipv4"),
+						QStringLiteral("add"), QStringLiteral("dnsservers"),
+						name, servers.at( 1 ), QStringLiteral("index=2") } );
+		}
+	}
+
+	// remember which interfaces we filtered so removal restores DHCP exactly there
+	QDir().mkpath( securityDataDirectory() );
+	QJsonObject marker;
+	marker[QStringLiteral("interfaces")] = QJsonArray::fromStringList( interfaces );
+	marker[QStringLiteral("dns")] = QJsonArray::fromStringList( servers );
+	QFile file( webFilterMarkerPath() );
+	if( file.open( QIODevice::WriteOnly | QIODevice::Truncate ) )
+	{
+		file.write( QJsonDocument( marker ).toJson( QJsonDocument::Compact ) );
+	}
+	return true;
+#else
+	return false;
+#endif
+}
+
+
+bool ClassWatchSecurityManager::removeWebFilter()
+{
+#ifdef Q_OS_WIN
+	QFile file( webFilterMarkerPath() );
+	if( !file.open( QIODevice::ReadOnly ) )
+	{
+		return false; // we never applied a filter - leave DNS alone
+	}
+	const auto doc = QJsonDocument::fromJson( file.readAll() );
+	file.close();
+	const auto interfaces = doc.object()
+							.value( QStringLiteral("interfaces") )
+							.toArray().toVariantList();
+
+	for( const auto& entry : interfaces )
+	{
+		runNetsh( { QStringLiteral("interface"), QStringLiteral("ipv4"),
+					QStringLiteral("set"), QStringLiteral("dnsservers"),
+					entry.toString(), QStringLiteral("dhcp") } );
+	}
+	QFile::remove( webFilterMarkerPath() );
+	return true;
+#else
+	return false;
+#endif
+}
+
+
+bool ClassWatchSecurityManager::isWebFilterActive() const
+{
+	return QFile::exists( webFilterMarkerPath() );
+}
+
+
+void ClassWatchSecurityManager::hardenSecurityFiles()
+{
+#ifdef Q_OS_WIN
+	QDir().mkpath( securityDataDirectory() );
+	// Restrict the security data directory to SYSTEM and Administrators so
+	// students cannot read the event log, forge warnings or tamper with the
+	// pending-warning file.
+	const auto dir = QDir::toNativeSeparators( securityDataDirectory() );
+	QProcess::execute( QStringLiteral("icacls"),
+					   { dir, QStringLiteral("/inheritance:r"),
+						 QStringLiteral("/grant:r"),
+						 QStringLiteral("NT AUTHORITY\\SYSTEM:(OI)(CI)F"),
+						 QStringLiteral("BUILTIN\\Administrators:(OI)(CI)F"),
+						 QStringLiteral("/T"), QStringLiteral("/C") } );
+#endif
 }

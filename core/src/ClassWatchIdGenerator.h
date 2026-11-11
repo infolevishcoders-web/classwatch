@@ -36,22 +36,22 @@ class VEYON_CORE_EXPORT ClassWatchIdGenerator : public QObject
 public:
 	explicit ClassWatchIdGenerator( QObject* parent = nullptr );
 
-	// Generate a ClassWatch ID (CW-001, CW-002, etc.)
+	// Generate a ClassWatch ID using the configured prefix (e.g. CW-001)
 	QString generateId();
 
 	// Generate ID based on existing computers
 	QString generateId( const QStringList& existingIds );
 
-	// Check if an ID is valid format
+	// Check if an ID is valid format (PREFIX-123)
 	static bool isValidId( const QString& id );
 
-	// Parse ID number from CW-XXX format
+	// Parse ID number from PREFIX-NNN format
 	static int parseIdNumber( const QString& id );
 
-	// Format ID from number
+	// Format ID from number using the configured prefix
 	static QString formatId( int number );
 
-	// Get next available ID based on existing IDs
+	// Get next available ID based on existing IDs and configured start number
 	static QString getNextAvailableId( const QStringList& existingIds );
 
 private:

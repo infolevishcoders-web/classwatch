@@ -28,6 +28,9 @@
 #include "ClassWatchComputerManagerExtension.h"
 #include "ClassWatchComputer.h"
 #include "ComputerManager.h"
+#include "VeyonCore.h"
+#include "VeyonConfiguration.h"
+#include "Filesystem.h"
 #include <QMessageBox>
 #include <QFileDialog>
 #include <QStandardPaths>
@@ -53,10 +56,8 @@ ClassWatchComputerPanel::ClassWatchComputerPanel( VeyonMaster* master, QWidget* 
 	ui->computerTreeWidget->setColumnWidth( 3, 120 ); // IP Address
 	ui->computerTreeWidget->setColumnWidth( 4, 120 ); // User
 	
-	// Load existing registry if available
-	QString registryPath = QStandardPaths::writableLocation( QStandardPaths::AppDataLocation ) + QStringLiteral("/classwatch_computers.json");
-	m_classWatchManager->loadClassWatchRegistry( registryPath );
-	
+	// The ClassWatchComputerManagerExtension already loaded the persisted
+	// registry on startup; just populate the view.
 	refreshComputerList();
 }
 
@@ -293,8 +294,8 @@ void ClassWatchComputerPanel::onLoadRegistry()
 void ClassWatchComputerPanel::onClose()
 {
 	// Save registry before closing
-	QString registryPath = QStandardPaths::writableLocation( QStandardPaths::AppDataLocation ) + QStringLiteral("/classwatch_computers.json");
-	m_classWatchManager->saveClassWatchRegistry( registryPath );
+	m_classWatchManager->saveClassWatchRegistry( VeyonCore::filesystem().expandPath(
+		VeyonCore::config().classWatchRegistryPath() ) );
 	
 	this->close();
 }

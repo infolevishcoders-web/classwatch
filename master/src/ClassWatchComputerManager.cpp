@@ -29,6 +29,8 @@
 #include <QFile>
 #include <QDir>
 #include <QStandardPaths>
+#include <QFileInfo>
+#include <QUuid>
 
 ClassWatchComputerManager::ClassWatchComputerManager( QObject* parent ) :
 	QObject( parent )
@@ -248,7 +250,11 @@ bool ClassWatchComputerManager::saveRegistry( const QString& filePath )
 		computerObj[QStringLiteral("ramInfo")] = computer.ramInfo();
 		computerObj[QStringLiteral("gpuInfo")] = computer.gpuInfo();
 		computerObj[QStringLiteral("lastConnectionTime")] = computer.lastConnectionTime().toString(Qt::ISODate);
-		
+		if ( !computer.networkObjectUid().isNull() ) {
+			computerObj[QStringLiteral("networkObjectUid")] =
+				computer.networkObjectUid().toString( QUuid::WithoutBraces );
+		}
+
 		computersArray.append( computerObj );
 	}
 	
@@ -257,6 +263,7 @@ bool ClassWatchComputerManager::saveRegistry( const QString& filePath )
 	rootObj[QStringLiteral("computers")] = computersArray;
 	
 	QJsonDocument doc( rootObj );
+	QDir().mkpath( QFileInfo( filePath ).absolutePath() );
 	QFile file( filePath );
 	
 	if ( !file.open( QIODevice::WriteOnly ) ) {
@@ -298,13 +305,20 @@ bool ClassWatchComputerManager::loadRegistry( const QString& filePath )
 	
 	for ( const QJsonValue& value : computersArray ) {
 		QJsonObject computerObj = value.toObject();
-		
-		ClassWatchComputer computer;
+
+		const auto uidString = computerObj[QStringLiteral("networkObjectUid")].toString();
+		const auto uid = uidString.isEmpty() ? NetworkObject::Uid()
+											 : QUuid::fromString( uidString );
+
+		// Build the base Computer first so the persistent network object UID
+		// (which has no setter) is carried into the ClassWatchComputer.
+		Computer baseComputer( uid,
+							  computerObj[QStringLiteral("displayName")].toString(),
+							  computerObj[QStringLiteral("hostAddress")].toString(),
+							  computerObj[QStringLiteral("macAddress")].toString(),
+							  computerObj[QStringLiteral("location")].toString() );
+		ClassWatchComputer computer( baseComputer );
 		computer.setClassWatchId( computerObj[QStringLiteral("classWatchId")].toString() );
-		computer.setDisplayName( computerObj[QStringLiteral("displayName")].toString() );
-		computer.setHostAddress( computerObj[QStringLiteral("hostAddress")].toString() );
-		computer.setMacAddress( computerObj[QStringLiteral("macAddress")].toString() );
-		computer.setLocation( computerObj[QStringLiteral("location")].toString() );
 		computer.setWindowsVersion( computerObj[QStringLiteral("windowsVersion")].toString() );
 		computer.setLoggedInUser( computerObj[QStringLiteral("loggedInUser")].toString() );
 		computer.setDomainName( computerObj[QStringLiteral("domainName")].toString() );
@@ -316,13 +330,15 @@ bool ClassWatchComputerManager::loadRegistry( const QString& filePath )
 		
 		QString timeStr = computerObj[QStringLiteral("lastConnectionTime")].toString();
 		computer.setLastConnectionTime( QDateTime::fromString( timeStr, Qt::ISODate ) );
-		
+
 		QString classWatchId = computer.classWatchId();
 		m_computers[classWatchId] = computer;
-		
-		// Try to reconstruct network object UID mapping
-		// This is a simplified approach - in a real implementation,
-		// we'd need to match with the actual NetworkObject instances
+
+		// Restore the network object UID -> ClassWatch ID mapping so the same
+		// physical machine keeps its ID across restarts and IP address changes.
+		if ( !uid.isNull() && !m_networkObjectToClassWatchId.contains( uid ) ) {
+			m_networkObjectToClassWatchId[uid] = classWatchId;
+		}
 	}
 	
 	return true;

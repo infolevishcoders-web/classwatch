@@ -23,6 +23,7 @@
  */
 
 #include "ClassWatchClientApp.h"
+#include "ClassWatchClientInfo.h"
 #include "ClassWatchClientStatus.h"
 #include "ClassWatchSecurityManager.h"
 #include <QAction>
@@ -132,12 +133,9 @@ void ClassWatchClientApp::updateTrayIcon()
 	m_trayIcon->setToolTip( tooltip );
 	
 	// Update icon based on status
-	if ( status == QStringLiteral("Connected") ) {
+	if ( status == QStringLiteral("Monitoring Active") ) {
 		m_trayIcon->setIcon( style()->standardIcon( QStyle::SP_DialogApplyButton ) );
 		m_isConnected = true;
-	} else if ( status == QStringLiteral("Connecting...") ) {
-		m_trayIcon->setIcon( style()->standardIcon( QStyle::SP_MessageBoxInformation ) );
-		m_isConnected = false;
 	} else {
 		m_trayIcon->setIcon( style()->standardIcon( QStyle::SP_MessageBoxWarning ) );
 		m_isConnected = false;
@@ -184,24 +182,10 @@ void ClassWatchClientApp::onQuit()
 
 QString ClassWatchClientApp::getClassWatchId()
 {
-	// This is a simplified implementation
-	// In a real implementation, we'd read from the ClassWatch registry
-	// or generate an ID based on the computer's network object UID
-	
-	VeyonConfiguration& config = VeyonCore::config();
-	QString prefix = config.classWatchIdPrefix();
-	int startNumber = config.classWatchIdStartNumber();
-	
-	// For now, return a placeholder ID
-	return QStringLiteral("%1-%2").arg( prefix ).arg( startNumber, 3, 10, QChar(QLatin1Char('0')) );
+	return ClassWatchClientInfo::machineLabel();
 }
 
 QString ClassWatchClientApp::getConnectionStatus()
 {
-	// This is a simplified implementation
-	// In real implementation, we'd check the actual connection status
-	// to the ClassWatch Master
-	
-	// For now, return a placeholder status
-	return m_isConnected ? QStringLiteral("Connected") : QStringLiteral("Disconnected");
+	return ClassWatchClientInfo::connectionStatus();
 }

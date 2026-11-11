@@ -28,6 +28,7 @@
 #include "ClassWatchComputer.h"
 #include "ClassWatchComputerManager.h"
 #include <QMap>
+#include <QTimer>
 
 class ClassWatchComputerManagerExtension : public QObject
 {
@@ -72,8 +73,16 @@ private:
 	void onComputerSelectionChanged();
 	void onComputerAdded( const Computer& computer );
 	void onComputerRemoved( const Computer& computer );
+	void scheduleSync();
+	void scheduleRegistrySave();
+	void persistRegistry();
+	ComputerList allDiscoveredComputers() const;
+	void collectHostComputers( const QModelIndex& parent, ComputerList& computers ) const;
 
 	ComputerManager* m_computerManager;
 	ClassWatchComputerManager* m_classWatchManager;
 	QMap<NetworkObject::Uid, QString> m_uidToClassWatchId;
+	QTimer* m_syncDebounceTimer;
+	QTimer* m_registrySaveTimer;
+	QTimer* m_periodicSyncTimer;
 };
