@@ -24,6 +24,7 @@
 
 #include <QCoreApplication>
 
+#include "ClassWatchSecurityManager.h"
 #include "VeyonServiceControl.h"
 #include "PlatformServiceFunctions.h"
 
@@ -33,6 +34,9 @@ int main( int argc, char** argv )
 
 	QCoreApplication app( argc, argv );
 	VeyonCore core( &app, VeyonCore::Component::Service, QStringLiteral("Service") );
+
+	// apply classroom lockdown policies (terminal lockdown, etc.) automatically
+	ClassWatchSecurityManager::initialize();
 
 	auto& serviceFunctions = core.platform().serviceFunctions();
 

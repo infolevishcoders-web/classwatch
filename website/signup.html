@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Start free trial — ClassWatch</title>
+<link rel="stylesheet" href="assets/app.css"><link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+</head>
+<body>
+<header class="topbar"><div class="wrap topbar-inner">
+  <a class="brand" href="index.html"><span>Class<span class="accent">Watch</span></span></a>
+  <nav class="nav"><a href="login.html">Already have an account? Log in</a></nav>
+</div></header>
+
+<div class="auth-wrap"><div class="auth-card">
+  <h1>Create your account</h1>
+  <p class="sub">Register your school or organization and get a <b>1-week free trial</b> — 3 devices included.</p>
+
+  <form id="signupForm">
+    <label>Email *</label>
+    <input type="email" id="email" required placeholder="you@school.ac.ug">
+
+    <label>Organization / School name *</label>
+    <input type="text" id="orgName" required placeholder="e.g. St. Mary's Secondary School">
+
+    <label>Organization type</label>
+    <select id="orgType">
+      <option value="school">School</option>
+      <option value="college">College / University</option>
+      <option value="training">Training center</option>
+      <option value="other">Other organization</option>
+    </select>
+
+    <label>Country</label>
+    <input type="text" id="country" placeholder="Uganda">
+    <label>District / City</label>
+    <input type="text" id="district" placeholder="e.g. Kampala">
+
+    <label>School location <span class="hint">(optional — used to show nearby schools on the map)</span></label>
+    <div class="oauth-row">
+      <button type="button" class="oauth-btn" id="locBtn">📍 Use my location</button>
+      <input type="text" id="mapUrl" placeholder="or paste Google Maps link" style="flex:2">
+    </div>
+    <p class="hint" id="locHint">We only use your location to show your school on the community map and calculate distances to nearby schools. It is never shared publicly without consent.</p>
+
+    <div class="divider">or sign up with</div>
+    <div class="oauth-row">
+      <button type="button" class="oauth-btn" onclick="googleLogin()">G Google</button>
+      <button type="button" class="oauth-btn" onclick="appleLogin()"> Apple</button>
+    </div>
+
+    <div class="error" id="err"></div>
+    <button class="btn btn-primary" type="submit" id="submitBtn">Start free trial</button>
+    <p class="hint" style="text-align:center;margin-top:14px">By continuing you agree to the ClassWatch terms. Your trial is free for 7 days — no card needed.</p>
+  </form>
+</div></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="assets/app.js"></script>
+<script>
+let picked = null;
+document.getElementById('locBtn').onclick = () => {
+  if (!navigator.geolocation) { alert('Geolocation not supported'); return; }
+  navigator.geolocation.getCurrentPosition(
+    p => { picked = { lat: p.coords.latitude, lng: p.coords.longitude }; document.getElementById('locBtn').textContent = '✓ Location captured'; },
+    () => alert('Location permission denied — you can paste a Google Maps link instead.'));
+};
+function parseMapsUrl(u) {
+  const m = /@(-?\d+\.\d+),(-?\d+\.\d+)/.exec(u || '') || /!3d(-?\d+\.\d+)!4d(-?\d+\.\d+)/.exec(u || '');
+  return m ? { lat: parseFloat(m[1]), lng: parseFloat(m[2]) } : null;
+}
+document.getElementById('signupForm').onsubmit = async e => {
+  e.preventDefault();
+  const err = document.getElementById('err'); hideMsg(err);
+  const btn = document.getElementById('submitBtn'); btn.disabled = true; btn.textContent = 'Creating…';
+  try {
+    const location = picked || parseMapsUrl(document.getElementById('mapUrl').value);
+    const data = await api('/api/trial/start', { method: 'POST', body: {
+      email: document.getElementById('email').value.trim(),
+      org_name: document.getElementById('orgName').value.trim(),
+      org_type: document.getElementById('orgType').value,
+      country: document.getElementById('country').value.trim() || null,
+      district: document.getElementById('district').value.trim() || null,
+      location, location_reason: location ? 'To display your school on the community map and compute distances to nearby schools.' : null,
+    }});
+    setSession(data.token, data.profile);
+    location.href = 'dashboard.html';
+  } catch (ex) { showMsg(err, ex.message); btn.disabled = false; btn.textContent = 'Start free trial'; }
+};
+</script>
+</body>
+</html>

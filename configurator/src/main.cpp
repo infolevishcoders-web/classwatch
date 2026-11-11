@@ -23,8 +23,11 @@
  */
 
 #include <QApplication>
+#include <QInputDialog>
+#include <QLineEdit>
 #include <QMessageBox>
 
+#include "ClassWatchSecurityManager.h"
 #include "VeyonConfiguration.h"
 #include "VeyonCore.h"
 #include "MainWindow.h"
@@ -68,6 +71,48 @@ int main( int argc, char **argv )
 											 "configuration is not writable! Please run ClassWatch "
 											 "Configurator with higher privileges."));
 		return -1;
+	}
+
+	// classroom lockdown: if the administrator locked the configurator,
+	// require the admin password before any changes can be made
+	auto& security = ClassWatchSecurityManager::instance();
+	if( security.isConfiguratorLocked() )
+	{
+		bool unlocked = false;
+		for( int attempt = 0; attempt < 3 && !unlocked; ++attempt )
+		{
+			bool ok = false;
+			const auto password = QInputDialog::getText(
+				nullptr, MainWindow::tr( "ClassWatch Configurator Locked" ),
+				MainWindow::tr( "The administrator has locked the ClassWatch Configurator.\n"
+								"Enter the admin password to continue:" ),
+				QLineEdit::Password, QString(), &ok );
+			if( !ok )
+			{
+				security.logSecurityEvent(
+					QStringLiteral("configurator_unlock_cancelled"),
+					QStringLiteral("Configurator access cancelled at password prompt") );
+				return 0;
+			}
+			if( security.verifyAdminPassword( password ) )
+			{
+				unlocked = true;
+			}
+			else
+			{
+				security.logSecurityEvent(
+					QStringLiteral("configurator_unlock_failed"),
+					QStringLiteral("Invalid admin password attempt %1").arg( attempt + 1 ) );
+				QMessageBox::warning( nullptr, MainWindow::tr( "Access denied" ),
+									  MainWindow::tr( "Incorrect admin password." ) );
+			}
+		}
+		if( !unlocked )
+		{
+			return 0;
+		}
+		security.logSecurityEvent( QStringLiteral("configurator_unlocked"),
+								  QStringLiteral("Configurator unlocked with admin password") );
 	}
 
 	// now create the main window

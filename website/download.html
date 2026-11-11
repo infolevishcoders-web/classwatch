@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Download — ClassWatch</title>
+<link rel="stylesheet" href="assets/app.css"><link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+</head>
+<body>
+<header class="topbar"><div class="wrap topbar-inner">
+  <a class="brand" href="index.html"><span>Class<span class="accent">Watch</span></span></a>
+  <nav class="nav"><a href="login.html">Log in</a><a class="btn btn-primary btn-sm" href="signup.html">Free trial</a></nav>
+</div></header>
+
+<div class="auth-wrap" style="display:block;padding:60px 20px">
+<div style="max-width:900px;margin:0 auto">
+  <h1 style="font-size:32px;margin-bottom:8px">Download ClassWatch</h1>
+  <p class="sub" style="font-size:16px;color:var(--muted);margin-bottom:30px">
+    <b>Teacher / admin PC:</b> install the full package (Master + Service + Client).<br>
+    <b>Student PCs:</b> use the same installer and choose <b>"ClassWatch Client only"</b> — the Master console is never installed on student machines.
+  </p>
+
+  <div class="cards">
+    <div class="card">
+      <h3>🪟 Windows</h3>
+      <p>Windows 10/11 · 64-bit installer with service auto-start.</p>
+      <a class="btn btn-primary" style="margin-top:14px" href="https://github.com/infolevishcoders-web/classwatch/releases/latest" target="_blank" rel="noopener">Download for Windows</a>
+      <p class="small" style="margin-top:8px">~35 MB · .exe setup</p>
+    </div>
+    <div class="card">
+      <h3>🐧 Linux</h3>
+      <p>Debian/Ubuntu .deb package — service via systemd.</p>
+      <a class="btn btn-primary" style="margin-top:14px" href="https://github.com/infolevishcoders-web/classwatch/releases/latest" target="_blank" rel="noopener">Download for Linux</a>
+      <p class="small" style="margin-top:8px">~3 MB · .deb</p>
+    </div>
+    <div class="card">
+      <h3>🍎 macOS</h3>
+      <p>DMG installer for macOS (Apple Silicon &amp; Intel).</p>
+      <a class="btn btn-primary" style="margin-top:14px" href="https://github.com/infolevishcoders-web/classwatch/releases/latest" target="_blank" rel="noopener">Download for macOS</a>
+      <p class="small" style="margin-top:8px">~4 MB · .dmg</p>
+    </div>
+  </div>
+
+  <div class="panel" style="margin-top:34px">
+    <h2>Automatic install (with your consent)</h2>
+    <p class="small">When you download on a device, ClassWatch can offer to install automatically — <b>only after you click "Install"</b>. Nothing installs silently without consent. Steps:</p>
+    <ol style="margin:12px 0 0 20px;font-size:14.5px;color:var(--muted)">
+      <li>Download the installer for your OS above.</li>
+      <li>Open it — Windows will ask for administrator permission (needed to install the background service).</li>
+      <li>On the components page, <b>uncheck "ClassWatch Master"</b> on student machines (or run <code>setup.exe /NoMaster</code> for silent student installs).</li>
+      <li>The service starts automatically at every boot — students cannot stop it without the admin password.</li>
+    </ol>
+  </div>
+
+  <div class="panel">
+    <h2>Need your timetable or other files?</h2>
+    <p class="small">Timetable templates and deployment resources live in the <a href="https://github.com/infolevishcoders-web/classwatch/tree/main/website/files" target="_blank" rel="noopener">website/files</a> folder of the source repository.</p>
+  </div>
+</div>
+</div>
+<script src="assets/app.js"></script>
+</body>
+</html>

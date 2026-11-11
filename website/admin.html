@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Admin — ClassWatch</title>
+<link rel="stylesheet" href="assets/app.css">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+</head>
+<body>
+<header class="topbar"><div class="wrap topbar-inner">
+  <a class="brand" href="index.html"><span>Class<span class="accent">Watch</span> <small style="font-size:12px;color:var(--danger)">ADMIN</small></span></a>
+  <nav class="nav"><a href="#" onclick="logout();return false">Log out</a></nav>
+</div></header>
+
+<div class="dash">
+  <aside class="dash-side">
+    <div class="who"><b>Administrator</b><span id="adminEmail"></span></div>
+    <a href="#overview" class="active">📊 Overview</a>
+    <a href="#users">👥 Users</a>
+    <a href="#security">🛡️ Security events</a>
+    <a href="#subs">💳 Subscriptions</a>
+    <a href="#map">🗺️ Schools map</a>
+    <a href="#tickets">🛟 Tickets</a>
+  </aside>
+  <main class="dash-main">
+    <h1>Admin dashboard</h1>
+    <p class="dash-sub">ClassWatch administration — accounts, security alerts, billing and schools.</p>
+    <div class="stats" id="stats"></div>
+
+    <div class="panel" id="overview"><h2>Overview</h2><div id="ovInfo"></div></div>
+
+    <div class="panel" id="users"><h2>Users</h2>
+      <table><thead><tr><th>Email</th><th>Name</th><th>Provider</th><th>Blocked</th><th>Joined</th><th></th></tr></thead>
+      <tbody id="userRows"></tbody></table></div>
+
+    <div class="panel" id="security"><h2>Security events (unacknowledged first)</h2>
+      <table><thead><tr><th>When (UTC)</th><th>Device</th><th>User</th><th>Kind</th><th>Detail</th><th>Local time</th><th></th></tr></thead>
+      <tbody id="secRows"></tbody></table></div>
+
+    <div class="panel" id="subs"><h2>Subscriptions</h2>
+      <table><thead><tr><th>User</th><th>Plan</th><th>Status</th><th>Seats</th><th>Expires</th><th>Provider</th></tr></thead>
+      <tbody id="subRows"></tbody></table></div>
+
+    <div class="panel" id="map"><h2>Schools using ClassWatch</h2>
+      <div id="adminMap" class="mapbox"></div>
+      <div id="orgList"></div></div>
+
+    <div class="panel" id="tickets"><h2>Support tickets</h2>
+      <div id="ticketAdmin"></div></div>
+  </main>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="assets/app.js"></script>
+<script>
+if (!token()) { location.href='login.html?admin=1'; throw 0; }
+// admin tokens are issued by /api/admin/login and stored under cw_admin_token
+const adminToken = () => localStorage.getItem('cw_admin_token') || '';
+function logout(){ localStorage.removeItem('cw_admin_token'); location.href='login.html'; }
+
+async function aapi(path, opts={}) {
+  const res = await fetch(API_BASE + path, {
+    method: opts.method || 'GET',
+    headers: { 'Content-Type':'application/json', Authorization:'Bearer '+adminToken(), ...(opts.headers||{}) },
+    body: opts.body ? JSON.stringify(opts.body) : undefined });
+  const d = await res.json().catch(()=>({}));
+  if (!res.ok) throw new Error(d.error || 'HTTP '+res.status);
+  return d;
+}
+
+async function load() {
+  try {
+    const [ov, users, sec, subs, geo, tickets] = await Promise.all([
+      aapi('/api/admin/overview'), aapi('/api/admin/users'),
+      aapi('/api/admin/security-events'), aapi('/api/admin/subscriptions'),
+      aapi('/api/admin/geo'), aapi('/api/admin/tickets')]);
+
+    document.getElementById('stats').innerHTML = `
+      <div class="stat"><b>${ov.users}</b><span>registered users</span></div>
+      <div class="stat"><b>${ov.active_subscriptions}</b><span>active subscriptions</span></div>
+      <div class="stat"><b>${ov.devices}</b><span>devices</span></div>
+      <div class="stat"><b style="color:var(--danger)">${ov.unacked_security_events}</b><span>unacked security events</span></div>`;
+
+    document.getElementById('userRows').innerHTML = (users.users||[]).map(u=>`
+      <tr><td>${esc(u.email)}</td><td>${esc(u.display_name||'—')}</td><td>${esc(u.auth_provider)}</td>
+      <td>${u.is_blocked?'<span class="badge red">blocked</span>':'<span class="badge green">ok</span>'}</td>
+      <td class="small">${new Date(u.created_at).toLocaleDateString()}</td>
+      <td>${u.is_blocked
+        ? `<button class="btn btn-ghost btn-sm" onclick="aunblock('${u.id}')">Unblock</button>`
+        : `<button class="btn btn-ghost btn-sm" onclick="ablock('${u.id}')">Block</button>`}
+        <button class="btn btn-danger btn-sm" onclick="adel('${u.id}','${esc(u.email)}')">Delete</button></td></tr>`).join('');
+
+    document.getElementById('secRows').innerHTML = (sec.events||[]).map(e=>`
+      <tr><td class="small mono">${new Date(e.utc_time||e.created_at).toLocaleString()}</td>
+      <td>${esc(e.devices?.hostname||'—')}</td><td>${esc(e.profiles?.email||'—')}</td>
+      <td><span class="badge amber">${esc(e.kind)}</span></td><td class="small">${esc(e.detail||'')}</td>
+      <td class="small mono">${esc(e.local_time||'—')}</td>
+      <td>${e.acknowledged?'':'<button class="btn btn-ghost btn-sm" onclick="aack('+e.id+')">Ack</button>'}</td></tr>`).join('')
+      || '<tr><td colspan="7" class="small">No security events yet</td></tr>';
+
+    document.getElementById('subRows').innerHTML = (subs.subscriptions||[]).map(s=>`
+      <tr><td>${esc(s.profiles?.email||'—')}</td><td>${esc(s.plans?.name||s.plan_code)}</td>
+      <td><span class="badge ${s.status==='active'?'green':s.status==='trialing'?'amber':'gray'}">${s.status}</span></td>
+      <td>${s.seats}</td><td class="small">${new Date(s.expires_at).toLocaleDateString()}</td>
+      <td>${esc(s.payment_provider||'—')}</td></tr>`).join('')
+      || '<tr><td colspan="6" class="small">No subscriptions</td></tr>';
+
+    // map of orgs
+    const mapEl = document.getElementById('adminMap');
+    const orgs = (geo.organizations||[]).filter(o=>o.location);
+    if (orgs.length) {
+      mapEl.style.display='block';
+      const m = L.map('adminMap');
+      L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'© OpenStreetMap'}).addTo(m);
+      const bounds=[];
+      orgs.forEach(o=>{
+        const mm=/POINT\(([-\d.]+) ([-\d.]+)\)/.exec(JSON.stringify(o.location));
+        if(!mm)return;
+        const mk=L.marker([+mm[2],+mm[1]]).addTo(m).bindPopup(`<b>${esc(o.name)}</b><br>${esc(o.org_type)} · ${esc(o.country||'')} ${esc(o.district||'')}`);
+        bounds.push([+mm[2],+mm[1]]);
+      });
+      if(bounds.length)m.fitBounds(bounds,{padding:[30,30]});
+    } else { mapEl.style.display='none'; }
+    document.getElementById('orgList').innerHTML = orgs.map(o=>
+      `<p>📍 <b>${esc(o.name)}</b> — ${esc(o.org_type)} · ${esc(o.country||'')} ${esc(o.district||'')}</p>`).join('')
+      || '<p class="small">No organizations with location yet.</p>';
+
+    document.getElementById('ticketAdmin').innerHTML = (tickets.tickets||[]).map(t=>`
+      <div class="panel" style="margin:10px 0">
+        <b>${esc(t.subject)}</b> <span class="badge ${t.status==='open'?'amber':'gray'}">${t.status}</span>
+        <span class="small"> — ${esc(t.profiles?.email||'')} · ${new Date(t.created_at).toLocaleString()}</span>
+        <p class="small" style="margin:8px 0">${esc(t.message)}</p>
+        ${t.admin_reply?`<p class="small"><b>Reply:</b> ${esc(t.admin_reply)}</p>`:''}
+        <div class="oauth-row" style="margin-top:8px">
+          <input id="rep-${t.id}" placeholder="Reply…" style="flex:1">
+          <button class="btn btn-primary btn-sm" onclick="areply('${t.id}')">Send</button>
+        </div></div>`).join('') || '<p class="small">No tickets.</p>';
+  } catch(ex){ document.getElementById('ovInfo').innerHTML = '<p class="error" style="display:block">'+esc(ex.message)+'</p>'; }
+}
+
+window.ablock = async id => { const r=prompt('Block reason?'); if(r===null)return; await aapi(`/api/admin/users/${id}/block`,{method:'POST',body:{reason:r}}); load(); };
+window.aunblock = async id => { await aapi(`/api/admin/users/${id}/unblock`,{method:'POST'}); load(); };
+window.adel = async (id,email) => {
+  if(!confirm(`Permanently delete ${email}? This cannot be undone.`))return;
+  await aapi('/api/account/delete-confirm',{method:'POST',body:{profile_id:id,admin_token:adminToken()}}); load();
+};
+window.aack = async id => { await aapi(`/api/admin/security-events/${id}/ack`,{method:'POST'}); load(); };
+window.areply = async id => {
+  const v=document.getElementById('rep-'+id).value.trim(); if(!v)return;
+  await aapi(`/api/admin/tickets/${id}/reply`,{method:'POST',body:{reply:v,status:'in_progress'}}); load();
+};
+
+// admin login if no token
+if (!adminToken()) {
+  document.querySelector('.dash-main').innerHTML = `
+    <div class="auth-card" style="max-width:420px;margin:60px auto">
+      <h1>Admin sign in</h1><p class="sub">Administrator access requires your credentials and a security code.</p>
+      <form id="adminForm">
+        <label>Email</label><input id="aEmail" type="email" required>
+        <label>Password</label><input id="aPass" type="password" required>
+        <button class="btn btn-primary" type="submit">Send security code</button>
+      </form>
+      <div id="adminOtp" style="display:none">
+        <label>6-digit code sent to your email</label><input id="aCode" maxlength="6">
+        <button class="btn btn-primary" id="aVerify">Verify &amp; enter</button>
+      </div>
+      <div class="error" id="aErr"></div>
+    </div>`;
+  let pendingEmail='';
+  document.getElementById('adminForm').onsubmit = async e => {
+    e.preventDefault(); hideMsg(document.getElementById('aErr'));
+    try {
+      const r = await api('/api/auth/otp/send',{method:'POST',body:{email:document.getElementById('aEmail').value.trim()}});
+      pendingEmail=document.getElementById('aEmail').value.trim();
+      document.getElementById('adminOtp').style.display='block';
+      if(r.dev_code) alert('DEV MODE code: '+r.dev_code);
+    } catch(ex){ showMsg(document.getElementById('aErr'),ex.message); }
+  };
+  document.getElementById('aVerify').onclick = async () => {
+    hideMsg(document.getElementById('aErr'));
+    try {
+      const code=document.getElementById('aCode').value.trim();
+      const hash=[...crypto.subtle?[]:[]]; // otp verify returns user token; then admin login
+      const otp=await api('/api/auth/otp/verify',{method:'POST',body:{email:pendingEmail,code}});
+      // now exchange credentials for admin token
+      const adm=await api('/api/admin/login',{method:'POST',body:{email:pendingEmail,password:document.getElementById('aPass').value}});
+      localStorage.setItem('cw_admin_token',adm.token);
+      location.reload();
+    } catch(ex){ showMsg(document.getElementById('aErr'),ex.message); }
+  };
+} else {
+  // decode admin email for display
+  try{ document.getElementById('adminEmail').textContent=JSON.parse(atob(adminToken().split('.')[1])).email; }catch{}
+  load();
+}
+</script>
+</body>
+</html>

@@ -24,9 +24,12 @@
 
 #include "ClassWatchClientApp.h"
 #include "ClassWatchClientStatus.h"
+#include "ClassWatchSecurityManager.h"
 #include <QAction>
 #include <QHostInfo>
 #include <QIcon>
+#include <QInputDialog>
+#include <QLineEdit>
 #include <QMenu>
 #include <QMessageBox>
 #include <QStyle>
@@ -107,6 +110,20 @@ void ClassWatchClientApp::showStatusDialog()
 
 void ClassWatchClientApp::updateTrayIcon()
 {
+	// pick up admin warnings raised on this device (lockdown violations,
+	// remote commands from the master, etc.) and show them locally
+	auto& security = ClassWatchSecurityManager::instance();
+	if( security.hasPendingDeviceWarning() )
+	{
+		const auto warning = security.takePendingDeviceWarning();
+		QMessageBox::warning( nullptr,
+							  warning.value( QStringLiteral("title") ).toString(),
+							  warning.value( QStringLiteral("message") ).toString() +
+							  QStringLiteral("\n\nLocal time: %1\nUTC time: %2")
+								  .arg( warning.value( QStringLiteral("localTime") ).toString(),
+										warning.value( QStringLiteral("utcTime") ).toString() ) );
+	}
+
 	QString classWatchId = getClassWatchId();
 	QString status = getConnectionStatus();
 	
@@ -129,11 +146,37 @@ void ClassWatchClientApp::updateTrayIcon()
 
 void ClassWatchClientApp::onQuit()
 {
+	auto& security = ClassWatchSecurityManager::instance();
+
+	// classroom lockdown: students cannot disconnect the client without
+	// the administrator password
+	if( security.isTerminalLockdownActive() && security.hasAdminPassword() )
+	{
+		bool ok = false;
+		const auto password = QInputDialog::getText(
+			nullptr, QStringLiteral("ClassWatch Administrator Required"),
+			QStringLiteral("ClassWatch is locked down by your administrator.\n"
+						   "Enter the admin password to quit the client:" ),
+			QLineEdit::Password, QString(), &ok );
+		if( !ok || !security.verifyAdminPassword( password ) )
+		{
+			security.logSecurityEvent(
+				QStringLiteral("client_quit_denied"),
+				QStringLiteral("Unauthorised attempt to quit ClassWatch Client") );
+			security.raiseDeviceWarning(
+				QStringLiteral("ClassWatch Security Alert"),
+				QStringLiteral("An unauthorised attempt to close ClassWatch was blocked and reported to the administrator.") );
+			return;
+		}
+		security.logSecurityEvent( QStringLiteral("client_quit_authorised"),
+								  QStringLiteral("Administrator authorised client quit") );
+	}
+
 	// Confirm quit
 	int result = QMessageBox::question( nullptr, QStringLiteral("Quit ClassWatch Client"),
 									   QStringLiteral("Are you sure you want to quit ClassWatch Client?\nThe client will continue to run as a service."),
 									   QMessageBox::Yes | QMessageBox::No );
-	
+
 	if ( result == QMessageBox::Yes ) {
 		quit();
 	}

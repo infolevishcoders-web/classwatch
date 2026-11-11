@@ -150,7 +150,7 @@ MainWindow::MainWindow( VeyonMaster &masterCore, QWidget* parent ) :
 	for( auto* splitter : { slideshowSpotlightSplitter, monitoringSplitter, mainSplitter } )
 	{
 		splitter->setHandleWidth( 7 );
-		splitter->setStyleSheet( QStringLiteral("QSplitter::handle:hover{background-color:#198cb3;}") );
+		splitter->setStyleSheet( QStringLiteral("QSplitter::handle:hover{background-color:#059669;}") );
 
 		splitter->installEventFilter( this );
 

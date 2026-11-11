@@ -44,4 +44,7 @@
 	OP( VeyonConfiguration, VeyonCore::config(), bool, enableAuditLogging, setEnableAuditLogging, "EnableAuditLogging", "ClassWatch", true, Configuration::Property::Flag::Standard ) \
 	OP( VeyonConfiguration, VeyonCore::config(), QString, auditLogPath, setAuditLogPath, "AuditLogPath", "ClassWatch", QDir::toNativeSeparators(QStringLiteral("%APPDATA%/ClassWatch/audit.log")), Configuration::Property::Flag::Standard ) \
 	OP( VeyonConfiguration, VeyonCore::config(), bool, enableMultiSessionSupport, setEnableMultiSessionSupport, "EnableMultiSessionSupport", "ClassWatch", false, Configuration::Property::Flag::Standard ) \
-	OP( VeyonConfiguration, VeyonCore::config(), QString, windowsServerSessionPolicy, setWindowsServerSessionPolicy, "WindowsServerSessionPolicy", "ClassWatch", QString(), Configuration::Property::Flag::Advanced )
+	OP( VeyonConfiguration, VeyonCore::config(), QString, windowsServerSessionPolicy, setWindowsServerSessionPolicy, "WindowsServerSessionPolicy", "ClassWatch", QString(), Configuration::Property::Flag::Advanced ) \
+	OP( VeyonConfiguration, VeyonCore::config(), bool, securityAutoLockdown, setSecurityAutoLockdown, "SecurityAutoLockdown", "Security", true, Configuration::Property::Flag::Standard ) \
+	OP( VeyonConfiguration, VeyonCore::config(), QString, securityAdminPasswordHash, setSecurityAdminPasswordHash, "SecurityAdminPasswordHash", "Security", QString(), Configuration::Property::Flag::Advanced ) \
+	OP( VeyonConfiguration, VeyonCore::config(), bool, securityConfiguratorLocked, setSecurityConfiguratorLocked, "SecurityConfiguratorLocked", "Security", false, Configuration::Property::Flag::Standard )

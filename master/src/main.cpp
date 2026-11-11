@@ -23,8 +23,11 @@
  */
 
 #include <QApplication>
+#include <QDialog>
 #include <QSplashScreen>
 
+#include "ClassWatchLicense.h"
+#include "ClassWatchLicenseDialog.h"
 #include "DocumentationFigureCreator.h"
 #include "VeyonMaster.h"
 #include "MainWindow.h"
@@ -38,6 +41,23 @@ int main( int argc, char** argv )
 	app.connect( &app, &QApplication::lastWindowClosed, &QApplication::quit );
 
 	VeyonCore core( &app, VeyonCore::Component::Master, QStringLiteral("Master") );
+
+	// license gate - monitoring requires an active license or the free
+	// trial; the ClassWatch website issues the license keys
+	for( ;; )
+	{
+		const auto license = ClassWatchLicense::current();
+		if( license.status == ClassWatchLicense::Status::Valid ||
+			license.status == ClassWatchLicense::Status::Trial )
+		{
+			break;
+		}
+		ClassWatchLicenseDialog licenseDialog;
+		if( licenseDialog.exec() != QDialog::Accepted )
+		{
+			return -1;
+		}
+	}
 
 #ifdef VEYON_DEBUG
 	if( qEnvironmentVariableIsSet( "VEYON_MASTER_CREATE_DOC_FIGURES") )

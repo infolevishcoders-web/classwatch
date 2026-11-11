@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Log in — ClassWatch</title>
+<link rel="stylesheet" href="assets/app.css"><link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+</head>
+<body>
+<header class="topbar"><div class="wrap topbar-inner">
+  <a class="brand" href="index.html"><span>Class<span class="accent">Watch</span></span></a>
+  <nav class="nav"><a class="btn btn-primary btn-sm" href="signup.html">Start free trial</a></nav>
+</div></header>
+
+<div class="auth-wrap"><div class="auth-card">
+  <h1>Welcome back</h1>
+  <p class="sub">Log in to manage your classroom. New here? <a href="signup.html">Start a free trial</a>.</p>
+
+  <div class="oauth-row" style="margin-bottom:6px">
+    <button type="button" class="oauth-btn" onclick="googleLogin()">G Continue with Google</button>
+    <button type="button" class="oauth-btn" onclick="appleLogin()"> Continue with Apple</button>
+  </div>
+
+  <div class="divider">or with email</div>
+
+  <div id="step1">
+    <form id="pwForm">
+      <label>Email</label><input type="email" id="email" required>
+      <label>Password</label><input type="password" id="password" required>
+      <div class="error" id="err1"></div>
+      <button class="btn btn-primary" type="submit">Log in</button>
+    </form>
+    <p class="hint" style="text-align:center;margin-top:14px"><a href="#" id="useOtp">Email me a security code instead</a></p>
+  </div>
+
+  <div id="step2" style="display:none">
+    <p class="sub">We sent a 6-digit security code to <b id="otpEmail"></b>. Enter it below.</p>
+    <form id="otpForm">
+      <label>Security code</label><input type="text" id="otpCode" inputmode="numeric" maxlength="6" required placeholder="123456">
+      <div class="error" id="err2"></div>
+      <button class="btn btn-primary" type="submit">Verify &amp; log in</button>
+    </form>
+    <p class="hint" style="text-align:center;margin-top:14px"><a href="#" id="backPw">← Back to password</a></p>
+  </div>
+</div></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="assets/app.js"></script>
+<script>
+document.getElementById('pwForm').onsubmit = async e => {
+  e.preventDefault(); hideMsg(document.getElementById('err1'));
+  try {
+    const d = await api('/api/auth/login', { method:'POST', body:{
+      email: document.getElementById('email').value.trim(),
+      password: document.getElementById('password').value }});
+    setSession(d.token, d.profile); location.href = 'dashboard.html';
+  } catch (ex) { showMsg(document.getElementById('err1'), ex.message); }
+};
+document.getElementById('useOtp').onclick = async e => {
+  e.preventDefault();
+  const email = document.getElementById('email').value.trim();
+  if (!email) { showMsg(document.getElementById('err1'), 'Enter your email first'); return; }
+  try { await api('/api/auth/otp/send', { method:'POST', body:{ email } });
+    document.getElementById('otpEmail').textContent = email;
+    document.getElementById('step1').style.display='none';
+    document.getElementById('step2').style.display='block';
+  } catch (ex) { showMsg(document.getElementById('err1'), ex.message); }
+};
+document.getElementById('otpForm').onsubmit = async e => {
+  e.preventDefault(); hideMsg(document.getElementById('err2'));
+  try {
+    const d = await api('/api/auth/otp/verify', { method:'POST', body:{
+      email: document.getElementById('email').value.trim(),
+      code: document.getElementById('otpCode').value.trim() }});
+    setSession(d.token, d.profile); location.href = 'dashboard.html';
+  } catch (ex) { showMsg(document.getElementById('err2'), ex.message); }
+};
+document.getElementById('backPw').onclick = e => {
+  e.preventDefault();
+  document.getElementById('step1').style.display='block';
+  document.getElementById('step2').style.display='none';
+};
+</script>
+</body>
+</html>

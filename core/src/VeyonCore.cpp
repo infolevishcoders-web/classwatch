@@ -611,12 +611,12 @@ void VeyonCore::initUi()
 		}
 
 		app->setStyleSheet(QStringLiteral(
-							   "QToolButton:checked {background-color:#88ddff;}"
+							   "QToolButton:checked {background-color:#86efac;}"
 							   "QToolTip {padding:5px; border:0px;}"
 							   ));
 
 		auto toolTipPalette = QToolTip::palette();
-		static const char* toolTipBackgroundColor = "#198cb3";
+		static const char* toolTipBackgroundColor = "#047857";
 		toolTipPalette.setColor(QPalette::Window, toolTipBackgroundColor);
 		toolTipPalette.setColor(QPalette::ToolTipBase, toolTipBackgroundColor);
 		toolTipPalette.setColor(QPalette::ToolTipText, Qt::white);

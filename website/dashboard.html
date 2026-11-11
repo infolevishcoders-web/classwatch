@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dashboard — ClassWatch</title>
+<link rel="stylesheet" href="assets/app.css">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+</head>
+<body>
+<header class="topbar"><div class="wrap topbar-inner">
+  <a class="brand" href="index.html"><span>Class<span class="accent">Watch</span></span></a>
+  <nav class="nav">
+    <a href="download.html">Download</a>
+    <a href="#" onclick="logout();return false">Log out</a>
+  </nav>
+</div></header>
+
+<div class="dash">
+  <aside class="dash-side">
+    <div class="who"><b id="whoName">…</b><span id="whoEmail"></span></div>
+    <a href="#overview" class="active">📊 Overview</a>
+    <a href="#devices">💻 Devices</a>
+    <a href="#subscription">💳 Subscription</a>
+    <a href="#usage">📈 Usage</a>
+    <a href="#map">🗺️ School map</a>
+    <a href="#support">🛟 Support</a>
+    <a href="#danger" style="color:#fca5a5">⚠ Danger zone</a>
+  </aside>
+
+  <main class="dash-main">
+    <h1 id="greet">Welcome to ClassWatch</h1>
+    <p class="dash-sub" id="dashSub"></p>
+
+    <div class="stats" id="stats"></div>
+
+    <div class="panel" id="overview">
+      <h2>Subscription</h2>
+      <div id="subInfo"></div>
+    </div>
+
+    <div class="panel" id="devices">
+      <h2>Devices <span class="small">(max 3 on trial — student installs don't need an account)</span></h2>
+      <table><thead><tr><th>Device</th><th>Role</th><th>OS</th><th>Organization</th><th>Last seen</th><th>Status</th><th></th></tr></thead>
+      <tbody id="devRows"><tr><td colspan="7" class="small">Loading…</td></tr></tbody></table>
+      <p class="small" style="margin-top:10px">Fingerprint is the machine ID reported by the ClassWatch client on registration.</p>
+    </div>
+
+    <div class="panel" id="subscription">
+      <h2>Plans &amp; billing — prices in UGX</h2>
+      <p class="small" style="margin-bottom:14px">Pay with mobile money (Pawapat) or card. Payment applies to the teacher console only — student device installs and monitoring stay free.</p>
+      <div class="plans" id="planGrid"></div>
+      <div id="checkoutInfo" style="margin-top:16px"></div>
+      <h2 style="margin-top:26px">License keys</h2>
+      <div id="licList"></div>
+    </div>
+
+    <div class="panel" id="usage">
+      <h2>Usage — last 30 days</h2>
+      <div id="usageInfo"></div>
+    </div>
+
+    <div class="panel" id="map">
+      <h2>Schools near me</h2>
+      <p class="small">Organizations using ClassWatch around your location, with distances.</p>
+      <button class="btn btn-ghost btn-sm" id="locateBtn" style="margin:10px 0">📍 Locate me &amp; show nearby</button>
+      <div id="nearbyList"></div>
+      <div id="mapBox" class="mapbox" style="display:none"></div>
+    </div>
+
+    <div class="panel" id="support">
+      <h2>Support &amp; connection issues</h2>
+      <form id="ticketForm" style="margin-bottom:18px">
+        <div class="oauth-row">
+          <input id="tSubject" placeholder="Subject (e.g. can't connect to CW-003)" required style="flex:2">
+          <select id="tCat" style="flex:1"><option value="connection">Connection</option><option value="billing">Billing</option><option value="bug">Bug</option><option value="other">Other</option></select>
+        </div>
+        <textarea id="tMsg" rows="3" placeholder="Describe the issue…" required style="margin-top:10px"></textarea>
+        <button class="btn btn-primary btn-sm" type="submit" style="margin-top:10px">Send ticket</button>
+      </form>
+      <table><thead><tr><th>Ticket</th><th>Category</th><th>Status</th><th>Reply</th><th>Date</th></tr></thead>
+      <tbody id="ticketRows"></tbody></table>
+    </div>
+
+    <div class="danger-zone" id="danger">
+      <h2>Danger zone</h2>
+      <p>Permanently delete your account, organization, devices, subscriptions and all data. This cannot be undone — even if you have an active paid plan. An administrator reviews every deletion request.</p>
+      <button class="btn btn-danger" id="delBtn">Request permanent deletion</button>
+      <div id="delBox" style="display:none;margin-top:16px">
+        <label>Why are you deleting? (required)</label>
+        <select id="delReason">
+          <option value="">Select a reason…</option>
+          <option value="not_useful">No longer useful</option>
+          <option value="too_expensive">Too expensive</option>
+          <option value="switching">Switching to another product</option>
+          <option value="privacy">Privacy concerns</option>
+          <option value="other">Other</option>
+        </select>
+        <label style="margin-top:12px"><input type="checkbox" id="delAck" style="width:auto"> I understand this permanently deletes all my data and cannot be undone.</label>
+        <input type="text" id="delConfirm" placeholder='Type DELETE to confirm' style="margin-top:10px">
+        <button class="btn btn-danger" id="delConfirmBtn" disabled>Submit deletion request</button>
+      </div>
+      <div class="error" id="delErr"></div>
+    </div>
+  </main>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="assets/app.js"></script>
+<script>
+if (!requireAuth()) throw 0;
+const p = profile() || {};
+document.getElementById('whoName').textContent = p.display_name || p.email || 'User';
+document.getElementById('whoEmail').textContent = p.email || '';
+document.getElementById('greet').textContent = 'Welcome back, ' + (p.display_name || p.email || '');
+function logout(){ clearSession(); location.href='login.html'; }
+
+async function load() {
+  try {
+    const [sub, devs, usage, plans] = await Promise.all([
+      api('/api/subscription/status'), api('/api/devices'),
+      api('/api/usage/summary'), api('/api/plans')]);
+
+    const a = sub.active;
+    document.getElementById('dashSub').textContent = a
+      ? `${a.plans?.name || a.plan_code} plan · ${a.seats} seats · expires ${new Date(a.expires_at).toLocaleDateString()}`
+      : 'No active subscription — start a trial or pick a plan below.';
+    document.getElementById('subInfo').innerHTML = a ? `
+      <span class="badge green">${a.status}</span>
+      <span class="mono">${esc(a.plans?.name || a.plan_code)}</span>
+      · <b>${a.seats} seats</b> · expires <b>${new Date(a.expires_at).toLocaleString()}</b>
+      ${a.trial_ends_at ? `· trial ends ${new Date(a.trial_ends_at).toLocaleDateString()}` : ''}` :
+      '<span class="badge amber">trial expired / none</span>';
+
+    document.getElementById('stats').innerHTML = `
+      <div class="stat"><b>${devs.devices?.length || 0}</b><span>registered devices</span></div>
+      <div class="stat"><b>${usage.events_30d || 0}</b><span>events (30d)</span></div>
+      <div class="stat"><b>${a?.seats || 3}</b><span>seats allowed</span></div>
+      <div class="stat"><b>${sub.licenses?.length || 0}</b><span>license keys</span></div>`;
+
+    document.getElementById('devRows').innerHTML = (devs.devices || []).map(d => `
+      <tr><td class="mono">${esc(d.hostname || d.device_fingerprint.slice(0,12))}</td>
+      <td>${esc(d.role)}</td><td>${esc(d.os || '—')}</td>
+      <td>${esc(d.organizations?.name || '—')}</td>
+      <td>${d.last_seen_at ? new Date(d.last_seen_at).toLocaleString() : '—'}</td>
+      <td>${d.is_blocked ? '<span class="badge red">blocked</span>' : '<span class="badge green">active</span>'}</td>
+      <td>${d.is_blocked
+        ? `<button class="btn btn-ghost btn-sm" onclick="unblockDev('${d.id}')">Unblock</button>`
+        : `<button class="btn btn-ghost btn-sm" onclick="blockDev('${d.id}')">Block</button>`}</td></tr>`).join('')
+      || '<tr><td colspan="7" class="small">No devices registered yet — install ClassWatch on a machine and register it with your license key.</td></tr>';
+
+    document.getElementById('planGrid').innerHTML = plans.plans.map(pl => `
+      <div class="plan ${pl.code==='annual'?'hot':''}">
+        <h3>${esc(pl.name)}</h3><div class="price">${fmtUGX(pl.price_ugx)}</div>
+        <div class="per">${pl.duration_months} months · ${pl.device_limit} seats</div>
+        <button class="btn ${pl.code==='annual'?'btn-primary':'btn-ghost'} btn-sm" onclick="checkout('${pl.code}')">Pay</button>
+      </div>`).join('');
+
+    document.getElementById('licList').innerHTML = (sub.licenses || []).map(l => `
+      <p class="mono" style="margin:6px 0">${esc(l.license_key)} <span class="small">(${l.seats_used}/${l.seats_max} seats, exp ${new Date(l.expires_at).toLocaleDateString()})</span></p>`).join('')
+      || '<p class="small">No license keys yet — they are issued when your trial or subscription starts.</p>';
+
+    document.getElementById('usageInfo').innerHTML = `
+      <p><b>${usage.events_30d}</b> tracked events in the last 30 days.</p>
+      <p class="small" style="margin-top:8px">Daily activity:</p>
+      <table><tbody>${Object.entries(usage.by_day || {}).slice(-14).map(([d,c]) =>
+        `<tr><td class="mono">${d}</td><td>${c} events</td></tr>`).join('') || '<tr><td class="small">No activity yet</td></tr>'}</tbody></table>`;
+
+    document.getElementById('ticketRows').innerHTML = (await api('/api/support/tickets')).tickets.map(t => `
+      <tr><td>${esc(t.subject)}</td><td>${esc(t.category)}</td>
+      <td><span class="badge ${t.status==='resolved'?'green':t.status==='open'?'amber':'gray'}">${t.status}</span></td>
+      <td class="small">${esc(t.admin_reply || '—')}</td>
+      <td class="small">${new Date(t.created_at).toLocaleDateString()}</td></tr>`).join('')
+      || '<tr><td colspan="5" class="small">No tickets yet</td></tr>';
+  } catch (ex) { document.getElementById('dashSub').textContent = 'API error: ' + ex.message; }
+}
+
+window.blockDev = async id => { await api(`/api/devices/${id}/block`,{method:'POST',body:{reason:'blocked by account owner'}}); load(); };
+window.unblockDev = async id => { await api(`/api/devices/${id}/unblock`,{method:'POST'}); load(); };
+window.checkout = async code => {
+  try {
+    const r = await api('/api/subscription/checkout', { method:'POST', body:{ plan_code: code }});
+    document.getElementById('checkoutInfo').innerHTML = `
+      <div class="panel" style="background:var(--emerald-bg);border-color:var(--emerald-l)">
+      <b>Reference:</b> <span class="mono">${esc(r.reference)}</span><br>
+      <b>Amount:</b> ${fmtUGX(r.amount_ugx)}<br>
+      <span class="small">${esc(r.instructions.mobile_money)} ${esc(r.instructions.card)}</span>
+      <p class="small" style="margin-top:8px">Your license key will appear here once payment is confirmed.</p></div>`;
+  } catch (ex) { alert(ex.message); }
+};
+
+document.getElementById('ticketForm').onsubmit = async e => {
+  e.preventDefault();
+  try {
+    await api('/api/support/tickets', { method:'POST', body:{
+      subject: document.getElementById('tSubject').value,
+      category: document.getElementById('tCat').value,
+      message: document.getElementById('tMsg').value }});
+    e.target.reset(); load();
+  } catch (ex) { alert(ex.message); }
+};
+
+let map, meMarker;
+document.getElementById('locateBtn').onclick = () => {
+  navigator.geolocation.getCurrentPosition(async pos => {
+    const { latitude: lat, longitude: lng } = pos.coords;
+    document.getElementById('mapBox').style.display = 'block';
+    if (!map) {
+      map = L.map('mapBox').setView([lat, lng], 11);
+      L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap' }).addTo(map);
+    } else map.setView([lat, lng], 11);
+    meMarker = L.marker([lat, lng]).addTo(map).bindPopup('You are here').openPopup();
+    try {
+      const { nearby } = await api(`/api/geo/nearby?lat=${lat}&lng=${lng}&radius=100`);
+      document.getElementById('nearbyList').innerHTML = nearby.length ? nearby.map(o => `
+        <p>📍 <b>${esc(o.name)}</b> — ${esc(o.org_type)} · ${esc(o.country || '')} ${esc(o.district || '')}
+        · <b>${o.distance_km} km</b> away${o.address ? ' · ' + esc(o.address) : ''}
+        <a target="_blank" rel="noopener" href="https://www.google.com/maps/dir/?api=1&destination=${o.distance_km}">Directions →</a></p>`).join('')
+        : '<p class="small">No other ClassWatch schools found within 100 km.</p>';
+      nearby.forEach(o => {
+        const m = /POINT\(([-\d.]+) ([-\d.]+)\)/.exec(JSON.stringify(o.location || ''));
+      });
+    } catch { document.getElementById('nearbyList').innerHTML = '<p class="small">Could not load nearby schools.</p>'; }
+  }, () => alert('Location permission denied.'));
+};
+
+document.getElementById('delBtn').onclick = () => { document.getElementById('delBox').style.display='block'; };
+document.getElementById('delReason').onchange = e => {
+  document.getElementById('delConfirmBtn').disabled = !(e.target.value && document.getElementById('delAck').checked);
+};
+document.getElementById('delAck').onchange = e => {
+  document.getElementById('delConfirmBtn').disabled = !(e.target.checked && document.getElementById('delReason').value);
+};
+document.getElementById('delConfirmBtn').onclick = async () => {
+  hideMsg(document.getElementById('delErr'));
+  if (document.getElementById('delConfirm').value !== 'DELETE') {
+    showMsg(document.getElementById('delErr'), 'Type DELETE exactly to confirm'); return;
+  }
+  try {
+    const r = await api('/api/account/delete-request', { method:'POST', body:{
+      reason: document.getElementById('delReason').value,
+      confirm_text: 'DELETE' }});
+    document.getElementById('delBox').innerHTML = `<p class="small">${esc(r.status)}</p>`;
+  } catch (ex) { showMsg(document.getElementById('delErr'), ex.message); }
+};
+
+load();
+</script>
+</body>
+</html>
