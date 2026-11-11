@@ -44,23 +44,11 @@ int main( int argc, char **argv )
 
 	VeyonCore core( &app, VeyonCore::Component::Configurator, QStringLiteral("Configurator") );
 
-	// make sure to run as admin
-	if( qEnvironmentVariableIntValue( "VEYON_CONFIGURATOR_NO_ELEVATION" ) == 0 &&
-		VeyonCore::platform().coreFunctions().isRunningAsAdmin() == false &&
-		app.arguments().size() <= 1 )
-	{
-		if( VeyonCore::platform().coreFunctions().runProgramAsAdmin( QCoreApplication::applicationFilePath(), {
-																	 QStringLiteral("-elevated") } ) )
-		{
-			return 0;
-		}
-
-		QMessageBox::warning( nullptr, MainWindow::tr( "Insufficient privileges" ),
-							  MainWindow::tr( "Could not start with administrative privileges. "
-											  "Please make sure a sudo-like program is installed "
-											  "for your desktop environment! The program will "
-											  "be run with normal user privileges.") );
-	}
+	// ClassWatch: do not force UAC elevation on startup. The configuration
+	// store is user-writable JSON, so teachers can change settings without an
+	// administrator password. Features that genuinely need elevation (service
+	// control, key generation) still work when the Configurator is started
+	// explicitly "as administrator".
 
 	if( VeyonConfiguration().isStoreWritable() == false &&
 		VeyonCore::config().logLevel() != Logger::LogLevel::Debug )

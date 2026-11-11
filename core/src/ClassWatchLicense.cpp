@@ -209,10 +209,10 @@ ClassWatchLicense::Info ClassWatchLicense::current()
 
 		if( !verifySignature( payload, signature ) )
 		{
-			Info info;
-			info.status = Status::Invalid;
-			info.message = QStringLiteral("License signature invalid - contact support");
-			return info;
+			// A corrupt or tampered license file must not lock the user out of
+			// their own machine - discard it and fall back to the free trial.
+			QFile::remove( licenseFilePath() );
+			return evaluateTrial();
 		}
 
 		const auto doc = QJsonDocument::fromJson( urlDecode( payload ) );
