@@ -36,7 +36,7 @@ create index if not exists orgs_location_gix on public.organizations using gist 
 
 -- ============ subscription plans (UGX pricing) ============
 create table if not exists public.plans (
-  code text primary key,                      -- monthly|quarterly|halfyearly|annual|three_year|four_year
+  code text primary key,                      -- monthly|quarterly|halfyearly|annual|three_year|four_year|five_year
   name text not null,
   duration_months int not null,
   price_ugx int not null,
@@ -51,7 +51,8 @@ insert into public.plans (code,name,duration_months,price_ugx,device_limit) valu
   ('halfyearly',   '6 Months',   6,  105000,  3),
   ('annual',       '1 Year',     12, 195000,  5),
   ('three_year',   '3 Years',    36, 520000,  8),
-  ('four_year',    '4 Years',    48, 650000, 10)
+  ('four_year',    '4 Years',    48, 650000, 10),
+  ('five_year',    '5 Years',    60, 780000, 12)
 on conflict (code) do nothing;
 
 -- ============ subscriptions ============
