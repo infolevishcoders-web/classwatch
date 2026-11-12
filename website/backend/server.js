@@ -20,7 +20,9 @@ const jwt = require('jsonwebtoken');
 const { createClient } = require('@supabase/supabase-js');
 
 const app = express();
-app.use(cors({ origin: process.env.FRONTEND_URL || '*' }));
+const rawFrontendOrigin = ( process.env.FRONTEND_URL || '' ).trim().replace( /^["']+|["']+$/g, '' );
+const frontendOrigin = /^https?:\/\/[^\s"']+$/.test( rawFrontendOrigin ) ? rawFrontendOrigin : '*';
+app.use( cors( { origin: frontendOrigin } ) );
 app.use(express.json({ limit: '1mb' }));
 
 const supabase = createClient(
