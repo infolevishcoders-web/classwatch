@@ -1,10 +1,13 @@
 # ClassWatch download files
 
-Place shareable resources here (served with the website or linked from it):
+Shareable resources served with the website:
 
+- `installers/` — ready-to-install ClassWatch packages for Windows (.exe),
+  Linux (.deb) and macOS (.dmg). Linked directly from `download.html`.
 - `timetable/` — class timetable templates (.csv/.xlsx/.pdf)
 - `docs/` — deployment guides, network requirements
 - `branding/` — logos for schools
 
-Installers are **not** committed here (too large) — they are built by GitHub Actions
-and linked from `download.html` via the releases page.
+Installers are also built by GitHub Actions on every push; the copies here
+are refreshed from the latest successful build so the website always serves
+working downloads.
