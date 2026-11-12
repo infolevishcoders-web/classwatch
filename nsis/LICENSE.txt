@@ -1,0 +1,23 @@
+ClassWatch - Classroom Monitoring & Management Suite
+Copyright (c) 2026 Levish Coders - https://levishcoders.com
+
+ClassWatch is free software. It is built on the open-source Veyon
+project and is distributed under the terms of the GNU General Public
+License, version 2 (GPLv2), as published by the Free Software
+Foundation.
+
+This means you are free to use, study, share and modify ClassWatch,
+including for commercial purposes, provided that any distributed
+modified versions also remain under GPLv2 and carry this notice.
+
+The complete GNU General Public License version 2 text is included in
+the file COPYING shipped with this software and is also available at
+https://www.gnu.org/licenses/old-licenses/gpl-2.0.html
+
+Levish Coders holds copyright on all ClassWatch modifications and
+branding. Original Veyon authors retain copyright on the upstream
+code they contributed, as required by the GPL.
+
+For commercial licensing, custom deployments or support:
+  Levish Coders - https://levishcoders.com
+  Email: info.levishcoders@gmail.com

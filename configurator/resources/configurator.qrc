@@ -10,5 +10,6 @@
         <file>vcs-normal.png</file>
         <file>vcs-removed.png</file>
         <file>access-rule-ask.png</file>
+        <file>watery-background.png</file>
     </qresource>
 </RCC>

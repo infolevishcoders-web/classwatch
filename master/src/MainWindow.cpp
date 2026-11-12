@@ -67,6 +67,13 @@ MainWindow::MainWindow( VeyonMaster &masterCore, QWidget* parent ) :
 {
 	ui->setupUi( this );
 
+	// ClassWatch "watery" theme: translucent panels over a soft blue
+	// water-gradient backdrop.
+	ui->centralWidget->setStyleSheet(
+		QStringLiteral( "QWidget { background: transparent; }"
+			"#centralWidget {"
+			"  border-image: url(:/master/watery-background.png) 0 0 0 0 stretch stretch; }" ) );
+
 	restoreState( QByteArray::fromBase64( m_master.userConfig().windowState().toUtf8() ) );
 	restoreGeometry( QByteArray::fromBase64( m_master.userConfig().windowGeometry().toUtf8() ) );
 
@@ -150,7 +157,7 @@ MainWindow::MainWindow( VeyonMaster &masterCore, QWidget* parent ) :
 	for( auto* splitter : { slideshowSpotlightSplitter, monitoringSplitter, mainSplitter } )
 	{
 		splitter->setHandleWidth( 7 );
-		splitter->setStyleSheet( QStringLiteral("QSplitter::handle:hover{background-color:#059669;}") );
+		splitter->setStyleSheet( QStringLiteral("QSplitter::handle:hover{background-color:#38bdf8;}") );
 
 		splitter->installEventFilter( this );
 

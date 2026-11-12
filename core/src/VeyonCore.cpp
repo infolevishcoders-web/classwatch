@@ -40,6 +40,7 @@
 #include <QToolTip>
 
 #include "BuiltinFeatures.h"
+#include "ClassWatchTheme.h"
 #include "FeatureManager.h"
 #include "Filesystem.h"
 #include "HostAddress.h"
@@ -90,6 +91,11 @@ VeyonCore::VeyonCore( QCoreApplication* application, Component component, const 
 	initLocaleAndTranslation();
 
 	initUi();
+
+	if( auto* guiApp = qobject_cast<QApplication *>( application ) )
+	{
+		ClassWatchTheme::apply( guiApp );
+	}
 
 	initCryptoCore();
 
@@ -690,14 +696,21 @@ bool VeyonCore::initLogonAuthentication()
 	if( qobject_cast<QApplication *>( QCoreApplication::instance() ) )
 	{
 		PasswordDialog dlg( QApplication::activeWindow() );
-		if( dlg.exec() &&
-			dlg.credentials().hasCredentials( AuthenticationCredentials::Type::UserLogon ) )
+		if( dlg.exec() == false )
+		{
+			// ClassWatch: cancelling the logon prompt must not terminate the
+			// Master - teachers can explore the interface first and enter
+			// credentials when they actually connect to a computer.
+			vDebug() << "Logon dialog cancelled - continuing without credentials";
+			return true;
+		}
+		if( dlg.credentials().hasCredentials( AuthenticationCredentials::Type::UserLogon ) )
 		{
 			m_authenticationCredentials->setLogonUsername( dlg.username() );
 			m_authenticationCredentials->setLogonPassword( dlg.password() );
-
-			return true;
 		}
+
+		return true;
 	}
 
 	return false;
