@@ -387,7 +387,7 @@ void BuiltinDirectoryConfigurationPage::scanLan()
 
 	// collect every IPv4 /24 subnet this machine is attached to
 	QSet<quint32> subnets;
-	const auto interfaces = QNetworkInterface::allEntries();
+	const auto interfaces = QNetworkInterface::allInterfaces();
 	for( const auto& interface : interfaces )
 	{
 		if( interface.flags().testFlag( QNetworkInterface::IsUp ) == false ||

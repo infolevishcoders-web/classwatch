@@ -82,7 +82,7 @@ private:
 	BuiltinDirectoryConfiguration& m_configuration;
 
 	QList<QHostAddress> m_scanTargets;
-	QSet<QPointer<QTcpSocket>> m_scanSockets;
+	QSet<QTcpSocket*> m_scanSockets;
 	QStringList m_scanFound;
 	int m_scanPort = 11100;
 
