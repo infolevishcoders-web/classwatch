@@ -11,6 +11,7 @@
  *   FRONTEND_URL                             (e.g. https://classwatch.netlify.app)
  */
 
+require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const crypto = require('crypto');
@@ -199,6 +200,43 @@ app.post('/api/auth/otp/verify', async (req, res) => {
   if (prof.is_blocked) return res.status(403).json({ error: 'account blocked' });
   const token = signJwt({ sub: prof.id, email, role: prof.role });
   res.json({ token, profile: prof });
+});
+
+// ---------- auth: OAuth (Google/Apple via Supabase) ----------
+// Frontend sends the Supabase access_token after signInWithOAuth redirect;
+// we verify it against Supabase, then issue a ClassWatch JWT.
+
+app.post('/api/auth/oauth', async (req, res) => {
+  const { access_token } = req.body || {};
+  if (!access_token) return res.status(400).json({ error: 'access_token required' });
+
+  const { data: { user }, error } = await supabase.auth.getUser(access_token);
+  if (error || !user || !user.email) return res.status(401).json({ error: 'invalid session' });
+
+  const profile = await getOrCreateProfile({
+    id: user.id, email: user.email,
+    provider: user.app_metadata?.provider || 'oauth',
+    displayName: user.user_metadata?.full_name || user.user_metadata?.name,
+  });
+  if (profile.is_blocked) return res.status(403).json({ error: 'account blocked' });
+
+  // new OAuth users get the same free trial as email signup
+  let sub = await activeSubscription(profile.id);
+  let license_key = null;
+  if (!sub) {
+    const expires = new Date(Date.now() + TRIAL_DAYS * 864e5).toISOString();
+    const { data: newSub } = await supabase.from('subscriptions').insert({
+      profile_id: profile.id, plan_code: 'trial', status: 'trialing',
+      seats: TRIAL_SEATS, expires_at: expires, trial_ends_at: expires,
+      payment_provider: 'trial',
+    }).select('*, plans(*)').single();
+    sub = newSub;
+    const { key } = await issueLicense(profile, { ...sub, plans: { duration_months: 0, device_limit: TRIAL_SEATS } });
+    license_key = key;
+  }
+
+  const token = signJwt({ sub: profile.id, email: profile.email, role: profile.role });
+  res.json({ token, profile, subscription: sub, license_key, trial_days: TRIAL_SEATS });
 });
 
 // ---------- devices (3 per license on trial) ----------

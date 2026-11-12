@@ -2,8 +2,8 @@
 
 // Configure before deploy: fill these from Supabase project settings + Render URL.
 const API_BASE = window.CLASSWATCH_API || 'https://classwatch-api.onrender.com';
-const SUPABASE_URL = window.SUPABASE_URL || 'https://YOUR-PROJECT.supabase.co';
-const SUPABASE_ANON_KEY = window.SUPABASE_ANON_KEY || 'YOUR-ANON-KEY';
+const SUPABASE_URL = window.SUPABASE_URL || 'https://zxoavloahtxzitvjzlot.supabase.co';
+const SUPABASE_ANON_KEY = window.SUPABASE_ANON_KEY || 'sb_publishable_a46ZJ-qqufDIGSLH1DJOoA_DPIe43wV';
 
 let supabase = null;
 try {
@@ -27,6 +27,26 @@ function profile() {
 function requireAuth(redirect = 'login.html') {
   if (!token()) { location.href = redirect; return false; }
   return true;
+}
+
+/* ---------- OAuth session exchange ----------
+   Handles the return trip from Google/Apple sign-in: Supabase stores the
+   session after the redirect, we trade its access_token for a ClassWatch
+   JWT (+ free trial for new users), then reload. */
+async function exchangeOAuthAndReload(redirect = 'login.html') {
+  try {
+    if (supabase) {
+      const { data } = await supabase.auth.getSession();
+      const at = data && data.session && data.session.access_token;
+      if (at) {
+        const r = await api('/api/auth/oauth', { method: 'POST', body: { access_token: at } });
+        setSession(r.token, r.profile);
+        location.reload();
+        return;
+      }
+    }
+  } catch (e) { /* fall through to redirect */ }
+  location.href = redirect;
 }
 function isAdmin() {
   try {

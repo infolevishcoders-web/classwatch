@@ -55,6 +55,11 @@ insert into public.plans (code,name,duration_months,price_ugx,device_limit) valu
   ('five_year',    '5 Years',    60, 780000, 12)
 on conflict (code) do nothing;
 
+-- internal trial plan - not shown as purchasable (active=false)
+insert into public.plans (code,name,duration_months,price_ugx,device_limit,active) values
+  ('trial', 'Free Trial', 0, 0, 3, false)
+on conflict (code) do nothing;
+
 -- ============ subscriptions ============
 create table if not exists public.subscriptions (
   id uuid primary key default gen_random_uuid(),
