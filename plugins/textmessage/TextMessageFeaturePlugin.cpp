@@ -152,6 +152,17 @@ bool TextMessageFeaturePlugin::handleFeatureMessage( VeyonWorkerInterface& worke
 		messageBox->setTextFormat( Qt::RichText );
 		messageBox->setTextInteractionFlags( Qt::TextBrowserInteraction | Qt::TextSelectableByKeyboard );
 		messageBox->setAttribute( Qt::WA_DeleteOnClose );
+		// ClassWatch "watery" popup - the student must click to dismiss it;
+		// it stays on top until the monitor closes it from their side
+		messageBox->setWindowFlag( Qt::WindowStaysOnTopHint, true );
+		messageBox->setStyleSheet( QStringLiteral(
+			"QMessageBox { background: qlineargradient(x1:0,y1:0,x2:0,y2:1,"
+			" stop:0 #e0f2fe, stop:1 #f8fafc); border: 2px solid #38bdf8; border-radius: 12px; }"
+			"QMessageBox QLabel { color: #164e63; font-size: 14px; }"
+			"QMessageBox QPushButton {"
+			"  background: qlineargradient(x1:0,y1:0,x2:0,y2:1, stop:0 #7dd3fc, stop:1 #38bdf8);"
+			"  color: #082f49; border-radius: 8px; padding: 8px 20px; font-weight: bold; min-width: 90px; }"
+			"QMessageBox QPushButton:hover { background: #38bdf8; }" ) );
 		messageBox->show();
 		VeyonCore::platform().coreFunctions().raiseWindow(messageBox, true);
 

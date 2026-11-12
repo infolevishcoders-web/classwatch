@@ -27,6 +27,13 @@
 #include "ConfigurationPage.h"
 #include "NetworkObject.h"
 
+#include <QHostAddress>
+#include <QPointer>
+#include <QSet>
+
+class QTcpSocket;
+class QLabel;
+
 namespace Ui {
 class BuiltinDirectoryConfigurationPage;
 }
@@ -55,6 +62,7 @@ private Q_SLOTS:
 	void removeComputer();
 	void moveComputerUp();
 	void moveComputerDown();
+	void scanLan();
 
 private:
 	void populateLocations();
@@ -63,8 +71,19 @@ private:
 	NetworkObject currentLocationObject() const;
 	NetworkObject currentComputerObject() const;
 
+	// LAN auto-discovery: probe the ClassWatch service port on every host
+	// of the local /24 subnet(s) and register responders automatically.
+	void pumpScan();
+	void finishScan();
+	void registerScannedComputers();
+
 	Ui::BuiltinDirectoryConfigurationPage *ui;
 
 	BuiltinDirectoryConfiguration& m_configuration;
+
+	QList<QHostAddress> m_scanTargets;
+	QSet<QPointer<QTcpSocket>> m_scanSockets;
+	QStringList m_scanFound;
+	int m_scanPort = 11100;
 
 };

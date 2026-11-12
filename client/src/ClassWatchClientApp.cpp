@@ -75,7 +75,23 @@ void ClassWatchClientApp::setupTrayIcon()
 	m_trayIcon = new QSystemTrayIcon( this );
 	m_trayIcon->setIcon( style()->standardIcon( QStyle::SP_ComputerIcon ) );
 	m_trayIcon->setToolTip( QStringLiteral("ClassWatch Client") );
-	m_trayIcon->show();
+
+	// classroom lockdown: the student-facing tray stays hidden unless the
+	// administrator explicitly enables it - students cannot see or open the
+	// ClassWatch interface on their own machine
+	bool showTray = false;
+	if( VeyonCore::instance() )
+	{
+		showTray = VeyonCore::config().clientShowTrayIcon();
+	}
+	if( showTray )
+	{
+		m_trayIcon->show();
+	}
+	else
+	{
+		m_trayIcon->hide();
+	}
 	
 	connect( m_trayIcon, &QSystemTrayIcon::activated, this, [this]( QSystemTrayIcon::ActivationReason reason ) {
 		if ( reason == QSystemTrayIcon::DoubleClick ) {

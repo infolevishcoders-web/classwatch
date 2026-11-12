@@ -163,8 +163,8 @@
        <item row="3" column="0" colspan="2">
         <widget class="QLabel" name="label_8">
          <property name="text">
-          <string notr="true">Copyright © 2004-2026 Tobias Junghans / Veyon Solutions
-Copyright © 2026 Levish Coders</string>
+          <string notr="true">ClassWatch by Levish Coders
+Nothing heals the past like time.</string>
          </property>
         </widget>
        </item>

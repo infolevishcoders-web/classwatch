@@ -48,4 +48,5 @@
 	OP( VeyonConfiguration, VeyonCore::config(), QString, windowsServerSessionPolicy, setWindowsServerSessionPolicy, "WindowsServerSessionPolicy", "ClassWatch", QString(), Configuration::Property::Flag::Advanced ) \
 	OP( VeyonConfiguration, VeyonCore::config(), bool, securityAutoLockdown, setSecurityAutoLockdown, "SecurityAutoLockdown", "Security", true, Configuration::Property::Flag::Standard ) \
 	OP( VeyonConfiguration, VeyonCore::config(), QString, securityAdminPasswordHash, setSecurityAdminPasswordHash, "SecurityAdminPasswordHash", "Security", QString(), Configuration::Property::Flag::Advanced ) \
-	OP( VeyonConfiguration, VeyonCore::config(), bool, securityConfiguratorLocked, setSecurityConfiguratorLocked, "SecurityConfiguratorLocked", "Security", false, Configuration::Property::Flag::Standard )
+	OP( VeyonConfiguration, VeyonCore::config(), bool, securityConfiguratorLocked, setSecurityConfiguratorLocked, "SecurityConfiguratorLocked", "Security", false, Configuration::Property::Flag::Standard ) \
+	OP( VeyonConfiguration, VeyonCore::config(), bool, clientShowTrayIcon, setClientShowTrayIcon, "ClientShowTrayIcon", "Client", false, Configuration::Property::Flag::Standard )

@@ -3,7 +3,7 @@
  <class>BuiltinDirectoryConfigurationPage</class>
  <widget class="QWidget" name="BuiltinDirectoryConfigurationPage">
   <property name="windowTitle">
-   <string>Locations &amp; computers</string>
+   <string>Classrooms &amp; student PCs</string>
   </property>
   <property name="windowIcon">
    <iconset resource="builtindirectory.qrc">
@@ -19,20 +19,20 @@
    <item>
     <widget class="QGroupBox" name="groupBox">
      <property name="title">
-      <string>Builtin directory</string>
+      <string>ClassWatch device directory</string>
      </property>
      <layout class="QGridLayout" name="gridLayout_2" rowstretch="0,1,0,0" columnstretch="0,1">
       <item row="0" column="1">
        <widget class="QLabel" name="label_2">
         <property name="text">
-         <string>Computers</string>
+         <string>Student PCs</string>
         </property>
        </widget>
       </item>
       <item row="0" column="0">
        <widget class="QLabel" name="label">
         <property name="text">
-         <string>Locations</string>
+         <string>Classrooms</string>
         </property>
        </widget>
       </item>
@@ -41,7 +41,7 @@
         <item>
          <widget class="QPushButton" name="addComputerButton">
           <property name="toolTip">
-           <string>Add new computer</string>
+           <string>Add new student PC</string>
           </property>
           <property name="text">
            <string/>
@@ -55,7 +55,7 @@
         <item>
          <widget class="QPushButton" name="removeComputerButton">
           <property name="toolTip">
-           <string>Remove selected computer</string>
+           <string>Remove selected student PC</string>
           </property>
           <property name="text">
            <string/>
@@ -69,7 +69,7 @@
         <item>
          <widget class="QPushButton" name="moveComputerUpButton">
           <property name="toolTip">
-           <string>Move selected computer up</string>
+           <string>Move selected student PC up</string>
           </property>
           <property name="text">
            <string/>
@@ -83,7 +83,7 @@
         <item>
          <widget class="QPushButton" name="moveComputerDownButton">
           <property name="toolTip">
-           <string>Move selected computer down</string>
+           <string>Move selected student PC down</string>
           </property>
           <property name="text">
            <string/>
@@ -91,6 +91,23 @@
           <property name="icon">
            <iconset resource="../../core/resources/core.qrc">
             <normaloff>:/core/go-down.png</normaloff>:/core/go-down.png</iconset>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="scanLanButton">
+          <property name="toolTip">
+           <string>Scan the local network and automatically register every ClassWatch device found</string>
+          </property>
+          <property name="text">
+           <string>Scan LAN</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="scanStatusLabel">
+          <property name="text">
+           <string/>
           </property>
          </widget>
         </item>
@@ -125,12 +142,12 @@
         </attribute>
         <column>
          <property name="text">
-          <string>Name</string>
+          <string>Student PC</string>
          </property>
         </column>
         <column>
          <property name="text">
-          <string>Host address/IP</string>
+          <string>IP / hostname</string>
          </property>
         </column>
         <column>
@@ -145,7 +162,7 @@
         <item>
          <widget class="QPushButton" name="addLocationButton">
           <property name="toolTip">
-           <string>Add new location</string>
+           <string>Add new classroom</string>
           </property>
           <property name="text">
            <string/>
@@ -159,7 +176,7 @@
         <item>
          <widget class="QPushButton" name="removeLocationButton">
           <property name="toolTip">
-           <string>Remove selected location</string>
+           <string>Remove selected classroom</string>
           </property>
           <property name="text">
            <string/>
@@ -173,7 +190,7 @@
         <item>
          <widget class="QPushButton" name="moveLocationUpButton">
           <property name="toolTip">
-           <string>Move selected location up</string>
+           <string>Move selected classroom up</string>
           </property>
           <property name="text">
            <string/>
@@ -187,7 +204,7 @@
         <item>
          <widget class="QPushButton" name="moveLocationDownButton">
           <property name="toolTip">
-           <string>Move selected location down</string>
+           <string>Move selected classroom down</string>
           </property>
           <property name="text">
            <string/>
@@ -226,7 +243,7 @@
         </attribute>
         <column>
          <property name="text">
-          <string>Locations</string>
+          <string>Classrooms</string>
          </property>
         </column>
        </widget>
@@ -239,7 +256,7 @@
          </font>
         </property>
         <property name="text">
-         <string>The import of CSV files is possible through the command line interface. For more information, see the &lt;a href=&quot;https://docs.veyon.io/en/latest/admin/cli.html#network-object-directory&quot;&gt;online documentation&lt;/a&gt;.</string>
+         <string>Student PCs on the same local network are found automatically with <b>Scan LAN</b> - or add them manually by IP/hostname. CSV import is available through the command line.</string>
         </property>
         <property name="wordWrap">
          <bool>true</bool>
@@ -416,6 +433,22 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>scanLanButton</sender>
+   <signal>clicked()</signal>
+   <receiver>BuiltinDirectoryConfigurationPage</receiver>
+   <slot>scanLan()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>900</x>
+     <y>528</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>507</x>
+     <y>351</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>addLocation()</slot>
@@ -428,5 +461,6 @@
   <slot>moveLocationDown()</slot>
   <slot>moveComputerUp()</slot>
   <slot>moveComputerDown()</slot>
+  <slot>scanLan()</slot>
  </slots>
 </ui>

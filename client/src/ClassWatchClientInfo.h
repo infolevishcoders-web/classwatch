@@ -49,9 +49,14 @@ namespace ClassWatchClientInfo
 			host = host.left( 12 );
 		}
 
-		QString prefix = VeyonCore::config().classWatchIdPrefix().trimmed();
-		prefix.remove( QLatin1Char('-') );
-		if ( prefix.isEmpty() ) {
+		QString prefix = QStringLiteral("CW");
+		if( VeyonCore::instance() )
+		{
+			prefix = VeyonCore::config().classWatchIdPrefix().trimmed();
+			prefix.remove( QLatin1Char('-') );
+		}
+		if( prefix.isEmpty() )
+		{
 			prefix = QStringLiteral("CW");
 		}
 		return QStringLiteral("%1-%2").arg( prefix, host );

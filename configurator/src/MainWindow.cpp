@@ -37,6 +37,7 @@
 #include "Configuration/UiMapping.h"
 
 #include "AboutDialog.h"
+#include "ClassWatchTheme.h"
 #include "ConfigurationPagePluginInterface.h"
 #include "ConfigurationManager.h"
 #include "VeyonConfiguration.h"
@@ -53,12 +54,11 @@ MainWindow::MainWindow( QWidget* parent ) :
 {
 	ui->setupUi( this );
 
-	// ClassWatch "watery" theme: translucent panels over a soft blue
-	// water-gradient backdrop.
+	// ClassWatch "watery" theme: translucent panels over a softly
+	// animated water-gradient backdrop.
 	ui->centralwidget->setStyleSheet(
-		QStringLiteral( "QWidget { background: transparent; }"
-			"#centralwidget {"
-			"  border-image: url(:/configurator/watery-background.png) 0 0 0 0 stretch stretch; }" ) );
+		QStringLiteral( "QWidget { background: transparent; }" ) );
+	ClassWatchTheme::startWateryAnimation( this );
 
 	setWindowTitle(tr("ClassWatch Configurator %1").arg(VeyonCore::versionString()));
 

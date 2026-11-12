@@ -33,6 +33,7 @@
 
 #include "AboutDialog.h"
 #include "AccessControlProvider.h"
+#include "ClassWatchTheme.h"
 #include "ClassWatchComputerPanel.h"
 #include "ClassWatchMessagePanel.h"
 #include "ClassWatchSessionPanel.h"
@@ -67,12 +68,11 @@ MainWindow::MainWindow( VeyonMaster &masterCore, QWidget* parent ) :
 {
 	ui->setupUi( this );
 
-	// ClassWatch "watery" theme: translucent panels over a soft blue
-	// water-gradient backdrop.
+	// ClassWatch "watery" theme: translucent panels over a softly
+	// animated water-gradient backdrop.
 	ui->centralWidget->setStyleSheet(
-		QStringLiteral( "QWidget { background: transparent; }"
-			"#centralWidget {"
-			"  border-image: url(:/master/watery-background.png) 0 0 0 0 stretch stretch; }" ) );
+		QStringLiteral( "QWidget { background: transparent; }" ) );
+	ClassWatchTheme::startWateryAnimation( this );
 
 	restoreState( QByteArray::fromBase64( m_master.userConfig().windowState().toUtf8() ) );
 	restoreGeometry( QByteArray::fromBase64( m_master.userConfig().windowGeometry().toUtf8() ) );

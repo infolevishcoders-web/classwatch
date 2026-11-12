@@ -46,7 +46,7 @@
         </rect>
        </property>
        <property name="toolTip">
-        <string>Adjust size of computer icons automatically</string>
+        <string>Adjust size of PC icons automatically</string>
        </property>
        <property name="text">
         <string>Auto</string>
@@ -140,7 +140,7 @@
         </rect>
        </property>
        <property name="placeholderText">
-        <string>Search users and computers</string>
+        <string>Search students and PCs</string>
        </property>
       </widget>
       <widget class="QLabel" name="spacerLabel2">
@@ -169,7 +169,7 @@
         </rect>
        </property>
        <property name="toolTip">
-        <string>Align computers to grid</string>
+        <string>Align PCs to grid</string>
        </property>
        <property name="icon">
         <iconset resource="../resources/master.qrc">
@@ -186,7 +186,7 @@
         </rect>
        </property>
        <property name="toolTip">
-        <string>Use custom computer arrangement.
+        <string>Use custom PC arrangement.
 
 Press and hold to load arrangement from a file or save current arrangement to a file.</string>
        </property>
@@ -218,7 +218,7 @@ Press and hold to load arrangement from a file or save current arrangement to a 
         </rect>
        </property>
        <property name="toolTip">
-        <string>Only show powered on computers</string>
+        <string>Only show powered on PCs</string>
        </property>
        <property name="icon">
         <iconset resource="../resources/master.qrc">
@@ -282,10 +282,10 @@ Press and hold to load arrangement from a file or save current arrangement to a 
         <item>
          <widget class="QToolButton" name="computerSelectPanelButton">
           <property name="toolTip">
-           <string>Locations &amp;&amp; computers</string>
+           <string>Classrooms &amp;&amp; student PCs</string>
           </property>
           <property name="text">
-           <string>Locations &amp;&amp; computers</string>
+           <string>Classrooms &amp;&amp; student PCs</string>
           </property>
           <property name="icon">
            <iconset resource="../resources/master.qrc">
@@ -446,7 +446,7 @@ Press and hold to load arrangement from a file or save current arrangement to a 
         </rect>
        </property>
        <property name="toolTip">
-        <string>Only show computers with logged on users</string>
+        <string>Only show PCs with logged on users</string>
        </property>
        <property name="icon">
         <iconset resource="../../core/resources/core.qrc">
