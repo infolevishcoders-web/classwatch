@@ -37,6 +37,7 @@
 #include <QRegularExpression>
 #include <QSettings>
 #include <QStandardPaths>
+#include <QTimer>
 #include <QSysInfo>
 #include <QTextStream>
 #include <QUuid>
@@ -83,20 +84,27 @@ void ClassWatchSecurityManager::initialize()
 		manager.logSecurityEvent( QStringLiteral("lockdown_applied"),
 								  QStringLiteral("Terminal lockdown policies applied at service start") );
 	}
-	if( config.enableWebFiltering() )
-	{
-		if( manager.applyWebFilter() )
+	// Web filtering and file hardening spawn netsh/icacls processes which can
+	// take tens of seconds. Running them here would block the service before
+	// it reports RUNNING to the Service Control Manager and Windows would kill
+	// it with error 1053. Defer them until the event loop is up.
+	QTimer::singleShot( 2000, &manager, [&manager]() {
+		auto& deferredConfig = VeyonCore::config();
+		if( deferredConfig.enableWebFiltering() )
 		{
-			manager.logSecurityEvent( QStringLiteral("web_filter_applied"),
+			if( manager.applyWebFilter() )
+			{
+				manager.logSecurityEvent( QStringLiteral("web_filter_applied"),
 									   QStringLiteral("DNS-level web filtering enabled on all active interfaces") );
+			}
 		}
-	}
-	else
-	{
-		// restores DHCP only on interfaces we previously filtered
-		manager.removeWebFilter();
-	}
-	manager.hardenSecurityFiles();
+		else
+		{
+			// restores DHCP only on interfaces we previously filtered
+			manager.removeWebFilter();
+		}
+		manager.hardenSecurityFiles();
+	} );
 }
 
 

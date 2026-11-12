@@ -114,6 +114,7 @@ jobs:
           'libjpeg-*.dll' 'libgcrypt-*.dll' 'libgpg-error-*.dll' \
           'libgnutls-*.dll' 'libnettle-*.dll' 'libhogweed-*.dll' \
           'libgmp-*.dll' 'libtasn1-*.dll' 'libidn2-*.dll' \
+          'libssl-*.dll' 'libssp-*.dll' \
           'libunistring-*.dll' 'libp11-kit-*.dll' 'libffi-*.dll' \
           'libbrotli*.dll' 'libexpat-*.dll' 'libiconv-*.dll' 'libintl-*.dll' \
           'libpcre-*.dll' 'libb2*.dll' 'libmd4c*.dll'; do
