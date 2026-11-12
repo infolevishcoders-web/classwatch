@@ -256,7 +256,7 @@
          </font>
         </property>
         <property name="text">
-         <string>Student PCs on the same local network are found automatically with <b>Scan LAN</b> - or add them manually by IP/hostname. CSV import is available through the command line.</string>
+         <string>Student PCs on the same local network are found automatically with &lt;b&gt;Scan LAN&lt;/b&gt; - or add them manually by IP/hostname. CSV import is available through the command line.</string>
         </property>
         <property name="wordWrap">
          <bool>true</bool>
