@@ -1,7 +1,7 @@
 /* ClassWatch website - shared API helpers */
 
 // Configure before deploy: fill these from Supabase project settings + Render URL.
-const API_BASE = window.CLASSWATCH_API || 'https://classwatch-api.onrender.com';
+const API_BASE = window.CLASSWATCH_API || 'https://classwatch-website.onrender.com';
 const SUPABASE_URL = window.SUPABASE_URL || 'https://zxoavloahtxzitvjzlot.supabase.co';
 const SUPABASE_ANON_KEY = window.SUPABASE_ANON_KEY || 'sb_publishable_a46ZJ-qqufDIGSLH1DJOoA_DPIe43wV';
 
