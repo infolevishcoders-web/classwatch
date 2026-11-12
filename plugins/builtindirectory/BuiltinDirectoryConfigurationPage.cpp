@@ -388,14 +388,14 @@ void BuiltinDirectoryConfigurationPage::scanLan()
 	// collect every IPv4 /24 subnet this machine is attached to
 	QSet<quint32> subnets;
 	const auto interfaces = QNetworkInterface::allInterfaces();
-	for( const auto& interface : interfaces )
+	for( const auto& netInterface : interfaces )
 	{
-		if( interface.flags().testFlag( QNetworkInterface::IsUp ) == false ||
-			interface.flags().testFlag( QNetworkInterface::IsLoopBack ) )
+		if( netInterface.flags().testFlag( QNetworkInterface::IsUp ) == false ||
+			netInterface.flags().testFlag( QNetworkInterface::IsLoopBack ) )
 		{
 			continue;
 		}
-		for( const auto& entry : interface.addressEntries() )
+		for( const auto& entry : netInterface.addressEntries() )
 		{
 			const auto ip = entry.ip();
 			if( ip.protocol() == QAbstractSocket::IPv4Protocol && ip.isLoopback() == false )

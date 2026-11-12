@@ -191,7 +191,7 @@ namespace ClassWatchTheme
 		}
 		const auto selector = QStringLiteral( "#%1" ).arg( window->objectName() );
 
-		QObject::connect( timer, &QTimer::timeout, window, [window, phase, timer, selector]() {
+		QObject::connect( timer, &QTimer::timeout, window, [window, phase, selector]() {
 			*phase += 0.012;
 			if( *phase >= 1.0 )
 			{
