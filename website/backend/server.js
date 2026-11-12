@@ -7,7 +7,7 @@
  *   CLASSWATCH_LICENSE_SECRET                (must match core/src/ClassWatchLicense.cpp)
  *   ADMIN_EMAIL, ADMIN_PASSWORD_HASH         (bcrypt hash of admin password)
  *   SMTP_URL                                 (optional - for OTP emails; without it codes are returned in dev mode)
- *   PAWAPAT_API_KEY, PAWAPAT_API_SECRET      (optional - Pawapat mobile money)
+ *   PAWAPAT_API_TOKEN, PAWAPAT_BASE_URL   (Pawapay mobile money - sandbox by default)
  *   FRONTEND_URL                             (e.g. https://classwatch.netlify.app)
  */
 
@@ -262,50 +262,168 @@ app.get('/api/subscription/status', authUser, async (req, res) => {
   res.json({ active: sub, history: history || [], licenses: licenses || [] });
 });
 
+// ---------- Pawapay mobile money (deposits) ----------
+// Env: PAWAPAT_API_TOKEN (bearer token from dashboard.pawapay.io),
+//      PAWAPAT_BASE_URL (default sandbox - use https://api.pawapay.io for live)
+
+const PAWAPAT_BASE = (process.env.PAWAPAT_BASE_URL || 'https://api.sandbox.pawapay.io').replace(/\/$/, '');
+const PAWAPAT_TOKEN = process.env.PAWAPAT_API_TOKEN || process.env.PAWAPAT_API_KEY || '';
+
+async function pawapay(path, { method = 'GET', body } = {}) {
+  const res = await fetch(PAWAPAT_BASE + path, {
+    method,
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer ' + PAWAPAT_TOKEN,
+    },
+    body: body ? JSON.stringify(body) : undefined,
+  });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(data.message || data.reason || ('Pawapay HTTP ' + res.status));
+  return data;
+}
+
+// Uganda mobile-money provider detection from phone number.
+// PawaPay provider IDs: MTN_MOMO_UGA, AIRTEL_OAPI_UGA
+function detectUgandaProvider(phone) {
+  const digits = String(phone || '').replace(/\D/g, '');
+  const local = digits.startsWith('256') ? digits.slice(3) : digits;
+  if (/^(256)?(77|78|76|39)/.test(digits) || /^(77|78|76|39)/.test(local)) return 'MTN_MOMO_UGA';
+  if (/^(256)?(70|75|20)/.test(digits) || /^(70|75|20)/.test(local)) return 'AIRTEL_OAPI_UGA';
+  return null;
+}
+
+function normalizeUgandaPhone(phone) {
+  const digits = String(phone || '').replace(/\D/g, '');
+  if (digits.startsWith('256')) return digits;
+  if (digits.startsWith('0')) return '256' + digits.slice(1);
+  return '256' + digits;
+}
+
+async function activatePaidSubscription(profileId, plan, depositId, reference) {
+  // idempotent: skip if a subscription with this payment ref already exists
+  const { data: dup } = await supabase.from('subscriptions')
+    .select('id').eq('profile_id', profileId).eq('payment_ref', reference || depositId).maybeSingle();
+  if (dup) return { subscription: dup, already: true };
+
+  const expires = new Date(Date.now() + plan.duration_months * 30 * 864e5).toISOString();
+  const { data: sub, error } = await supabase.from('subscriptions').insert({
+    profile_id: profileId, plan_code: plan.code, status: 'active', seats: plan.device_limit,
+    expires_at: expires, payment_provider: 'pawapat', payment_ref: reference || depositId,
+  }).select('*, plans(*)').single();
+  if (error) throw error;
+
+  const profile = (await supabase.from('profiles').select('*').eq('id', profileId).single()).data;
+  const { key } = await issueLicense(profile, sub);
+  return { subscription: sub, license_key: key };
+}
+
 app.post('/api/subscription/checkout', authUser, async (req, res) => {
-  const { plan_code } = req.body || {};
+  const { plan_code, phone } = req.body || {};
   const { data: plan } = await supabase.from('plans').select('*').eq('code', plan_code).maybeSingle();
   if (!plan) return res.status(400).json({ error: 'unknown plan' });
 
-  // TODO: integrate Pawapat API - create payment request and return checkout URL.
-  // Until keys are configured, return a manual/mobile-money instruction payload.
+  if (PAWAPAT_TOKEN) {
+    // real Pawapay deposit - customer approves the charge on their phone
+    if (!phone) return res.status(400).json({ error: 'mobile money phone number required (e.g. 743199780)' });
+    const provider = detectUgandaProvider(phone);
+    if (!provider) return res.status(400).json({ error: 'could not detect mobile money provider - use MTN or Airtel number' });
+
+    const depositId = crypto.randomUUID();
+    try {
+      await pawapay('/v2/deposits', {
+        method: 'POST',
+        body: {
+          depositId,
+          amount: String(plan.price_ugx),
+          currency: 'UGX',
+          payer: {
+            type: 'MMO',
+            accountDetails: { phoneNumber: normalizeUgandaPhone(phone), provider },
+          },
+          customerMessage: 'ClassWatch ' + plan.name,
+        },
+      });
+    } catch (e) {
+      return res.status(502).json({ error: 'payment provider error: ' + e.message });
+    }
+
+    await supabase.from('payments').insert({
+      profile_id: req.user.sub, deposit_id: depositId, plan_code,
+      amount_ugx: plan.price_ugx, phone: normalizeUgandaPhone(phone), provider,
+    });
+
+    return res.json({
+      mode: 'pawapay', deposit_id: depositId, plan, amount_ugx: plan.price_ugx,
+      status: 'pending', phone: normalizeUgandaPhone(phone), provider,
+      instructions: 'Check your phone - approve the ClassWatch payment prompt to complete checkout.',
+    });
+  }
+
+  // fallback: manual mobile-money payment reference (no Pawapay keys configured)
   const ref = 'CW-' + Date.now().toString(36).toUpperCase();
   res.json({
     reference: ref, plan, amount_ugx: plan.price_ugx,
     instructions: {
-      mobile_money: 'Pay via Pawapat / mobile money to the ClassWatch business number. Quote this reference.',
-      card: 'Card payments coming soon via Pawapat checkout.',
-      note: process.env.PAWAPAT_API_KEY ? 'online checkout enabled' : 'manual confirmation pending',
+      mobile_money: 'Pay via mobile money and quote this reference. Your license activates after confirmation.',
+      card: 'Card payments via Pawapay checkout coming soon.',
     },
     status: 'pending_payment',
   });
 });
 
-// Pawapat webhook - payment confirmation -> activate subscription + issue license
-app.post('/api/webhooks/pawapat', async (req, res) => {
-  // TODO: verify Pawapat signature per their docs
-  const { reference, status, phone, plan_code, email } = req.body || {};
-  if (status !== 'success') return res.json({ received: true });
-
-  let profileId = null;
-  if (email) {
-    const { data: prof } = await supabase.from('profiles').select('id').eq('email', email).maybeSingle();
-    profileId = prof?.id;
+// poll payment status - activates subscription when Pawapay confirms
+app.get('/api/payments/:depositId', authUser, async (req, res) => {
+  const { data: payment } = await supabase.from('payments')
+    .select('*').eq('deposit_id', req.params.depositId).eq('profile_id', req.user.sub).maybeSingle();
+  if (!payment) return res.status(404).json({ error: 'payment not found' });
+  if (payment.status === 'completed') {
+    return res.json({ status: 'completed', license_key: payment.license_key });
   }
-  if (!profileId) return res.status(400).json({ error: 'unknown payer' });
+  if (!PAWAPAT_TOKEN) return res.json({ status: payment.status });
 
-  const { data: plan } = await supabase.from('plans').select('*').eq('code', plan_code).maybeSingle();
-  if (!plan) return res.status(400).json({ error: 'unknown plan' });
+  try {
+    const dep = await pawapay('/v2/deposits/' + req.params.depositId);
+    const pawapayStatus = dep.status || dep.deposit?.status;
+    if (pawapayStatus === 'COMPLETED') {
+      const { data: plan } = await supabase.from('plans').select('*').eq('code', payment.plan_code).single();
+      const { license_key } = await activatePaidSubscription(req.user.sub, plan, payment.deposit_id, payment.deposit_id);
+      await supabase.from('payments').update({
+        status: 'completed', license_key, completed_at: new Date().toISOString(),
+      }).eq('id', payment.id);
+      return res.json({ status: 'completed', license_key });
+    }
+    if (['FAILED', 'REJECTED', 'EXPIRED'].includes(pawapayStatus)) {
+      await supabase.from('payments').update({ status: 'failed' }).eq('id', payment.id);
+      return res.json({ status: 'failed' });
+    }
+    return res.json({ status: 'pending' });
+  } catch (e) {
+    return res.status(502).json({ error: 'could not check payment status: ' + e.message });
+  }
+});
 
-  const expires = new Date(Date.now() + plan.duration_months * 30 * 864e5).toISOString();
-  const { data: sub } = await supabase.from('subscriptions').insert({
-    profile_id: profileId, plan_code, status: 'active', seats: plan.device_limit,
-    expires_at: expires, payment_provider: 'pawapat', payment_ref: reference,
-  }).select('*, plans(*)').single();
+// Pawapay callback - they POST deposit status updates here
+app.post('/api/webhooks/pawapat', async (req, res) => {
+  const payload = req.body || {};
+  const depositId = payload.depositId || payload.id;
+  const status = payload.status;
+  if (!depositId) return res.json({ received: true });
 
-  const profile = (await supabase.from('profiles').select('*').eq('id', profileId).single()).data;
-  const { key } = await issueLicense(profile, sub);
-  res.json({ received: true, license_key: key });
+  const { data: payment } = await supabase.from('payments')
+    .select('*').eq('deposit_id', depositId).maybeSingle();
+  if (!payment) return res.json({ received: true }); // unknown deposit - ignore
+
+  if (status === 'COMPLETED' && payment.status !== 'completed') {
+    const { data: plan } = await supabase.from('plans').select('*').eq('code', payment.plan_code).single();
+    const { license_key } = await activatePaidSubscription(payment.profile_id, plan, depositId, depositId);
+    await supabase.from('payments').update({
+      status: 'completed', license_key, completed_at: new Date().toISOString(),
+    }).eq('id', payment.id);
+  } else if (['FAILED', 'REJECTED', 'EXPIRED'].includes(status)) {
+    await supabase.from('payments').update({ status: 'failed' }).eq('id', payment.id);
+  }
+  res.json({ received: true });
 });
 
 // ---------- account management (danger zone) ----------

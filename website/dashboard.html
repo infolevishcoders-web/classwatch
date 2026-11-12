@@ -179,8 +179,35 @@ async function load() {
 window.blockDev = async id => { await api(`/api/devices/${id}/block`,{method:'POST',body:{reason:'blocked by account owner'}}); load(); };
 window.unblockDev = async id => { await api(`/api/devices/${id}/unblock`,{method:'POST'}); load(); };
 window.checkout = async code => {
+  const phone = prompt('Enter your mobile money number (MTN or Airtel, e.g. 743199780):');
+  if (phone === null) return;
   try {
-    const r = await api('/api/subscription/checkout', { method:'POST', body:{ plan_code: code }});
+    const r = await api('/api/subscription/checkout', { method:'POST', body:{ plan_code: code, phone }});
+    if (r.mode === 'pawapay') {
+      document.getElementById('checkoutInfo').innerHTML = `
+        <div class="panel" style="background:var(--emerald-bg);border-color:var(--emerald-l)">
+        <b>Approve the payment on your phone</b> — ${esc(r.provider || 'mobile money')} · ${esc(r.phone || '')}<br>
+        <b>Amount:</b> ${fmtUGX(r.amount_ugx)}<br>
+        <span class="small">${esc(r.instructions || '')}</span>
+        <p class="small" id="payStatus" style="margin-top:8px">Waiting for approval…</p></div>`;
+      // poll until the deposit completes
+      const poll = setInterval(async () => {
+        try {
+          const p = await api('/api/payments/' + r.deposit_id);
+          const el = document.getElementById('payStatus');
+          if (p.status === 'completed') {
+            clearInterval(poll);
+            el.innerHTML = '<b style="color:var(--emerald)">Payment confirmed!</b> Your license key: <span class="mono">' + esc(p.license_key || '') + '</span>';
+            load();
+          } else if (p.status === 'failed') {
+            clearInterval(poll);
+            el.innerHTML = '<b style="color:#dc2626">Payment failed or was rejected.</b>';
+          }
+        } catch {}
+      }, 5000);
+      setTimeout(() => clearInterval(poll), 10 * 60 * 1000);
+      return;
+    }
     document.getElementById('checkoutInfo').innerHTML = `
       <div class="panel" style="background:var(--emerald-bg);border-color:var(--emerald-l)">
       <b>Reference:</b> <span class="mono">${esc(r.reference)}</span><br>

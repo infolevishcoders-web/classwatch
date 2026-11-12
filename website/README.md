@@ -26,7 +26,8 @@
 | `ADMIN_PASSWORD_HASH` | `node -e "console.log(require('bcryptjs').hashSync('YOUR-PASSWORD',10))"` |
 | `FRONTEND_URL` | your Netlify URL (CORS) |
 | `SMTP_URL` | optional SMTP for OTP emails; without it codes are returned in dev mode |
-| `PAWAPAT_API_KEY` / `PAWAPAT_API_SECRET` | add when you receive Pawapat credentials |
+| `PAWAPAT_API_TOKEN` | Pawapay bearer token (dashboard.pawapay.io → API tokens). **Sandbox token = sandbox base URL; live token = live base URL** |
+| `PAWAPAT_BASE_URL` | `https://api.sandbox.pawapay.io` for testing, `https://api.pawapay.io` for production |
 
 ## 3. Netlify frontend
 
@@ -34,12 +35,17 @@
 2. Set build command to `echo ok` (static site)
 3. In `assets/app.js`, set `API_BASE`, `SUPABASE_URL`, `SUPABASE_ANON_KEY` — or inject via Netlify env vars + a small config snippet.
 
-## 4. Payments (Pawapat)
+## 4. Payments (Pawapay — implemented)
 
-`POST /api/subscription/checkout` currently returns a payment reference + UGX amount.
-When Pawapat credentials arrive: implement their payment-request API in that handler and
-confirm via `POST /api/webhooks/pawapat` (already written — it activates the subscription
-and issues a signed `CW1-…` license key). Card payments go through the same webhook flow.
+Mobile-money checkout is fully wired via the Pawapay **Deposits** API:
+
+1. Dashboard "Pay" → prompts for the customer's MTN/Airtel number → `POST /api/subscription/checkout`
+2. Backend calls `POST {PAWAPAT_BASE_URL}/v2/deposits` — the customer gets an approval prompt on their phone
+3. Frontend polls `GET /api/payments/:depositId` every 5 s; when Pawapay reports `COMPLETED` the subscription activates and a signed `CW1-…` license key is issued
+4. `POST /api/webhooks/pawapat` also activates on Pawapay callbacks (configure the callback URL in the Pawapay dashboard)
+
+Provider detection: MTN prefixes (76/77/78/39) → `MTN_MOMO_UGA`, Airtel (70/75/20) → `AIRTEL_OAPI_UGA`.
+Card payments will reuse the same activate-on-confirm flow when enabled in Pawapay.
 
 ## 5. License flow
 

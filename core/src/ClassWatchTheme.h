@@ -28,6 +28,7 @@
 #include <QColor>
 #include <QPalette>
 #include <QTimer>
+#include <QtMath>
 #include <QWidget>
 
 namespace ClassWatchTheme
@@ -167,7 +168,7 @@ namespace ClassWatchTheme
 			"  background: qlineargradient(x1:0,y1:0,x2:0,y2:1, stop:0 #7dd3fc, stop:1 #38bdf8);"
 			"  color: #082f49; border-radius: 8px; padding: 7px 18px; font-weight: bold; min-width: 80px; }"
 			"QMessageBox QPushButton:hover { background: #38bdf8; }"
-		) ).arg( wateryGradient( 0.0 ) );
+		).arg( wateryGradient( 0.0 ) ) );
 	}
 
 	// Slowly drifting "watery" animation for a top-level window.

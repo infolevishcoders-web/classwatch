@@ -7,3 +7,7 @@ plugins/extra
 
 build/
 
+
+# local secrets - never commit
+.env
+*.env.local

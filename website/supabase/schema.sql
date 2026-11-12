@@ -184,3 +184,23 @@ create policy "read plans" on public.plans for select using (true);
 
 -- everything else is accessed through the Render backend with the
 -- service-role key (bypasses RLS) - never expose service key client-side.
+
+-- ============ payments (Pawapay mobile money) ============
+create table if not exists public.payments (
+  id uuid primary key default gen_random_uuid(),
+  profile_id uuid not null references public.profiles(id) on delete cascade,
+  deposit_id text unique,                     -- Pawapay deposit UUID
+  plan_code text not null,
+  amount_ugx integer not null,
+  currency text not null default 'UGX',
+  phone text,
+  provider text,
+  status text not null default 'pending' check (status in ('pending','completed','failed','expired')),
+  license_key text,
+  created_at timestamptz not null default now(),
+  completed_at timestamptz
+);
+create index if not exists payments_profile_idx on public.payments(profile_id);
+create index if not exists payments_deposit_idx on public.payments(deposit_id);
+alter table public.payments enable row level security;
+create policy "own payments" on public.payments for select using (auth.uid() = profile_id);
