@@ -663,6 +663,12 @@ app.post('/api/usage/events', authUser, async (req, res) => {
 });
 
 // ---------- health ----------
+// global error trap - surfaces the real error instead of a bare 500
+app.use((err, req, res, next) => {
+  console.error('API error:', err);
+  res.status(500).json({ ok: false, error: String((err && err.message) || err) });
+});
+
 app.get('/api/health', (req, res) => res.json({ ok: true, service: 'classwatch-api', time: new Date().toISOString() }));
 
 const PORT = process.env.PORT || 3000;
