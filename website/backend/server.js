@@ -241,6 +241,58 @@ app.post('/api/auth/oauth', async (req, res) => {
   res.json({ token, profile, subscription: sub, license_key, trial_days: TRIAL_SEATS });
 });
 
+// ---------- auth: desktop license login ----------
+// ClassWatch Master sends the license key it got from the website; we verify
+// the HMAC signature, confirm the subscription is still active, and return a
+// long-lived JWT + profile so the desktop can call authenticated endpoints.
+
+app.post('/api/license/verify', async (req, res) => {
+  const { license_key, email } = req.body || {};
+  if (!license_key || !license_key.startsWith('CW1-')) {
+    return res.status(400).json({ error: 'valid license key required' });
+  }
+
+  const raw = license_key.slice(4);
+  const parts = raw.split('.');
+  if (parts.length !== 2) return res.status(400).json({ error: 'malformed license key' });
+
+  const payloadBuf = Buffer.from(parts[0].replace(/-/g, '+').replace(/_/g, '/'), 'base64');
+  const sigBuf = Buffer.from(parts[1].replace(/-/g, '+').replace(/_/g, '/'), 'base64');
+  const expected = crypto.createHmac('sha256', LICENSE_SECRET).update(payloadBuf).digest();
+  if (!crypto.timingSafeEqual(sigBuf, expected)) {
+    return res.status(401).json({ error: 'invalid license signature' });
+  }
+
+  let data;
+  try { data = JSON.parse(payloadBuf.toString('utf8')); }
+  catch { return res.status(400).json({ error: 'corrupt license payload' }); }
+
+  if (email && data.email && data.email.toLowerCase() !== String(email).toLowerCase()) {
+    return res.status(403).json({ error: 'license belongs to a different account' });
+  }
+  if (data.exp && new Date(data.exp) < new Date()) {
+    return res.status(403).json({ error: 'license expired - please renew' });
+  }
+
+  const { data: profile } = await supabase.from('profiles')
+    .select('*').eq('email', data.email).maybeSingle();
+  if (!profile) return res.status(404).json({ error: 'no account found for this license' });
+  if (profile.is_blocked) return res.status(403).json({ error: 'account blocked' });
+
+  const sub = await activeSubscription(profile.id);
+  if (!sub) return res.status(403).json({ error: 'subscription inactive - please renew' });
+
+  const token = signJwt({ sub: profile.id, email: profile.email, role: profile.role }, '30d');
+  res.json({
+    token, profile,
+    license: {
+      email: data.email, plan: data.plan, seats: data.seats,
+      expires_at: data.exp, lic: data.lic,
+    },
+    subscription: sub,
+  });
+});
+
 // ---------- devices (3 per license on trial) ----------
 
 app.post('/api/devices/register', authUser, async (req, res) => {

@@ -275,7 +275,7 @@ MainWindow::MainWindow( VeyonMaster &masterCore, QWidget* parent ) :
 	const auto toolButtons = findChildren<QToolButton*>();
 	for(auto* btn : toolButtons)
 	{
-		btn->setIconSize(QSize(20, 20));
+		btn->setIconSize(QSize(16, 16));
 	}
 
 	if (VeyonCore::useDarkMode())
@@ -291,7 +291,7 @@ MainWindow::MainWindow( VeyonMaster &masterCore, QWidget* parent ) :
 
 	// create the main toolbar
 	ui->toolBar->layout()->setSpacing( 2 );
-	ui->toolBar->setIconSize( QSize( 20, 20 ) );
+	ui->toolBar->setIconSize( QSize( 16, 16 ) );
 	ui->toolBar->setToolButtonStyle( Qt::ToolButtonIconOnly );
 	ui->toolBar->toggleViewAction()->setEnabled( false );
 
@@ -403,6 +403,19 @@ void MainWindow::closeEvent( QCloseEvent* event )
 		return;
 	}
 
+	// confirm before quitting - teachers often close by accident while
+	// monitoring a class
+	const auto reply = QMessageBox::question(
+		this, tr( "Quit ClassWatch" ),
+		tr( "Are you sure you want to quit ClassWatch?\n"
+			"Monitoring and control sessions will stop." ),
+		QMessageBox::Yes | QMessageBox::No, QMessageBox::No );
+	if( reply != QMessageBox::Yes )
+	{
+		event->ignore();
+		return;
+	}
+
 	QJsonObject splitterStates;
 	const auto splitters = findChildren<QSplitter *>();
 	for( const auto* splitter : splitters )
@@ -489,12 +502,28 @@ void MainWindow::showAboutDialog()
 
 void MainWindow::addFeaturesToToolBar()
 {
+	// keep the primary features on the bar; everything else goes into the
+	// "More" overflow menu so the toolbar always fits on one line
+	constexpr int kMaxVisibleFeatures = 9;
+
+	FeatureList overflowFeatures;
+	int visibleCount = 0;
+
 	for( const auto& feature : m_master.features() )
 	{
 		if( feature.testFlag( Feature::Flag::Meta ) )
 		{
 			continue;
 		}
+
+		const auto toOverflow = visibleCount >= kMaxVisibleFeatures &&
+								!feature.testFlag( Feature::Flag::Mode );
+		if( toOverflow )
+		{
+			overflowFeatures.append( feature );
+			continue;
+		}
+		++visibleCount;
 
 		auto btn = new ToolButton( QIcon( feature.iconUrl() ),
 										  feature.displayName(),
@@ -510,7 +539,7 @@ void MainWindow::addFeaturesToToolBar()
 			}
 		});
 		btn->setObjectName( feature.name() );
-		btn->setIconSize( QSize( 20, 20 ) );
+		btn->setIconSize( QSize( 16, 16 ) );
 		btn->addTo( ui->toolBar );
 
 		if( feature.testFlag( Feature::Flag::Mode ) )
@@ -518,6 +547,29 @@ void MainWindow::addFeaturesToToolBar()
 			btn->setCheckable( true );
 			m_modeGroup->addButton( btn, buttonId( feature ) );
 		}
+	}
+
+	if( !overflowFeatures.isEmpty() )
+	{
+		auto* moreButton = new QToolButton( this );
+		moreButton->setText( tr( "More" ) );
+		moreButton->setToolTip( tr( "Additional ClassWatch features" ) );
+		moreButton->setPopupMode( QToolButton::InstantPopup );
+		moreButton->setStyleSheet( QStringLiteral("padding: 4px 8px;") );
+
+		auto* menu = new QMenu( moreButton );
+		for( const auto& feature : overflowFeatures )
+		{
+			auto* action = menu->addAction( QIcon( feature.iconUrl() ),
+										 feature.displayName() );
+			action->setToolTip( feature.description() );
+			connect( action, &QAction::triggered, this, [=, this]() {
+				m_master.runFeature( feature );
+				updateModeButtonGroup();
+			} );
+		}
+		moreButton->setMenu( menu );
+		ui->toolBar->addWidget( moreButton );
 	}
 }
 

@@ -32,6 +32,7 @@
 
 #include "ui_DashboardPanel.h"
 
+#include <QLabel>
 #include <QListWidgetItem>
 #include <QTimer>
 
@@ -42,6 +43,26 @@ DashboardPanel::DashboardPanel( VeyonMaster& master, QWidget *parent ) :
 	m_computerManager(master.computerManager())
 {
 	ui->setupUi(this);
+
+	// metric cards: big accent numbers on dark glass tiles
+	const QString metricStyle = QStringLiteral(
+		"QLabel { color:#e0f2fe; font-size:26px; font-weight:800; }" );
+	for( const auto* name : { "totalComputersValue", "connectedComputersValue",
+							  "offlineComputersValue", "activeSessionsValue" } )
+	{
+		if( auto* label = findChild<QLabel *>( QString::fromLatin1( name ) ) )
+		{
+			label->setStyleSheet( metricStyle );
+		}
+	}
+	setStyleSheet( QStringLiteral(
+		"QWidget { background: rgba(8,47,73,0.55); border-radius:10px; }"
+		"QLabel { color:#bae6fd; }"
+		"QListWidget { background: rgba(2,132,199,0.08); border:1px solid rgba(56,189,248,0.25);"
+		" border-radius:8px; color:#e0f2fe; }"
+		"QPushButton { background:#0284c7; color:white; border:none; border-radius:8px;"
+		" padding:8px 14px; font-weight:600; }"
+		"QPushButton:hover { background:#0ea5e9; }" ) );
 
 	// Connect quick action buttons
 	connect(ui->monitorAllButton, &QPushButton::clicked, this, []() {

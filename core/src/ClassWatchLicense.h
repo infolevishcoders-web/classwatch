@@ -65,10 +65,16 @@ public:
 	// remove the stored license (danger zone / transfer)
 	static void deactivate();
 
+	// website session (JWT + profile JSON) issued by /api/license/verify
+	static void saveSession( const QString& token, const QJsonObject& profile );
+	static QString sessionToken();
+	static QJsonObject sessionProfile();
+
 	// paths
 	static QString licenseDirectory();
 	static QString licenseFilePath();
 	static QString trialStateFilePath();
+	static QString sessionFilePath();
 
 private:
 	static QJsonObject loadLicenseFile();

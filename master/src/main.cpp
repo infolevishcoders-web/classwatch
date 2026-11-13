@@ -28,6 +28,7 @@
 
 #include "ClassWatchLicense.h"
 #include "ClassWatchLicenseDialog.h"
+#include "ClassWatchProtection.h"
 #include "DocumentationFigureCreator.h"
 #include "VeyonMaster.h"
 #include "MainWindow.h"
@@ -39,6 +40,16 @@ int main( int argc, char** argv )
 
 	QApplication app( argc, argv );
 	app.connect( &app, &QApplication::lastWindowClosed, &QApplication::quit );
+
+	// anti-tamper: refuse to run under a debugger or next to common
+	// reversing tools; periodic checks run for the app's lifetime
+	if( ClassWatchProtection::debuggerDetected() ||
+		ClassWatchProtection::analysisToolDetected() )
+	{
+		return -1;
+	}
+	auto* protection = new ClassWatchProtection( &app );
+	protection->installPeriodicChecks();
 
 	VeyonCore core( &app, VeyonCore::Component::Master, QStringLiteral("Master") );
 

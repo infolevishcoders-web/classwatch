@@ -1,5 +1,6 @@
 /*
- * ClassWatchLicenseDialog.h - license activation dialog for ClassWatch Master
+ * ClassWatchLicenseDialog.h - license activation / account login dialog
+ * for ClassWatch Master
  *
  * Copyright (c) 2026 Levish Coders
  *
@@ -31,6 +32,10 @@ class QLabel;
 class QLineEdit;
 class QPushButton;
 
+// Shown when no valid license/trial exists. Teachers sign up on the
+// ClassWatch website, receive a CW1-... license key, and sign in here -
+// the key is verified online against the licensing backend and the
+// returned session JWT is stored for authenticated API calls.
 class ClassWatchLicenseDialog : public QDialog
 {
 	Q_OBJECT
@@ -44,8 +49,11 @@ private Q_SLOTS:
 
 private:
 	void setupUi();
+	void verifyOnline();
 
 	QLabel* m_statusLabel;
+	QLabel* m_accountLabel;
+	QLineEdit* m_emailEdit;
 	QLineEdit* m_licenseKeyEdit;
 	QPushButton* m_activateButton;
 	QDialogButtonBox* m_buttonBox;
