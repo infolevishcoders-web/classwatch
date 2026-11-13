@@ -266,7 +266,7 @@ void DashboardPanel::onRecordClicked()
 	}
 
 	const auto computerName = ui->recorderComputerCombo->currentText()
-			.replace( QRegularExpression( "[^A-Za-z0-9_-]" ), QStringLiteral("_") );
+			.replace( QRegularExpression( QStringLiteral("[^A-Za-z0-9_-]") ), QStringLiteral("_") );
 	const auto dir = QStandardPaths::writableLocation( QStandardPaths::DocumentsLocation )
 			+ QStringLiteral("/ClassWatch Recordings");
 	const auto filePath = dir + QStringLiteral("/%1-%2.avi")
