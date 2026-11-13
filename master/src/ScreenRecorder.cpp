@@ -27,6 +27,7 @@
 #include <QBuffer>
 #include <QDir>
 #include <QElapsedTimer>
+#include <QFile>
 #include <QFileInfo>
 #include <QImage>
 #include <QTimer>

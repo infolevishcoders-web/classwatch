@@ -1,4 +1,4 @@
-﻿/*
+/*
  * ComputerManager.cpp - maintains and provides a computer object list
  *
  * Copyright (c) 2017-2026 Tobias Junghans <tobydox@veyon.io>

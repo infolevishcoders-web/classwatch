@@ -1,4 +1,4 @@
-﻿/*
+/*
  * VeyonMaster.cpp - management of application-global instances
  *
  * Copyright (c) 2017-2026 Tobias Junghans <tobydox@veyon.io>
