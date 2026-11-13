@@ -189,6 +189,9 @@ jobs:
           "$NSI_FILE"
         # normalize remaining forward slashes inside File paths to backslashes
         sed -i '/File "/s|/|\\|g' "$NSI_FILE"
+        # "File /nonfatal" lines were skipped above - normalize slashes inside
+        # their quoted paths too, otherwise NSIS finds no files (mixed separators)
+        sed -i '/File \/nonfatal/s|\(File /nonfatal "[^"]*\)/|\1\\|g' "$NSI_FILE"
         # optional plugin payloads must not abort the build if a Qt plugin
         # is absent from the MSYS2 package
         sed -i '/File ".*crypto\\\|File ".*imageformats\\\|File ".*platforms\\\|File ".*styles\\\|File ".*tls\\\|File ".*interception/s|File "|File /nonfatal "|' "$NSI_FILE"
