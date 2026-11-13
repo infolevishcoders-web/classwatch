@@ -276,7 +276,6 @@ void DashboardPanel::onRecordClicked()
 	QString error;
 	if( m_recorder->start( connection, filePath, &error ) )
 	{
-		m_recorderRow = row;
 		ui->recordButton->setEnabled( false );
 		ui->stopRecordButton->setEnabled( true );
 		ui->recorderStatusLabel->setText( tr( "Recording %1 - 0 frames" ).arg( computerName ) );

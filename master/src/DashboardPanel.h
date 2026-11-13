@@ -58,6 +58,5 @@ private:
 	VeyonMaster& m_master;
 	ComputerManager& m_computerManager;
 	ScreenRecorder* m_recorder = nullptr;
-	int m_recorderRow = -1;
 
 };

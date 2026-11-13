@@ -81,7 +81,6 @@ bool AviWriter::open( const QString& filePath, int width, int height, int fps )
 	m_height = height;
 	m_fps = fps;
 	m_frameCount = 0;
-	m_maxFrameBytes = 0;
 	m_entries.clear();
 
 	QByteArray h;
@@ -100,7 +99,6 @@ bool AviWriter::open( const QString& filePath, int width, int height, int fps )
 	// avih - Main AVI Header (56 bytes)
 	h.append( "avih", 4 );
 	h.append( QByteArray( 4, '\0' ) );          // avih size = 56
-	const auto avihPos = h.size();
 	auto put32 = [&h]( quint32 v ) {
 		h.append( static_cast<char>( v & 0xff ) );
 		h.append( static_cast<char>( ( v >> 8 ) & 0xff ) );
@@ -184,7 +182,6 @@ bool AviWriter::open( const QString& filePath, int width, int height, int fps )
 	}
 
 	// LIST movi - placeholder size patched in finish()
-	const auto moviPos = h.size();
 	h.append( "LIST", 4 );
 	m_moviListSizePos = h.size();
 	h.append( QByteArray( 4, '\0' ) );
@@ -225,7 +222,6 @@ bool AviWriter::addFrameJpeg( const QByteArray& jpegData )
 	const auto offset = static_cast<quint32>( m_file.pos() - m_moviDataPos );
 	m_file.write( chunk );
 	m_entries.append( { offset, sz } );
-	m_maxFrameBytes = qMax( m_maxFrameBytes, sz );
 	++m_frameCount;
 	return true;
 }
@@ -242,7 +238,6 @@ bool AviWriter::finish()
 	const auto moviEnd = m_file.pos();
 
 	// idx1 index
-	const auto idx1Pos = m_file.pos();
 	QByteArray idx;
 	idx.reserve( m_entries.size() * 16 + 8 );
 	idx.append( "idx1", 4 );

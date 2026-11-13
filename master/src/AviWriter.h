@@ -54,7 +54,6 @@ private:
 	qint64 m_moviDataPos = -1;
 	struct IndexEntry { quint32 offset; quint32 size; };
 	QList<IndexEntry> m_entries;
-	quint32 m_maxFrameBytes = 0;
 	int m_frameCount = 0;
 	int m_width = 0;
 	int m_height = 0;
