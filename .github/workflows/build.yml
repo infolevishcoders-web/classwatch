@@ -55,7 +55,7 @@ jobs:
         cmake --version
         mkdir build
         cd build
-        cmake .. -G "MinGW Makefiles" -DCMAKE_BUILD_TYPE=Release -DWITH_TESTS=OFF -DWITH_BUNDLED_LIBVNC=OFF -DWITH_WEBAPI=OFF -DWITH_PCH=OFF -DWITH_TRANSLATIONS=OFF 2>&1 | tee configure.log
+        cmake .. -G "MinGW Makefiles" -DCMAKE_BUILD_TYPE=Release -DWITH_TESTS=OFF -DWITH_BUNDLED_LIBVNC=OFF -DWITH_WEBAPI=OFF -DWITH_PCH=OFF 2>&1 | tee configure.log
         cmake --build . --parallel 2 2>&1 | tee build-output.log
 
     - name: Report build failure
@@ -182,7 +182,7 @@ jobs:
           -e "s|!define LICENSE_TXT \"COPYING\"|!define LICENSE_TXT \"${ESC_STAGE}\\\\COPYING\"|" \
           -e "s|\"nsis/|\"${ESC_STAGE}\\\\nsis\\\\|g" \
           -e "s|^File \"\([^\"]*\)\"|File \"${ESC_STAGE}\\\\\1\"|g" \
-          -e "/File \".*translations/d" \
+          -e "/File \".*translations/s|File \"|File /nonfatal \"|" \
           "$NSI_FILE"
         # normalize remaining forward slashes inside File paths to backslashes
         sed -i '/File "/s|/|\\|g' "$NSI_FILE"
@@ -271,7 +271,7 @@ jobs:
         set -o pipefail
         mkdir build
         cd build
-        cmake .. -DCMAKE_BUILD_TYPE=Release -DWITH_TESTS=OFF -DWITH_WEBAPI=OFF -DWITH_PCH=OFF -DWITH_TRANSLATIONS=OFF 2>&1 | tee configure.log
+        cmake .. -DCMAKE_BUILD_TYPE=Release -DWITH_TESTS=OFF -DWITH_WEBAPI=OFF -DWITH_PCH=OFF 2>&1 | tee configure.log
         cmake --build . --parallel $(nproc) 2>&1 | tee build-output.log
 
     - name: Report build failure
@@ -325,7 +325,7 @@ jobs:
         set -o pipefail
         mkdir build
         cd build
-        cmake .. -DCMAKE_BUILD_TYPE=Release -DWITH_TESTS=OFF -DWITH_WEBAPI=OFF -DWITH_PCH=OFF -DWITH_TRANSLATIONS=OFF \
+        cmake .. -DCMAKE_BUILD_TYPE=Release -DWITH_TESTS=OFF -DWITH_WEBAPI=OFF -DWITH_PCH=OFF \
           -DCMAKE_CXX_FLAGS="-Wno-deprecated-declarations" \
           -DLdap_INCLUDE_DIRS=/opt/homebrew/opt/openldap/include \
           -DLdap_LIBRARIES=/opt/homebrew/opt/openldap/lib/libldap.dylib \

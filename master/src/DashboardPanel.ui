@@ -4,105 +4,72 @@
  <widget class="QWidget" name="DashboardPanel">
   <property name="minimumSize">
    <size>
-    <width>300</width>
-    <height>420</height>
+    <width>280</width>
+    <height>380</height>
    </size>
-  </property>
-  <property name="geometry">
-   <rect>
-    <x>0</x>
-    <y>0</y>
-    <width>400</width>
-    <height>600</height>
-   </rect>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <property name="spacing">
-    <number>10</number>
+    <number>6</number>
    </property>
    <property name="leftMargin">
-    <number>10</number>
+    <number>8</number>
    </property>
    <property name="topMargin">
-    <number>10</number>
+    <number>8</number>
    </property>
    <property name="rightMargin">
-    <number>10</number>
+    <number>8</number>
    </property>
    <property name="bottomMargin">
-    <number>10</number>
+    <number>8</number>
    </property>
    <item>
     <widget class="QGroupBox" name="statisticsGroupBox">
      <property name="title">
-      <string>Classroom Statistics</string>
+      <string>Statistics</string>
      </property>
-     <layout class="QGridLayout" name="statisticsLayout">
-      <item row="0" column="0">
-       <widget class="QLabel" name="totalComputersLabel">
-        <property name="text">
-         <string>Total Computers:</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="1">
+     <layout class="QHBoxLayout" name="statisticsLayout">
+      <property name="spacing">
+       <number>4</number>
+      </property>
+      <item>
        <widget class="QLabel" name="totalComputersValue">
-        <property name="text">
-         <string>0</string>
-        </property>
         <property name="alignment">
-         <set>Qt::AlignRight|Qt::AlignVCenter</set>
+         <set>Qt::AlignCenter</set>
         </property>
-       </widget>
-      </item>
-      <item row="1" column="0">
-       <widget class="QLabel" name="connectedComputersLabel">
         <property name="text">
-         <string>Connected:</string>
+         <string>0&#10;Total</string>
         </property>
        </widget>
       </item>
-      <item row="1" column="1">
+      <item>
        <widget class="QLabel" name="connectedComputersValue">
-        <property name="text">
-         <string>0</string>
-        </property>
         <property name="alignment">
-         <set>Qt::AlignRight|Qt::AlignVCenter</set>
+         <set>Qt::AlignCenter</set>
         </property>
-       </widget>
-      </item>
-      <item row="2" column="0">
-       <widget class="QLabel" name="offlineComputersLabel">
         <property name="text">
-         <string>Offline:</string>
+         <string>0&#10;Online</string>
         </property>
        </widget>
       </item>
-      <item row="2" column="1">
+      <item>
        <widget class="QLabel" name="offlineComputersValue">
-        <property name="text">
-         <string>0</string>
-        </property>
         <property name="alignment">
-         <set>Qt::AlignRight|Qt::AlignVCenter</set>
+         <set>Qt::AlignCenter</set>
         </property>
-       </widget>
-      </item>
-      <item row="3" column="0">
-       <widget class="QLabel" name="activeSessionsLabel">
         <property name="text">
-         <string>Active Sessions:</string>
+         <string>0&#10;Offline</string>
         </property>
        </widget>
       </item>
-      <item row="3" column="1">
+      <item>
        <widget class="QLabel" name="activeSessionsValue">
-        <property name="text">
-         <string>0</string>
-        </property>
         <property name="alignment">
-         <set>Qt::AlignRight|Qt::AlignVCenter</set>
+         <set>Qt::AlignCenter</set>
+        </property>
+        <property name="text">
+         <string>0&#10;Sessions</string>
         </property>
        </widget>
       </item>
@@ -114,32 +81,35 @@
      <property name="title">
       <string>Quick Actions</string>
      </property>
-     <layout class="QVBoxLayout" name="quickActionsLayout">
-      <item>
+     <layout class="QGridLayout" name="quickActionsLayout">
+      <property name="spacing">
+       <number>4</number>
+      </property>
+      <item row="0" column="0">
        <widget class="QPushButton" name="monitorAllButton">
         <property name="text">
-         <string>Monitor All Computers</string>
+         <string>Monitor All</string>
         </property>
        </widget>
       </item>
-      <item>
+      <item row="0" column="1">
        <widget class="QPushButton" name="lockAllButton">
         <property name="text">
-         <string>Lock All Screens</string>
+         <string>Lock All</string>
         </property>
        </widget>
       </item>
-      <item>
+      <item row="1" column="0">
        <widget class="QPushButton" name="messageAllButton">
         <property name="text">
-         <string>Send Message to All</string>
+         <string>Message All</string>
         </property>
        </widget>
       </item>
-      <item>
+      <item row="1" column="1">
        <widget class="QPushButton" name="powerOffButton">
         <property name="text">
-         <string>Power Off Selected</string>
+         <string>Power Off</string>
         </property>
        </widget>
       </item>
@@ -168,6 +138,9 @@
       <string>Screen Recorder</string>
      </property>
      <layout class="QVBoxLayout" name="recorderLayout">
+      <property name="spacing">
+       <number>4</number>
+      </property>
       <item>
        <widget class="QComboBox" name="recorderComputerCombo">
         <property name="toolTip">
@@ -176,31 +149,105 @@
        </widget>
       </item>
       <item>
-       <widget class="QPushButton" name="recordButton">
-        <property name="text">
-         <string>● Record Screen</string>
+       <layout class="QHBoxLayout" name="recordButtonsLayout">
+        <property name="spacing">
+         <number>4</number>
         </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QPushButton" name="stopRecordButton">
-        <property name="text">
-         <string>■ Stop &amp; Save Video</string>
-        </property>
-        <property name="enabled">
-         <bool>false</bool>
-        </property>
-       </widget>
+        <item>
+         <widget class="QPushButton" name="recordButton">
+          <property name="text">
+           <string>● Record</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="stopRecordButton">
+          <property name="text">
+           <string>■ Stop</string>
+          </property>
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
+         </widget>
+        </item>
+       </layout>
       </item>
       <item>
        <widget class="QLabel" name="recorderStatusLabel">
         <property name="text">
-         <string>Ready - recordings save to Documents\ClassWatch Recordings</string>
+         <string>Ready</string>
         </property>
         <property name="wordWrap">
          <bool>true</bool>
         </property>
        </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="storageLabel">
+        <property name="text">
+         <string>Save to:</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="recordingsDirLayout">
+        <property name="spacing">
+         <number>4</number>
+        </property>
+        <item>
+         <widget class="QLineEdit" name="recordingsDirEdit">
+          <property name="readOnly">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="browseRecordingsButton">
+          <property name="text">
+           <string>…</string>
+          </property>
+          <property name="toolTip">
+           <string>Change recording save folder</string>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>34</width>
+            <height>16777215</height>
+           </size>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="screenshotsDirLayout">
+        <property name="spacing">
+         <number>4</number>
+        </property>
+        <item>
+         <widget class="QLineEdit" name="screenshotsDirEdit">
+          <property name="readOnly">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="browseScreenshotsButton">
+          <property name="text">
+           <string>…</string>
+          </property>
+          <property name="toolTip">
+           <string>Change screenshot save folder</string>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>34</width>
+            <height>16777215</height>
+           </size>
+          </property>
+         </widget>
+        </item>
+       </layout>
       </item>
      </layout>
     </widget>
@@ -213,7 +260,7 @@
      <property name="sizeHint" stdset="0">
       <size>
        <width>20</width>
-       <height>40</height>
+       <height>20</height>
       </size>
      </property>
     </spacer>

@@ -22,14 +22,21 @@
  *
  */
 
+#include <QAction>
+#include <QActionGroup>
 #include <QCloseEvent>
+#include <QDir>
 #include <QFileDialog>
 #include <QJsonDocument>
 #include <QKeyEvent>
 #include <QHostAddress>
+#include <QIcon>
+#include <QLocale>
 #include <QMenu>
 #include <QMessageBox>
 #include <QSplitter>
+#include <QToolButton>
+#include <QTranslator>
 
 #include "AboutDialog.h"
 #include "AccessControlProvider.h"
@@ -54,10 +61,96 @@
 #include "SpotlightPanel.h"
 #include "ToolButton.h"
 #include "VeyonConfiguration.h"
+#include "VeyonCore.h"
 #include "VeyonMaster.h"
 #include "UserConfig.h"
 
 #include "ui_MainWindow.h"
+
+
+namespace {
+
+void applyClassWatchLanguage( const QString& languageName, const QString& localeName )
+{
+	VeyonCore::config().setUiLanguage(
+		QStringLiteral( "%1 (%2)" ).arg( languageName, localeName ) );
+
+	const QLocale locale( localeName );
+	QLocale::setDefault( locale );
+
+	for( const auto& resource : { QStringLiteral("qtbase"), QStringLiteral("veyon") } )
+	{
+		const auto dir = resource.startsWith( QLatin1String("qt") )
+							 ? VeyonCore::qtTranslationsDirectory()
+							 : VeyonCore::translationsDirectory();
+		auto* translator = new QTranslator( qApp );
+		if( translator->load( QStringLiteral( "%1_%2" ).arg( resource, localeName ), dir ) )
+		{
+			QCoreApplication::installTranslator( translator );
+		}
+		else
+		{
+			delete translator;
+		}
+	}
+}
+
+void setupClassWatchLanguageButton( QToolButton* button )
+{
+	const auto qmFiles = QDir( VeyonCore::translationsDirectory() )
+							.entryList( { QStringLiteral("veyon*.qm") }, QDir::Files, QDir::Name );
+	if( qmFiles.isEmpty() )
+	{
+		button->setVisible( false );
+		return;
+	}
+
+	auto* menu = new QMenu( button );
+	button->setMenu( menu );
+
+	auto* group = new QActionGroup( menu );
+	group->setExclusive( true );
+
+	const auto currentLanguage = VeyonCore::config().uiLanguage();
+
+	for( const auto& qmFile : qmFiles )
+	{
+		// "veyon_de_DE.qm" -> "de_DE"
+		const auto localeName = qmFile.mid( 6 ).section( QLatin1Char('.'), 0, 0 );
+		QLocale loc( localeName );
+		const auto known = loc.language() != QLocale::C;
+
+		const auto text = QStringLiteral( "%1 - %2 (%3)" )
+							  .arg( known ? QLocale::languageToString( loc.language() ) : localeName,
+									known ? loc.nativeLanguageName() : localeName,
+									localeName );
+		auto* action = menu->addAction( text );
+		action->setCheckable( true );
+		group->addAction( action );
+
+		if( currentLanguage.contains( localeName ) )
+		{
+			action->setChecked( true );
+		}
+
+		QObject::connect( action, &QAction::triggered, button,
+						  [text, localeName]() { applyClassWatchLanguage( text, localeName ); } );
+	}
+
+	auto* systemAction = menu->addAction( QCoreApplication::translate( "MainWindow", "System language" ) );
+	systemAction->setCheckable( true );
+	group->addAction( systemAction );
+	if( currentLanguage.isEmpty() )
+	{
+		systemAction->setChecked( true );
+	}
+	QObject::connect( systemAction, &QAction::triggered, button, []() {
+		applyClassWatchLanguage( QCoreApplication::translate( "MainWindow", "System" ),
+								 QLocale::system().name() );
+	} );
+}
+
+}
 
 
 MainWindow::MainWindow( VeyonMaster &masterCore, QWidget* parent ) :
@@ -91,6 +184,15 @@ MainWindow::MainWindow( VeyonMaster &masterCore, QWidget* parent ) :
 	ui->statusBar->addWidget( ui->alignComputersButton );
 	ui->statusBar->addWidget( ui->spacerLabel4 );
 	ui->statusBar->addWidget( ui->aboutButton );
+
+	// language switcher pinned to the top-right of the status bar
+	auto* languageButton = new QToolButton( this );
+	languageButton->setIcon( QIcon( QStringLiteral( ":/core/languages.png" ) ) );
+	languageButton->setToolTip( tr( "Change language" ) );
+	languageButton->setPopupMode( QToolButton::InstantPopup );
+	languageButton->setAutoRaise( true );
+	setupClassWatchLanguageButton( languageButton );
+	ui->statusBar->addPermanentWidget( languageButton );
 
 	// create all views
 	auto mainSplitter = new QSplitter( Qt::Horizontal, ui->centralWidget );

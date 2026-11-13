@@ -24,9 +24,12 @@
 
 #pragma once
 
+#include <QList>
 #include <QMainWindow>
 
 class QAbstractButton;
+class QToolButton;
+class QWidget;
 
 namespace Ui {
 class MainWindow;
@@ -62,9 +65,14 @@ private:
 
 	void loadConfigurationPagePlugins();
 
+	void addPageTab( int pageIndex );
+	void setupLanguageMenu();
+	void applyLanguage( const QString& languageName, const QString& localeName );
+
 	void closeEvent( QCloseEvent *closeEvent ) override;
 
 	Ui::MainWindow *ui;
 	bool m_configChanged;
+	QList<QToolButton *> m_pageButtons;
 
 } ;

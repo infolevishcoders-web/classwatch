@@ -19,12 +19,12 @@
        <widget class="QComboBox" name="uiStyle">
         <item>
          <property name="text">
-          <string notr="true">Fusion</string>
+          <string notr="true">ClassWatch</string>
          </property>
         </item>
         <item>
          <property name="text">
-          <string>Native</string>
+          <string>System</string>
          </property>
         </item>
        </widget>

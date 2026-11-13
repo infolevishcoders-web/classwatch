@@ -35,11 +35,17 @@
 #include "ui_DashboardPanel.h"
 
 #include <QDateTime>
+#include <QFileDialog>
 #include <QLabel>
+#include <QLineEdit>
 #include <QListWidgetItem>
 #include <QRegularExpression>
 #include <QStandardPaths>
 #include <QTimer>
+
+#include "VeyonConfiguration.h"
+#include "VeyonCore.h"
+#include "Filesystem.h"
 
 DashboardPanel::DashboardPanel( VeyonMaster& master, QWidget *parent ) :
 	QWidget(parent),
@@ -49,31 +55,57 @@ DashboardPanel::DashboardPanel( VeyonMaster& master, QWidget *parent ) :
 {
 	ui->setupUi(this);
 
-	// metric cards: big accent numbers on dark red glass tiles
-	const QString metricStyle = QStringLiteral(
-		"QLabel { color:#fecaca; font-size:26px; font-weight:800; }" );
+	// compact metric tiles: big accent number over a small caption
 	for( const auto* name : { "totalComputersValue", "connectedComputersValue",
 							  "offlineComputersValue", "activeSessionsValue" } )
 	{
 		if( auto* label = findChild<QLabel *>( QString::fromLatin1( name ) ) )
 		{
-			label->setStyleSheet( metricStyle );
+			label->setStyleSheet( QStringLiteral(
+				"QLabel { color:#fecaca; }"
+				"QLabel QLabel { color:#fca5a5; }" ) );
 		}
 	}
 	setStyleSheet( QStringLiteral(
 		"QWidget { background: rgba(28,0,0,0.6); border-radius:10px; }"
-		"QLabel { color:#fecaca; }"
+		"QLabel { color:#fecaca; font-size:15px; font-weight:700; }"
+		"QLineEdit { background:rgba(24,24,27,240); border:1px solid #7f1d1d;"
+		" border-radius:6px; padding:3px 6px; color:#f4f4f5; font-size:11px; }"
 		"QListWidget { background: rgba(60,10,10,0.15); border:1px solid rgba(220,38,38,0.35);"
 		" border-radius:8px; color:#f4f4f5; }"
 		"QPushButton { background:#991b1b; color:#fff1f2; border:1px solid rgba(254,202,202,0.3);"
-		" border-radius:8px; padding:8px 14px; font-weight:600; }"
+		" border-radius:8px; padding:4px 10px; font-weight:600; font-size:12px; }"
 		"QPushButton:hover { background:#dc2626; }"
 		"QPushButton:disabled { background:#3f3f46; color:#a1a1aa; }"
 		"QComboBox { background:rgba(24,24,27,240); border:1px solid #7f1d1d;"
-		" border-radius:7px; padding:4px; color:#f4f4f5; }"
+		" border-radius:7px; padding:3px; color:#f4f4f5; font-size:12px; }"
 		"QGroupBox { border:1px solid rgba(220,38,38,0.4); border-radius:10px;"
-		" margin-top:12px; padding-top:8px; color:#fca5a5; font-weight:bold; }"
-		"QGroupBox::title { subcontrol-origin:margin; left:10px; padding:0 5px; color:#fca5a5; }" ) );
+		" margin-top:10px; padding-top:6px; color:#fca5a5; font-weight:bold; font-size:12px; }"
+		"QGroupBox::title { subcontrol-origin:margin; left:8px; padding:0 4px; color:#fca5a5; }" ) );
+
+	// storage locations: recordings + screenshots save folders
+	ui->recordingsDirEdit->setText( VeyonCore::filesystem().expandPath(
+		VeyonCore::config().recordingsDirectory() ) );
+	ui->screenshotsDirEdit->setText( VeyonCore::filesystem().expandPath(
+		VeyonCore::config().screenshotDirectory() ) );
+	connect( ui->browseRecordingsButton, &QPushButton::clicked, this, [this]() {
+		const auto dir = QFileDialog::getExistingDirectory( this, tr( "Select recording save folder" ),
+														 ui->recordingsDirEdit->text() );
+		if( !dir.isEmpty() )
+		{
+			VeyonCore::config().setRecordingsDirectory( dir );
+			ui->recordingsDirEdit->setText( dir );
+		}
+	} );
+	connect( ui->browseScreenshotsButton, &QPushButton::clicked, this, [this]() {
+		const auto dir = QFileDialog::getExistingDirectory( this, tr( "Select screenshot save folder" ),
+														 ui->screenshotsDirEdit->text() );
+		if( !dir.isEmpty() )
+		{
+			VeyonCore::config().setScreenshotDirectory( dir );
+			ui->screenshotsDirEdit->setText( dir );
+		}
+	} );
 
 	// Connect quick action buttons
 	connect(ui->monitorAllButton, &QPushButton::clicked, this, []() {
@@ -163,11 +195,19 @@ void DashboardPanel::refreshStatistics()
 		}
 	}
 
-	// Update UI labels
-	ui->totalComputersValue->setText(QString::number(totalComputers));
-	ui->connectedComputersValue->setText(QString::number(connectedComputers));
-	ui->offlineComputersValue->setText(QString::number(offlineComputers));
-	ui->activeSessionsValue->setText(QString::number(activeSessions));
+	// Update UI labels - compact "number\ncaption" tiles
+	ui->totalComputersValue->setText( QStringLiteral("<span style='font-size:20px'>%1</span><br>"
+													 "<span style='font-size:10px'>Total</span>")
+												  .arg( totalComputers ) );
+	ui->connectedComputersValue->setText( QStringLiteral("<span style='font-size:20px'>%1</span><br>"
+														 "<span style='font-size:10px'>Online</span>")
+													.arg( connectedComputers ) );
+	ui->offlineComputersValue->setText( QStringLiteral("<span style='font-size:20px'>%1</span><br>"
+													   "<span style='font-size:10px'>Offline</span>")
+													  .arg( offlineComputers ) );
+	ui->activeSessionsValue->setText( QStringLiteral("<span style='font-size:20px'>%1</span><br>"
+														 "<span style='font-size:10px'>Sessions</span>")
+													.arg( activeSessions ) );
 
 	// Update computer status list
 	updateComputerList();
@@ -274,8 +314,8 @@ void DashboardPanel::onRecordClicked()
 
 	const auto computerName = ui->recorderComputerCombo->currentText()
 			.replace( QRegularExpression( QStringLiteral("[^A-Za-z0-9_-]") ), QStringLiteral("_") );
-	const auto dir = QStandardPaths::writableLocation( QStandardPaths::DocumentsLocation )
-			+ QStringLiteral("/ClassWatch Recordings");
+	const auto dir = VeyonCore::filesystem().expandPath( VeyonCore::config().recordingsDirectory() );
+	VeyonCore::filesystem().ensurePathExists( dir );
 	const auto filePath = dir + QStringLiteral("/%1-%2.avi")
 			.arg( computerName,
 				  QDateTime::currentDateTime().toString( QStringLiteral("yyyyMMdd-HHmmss") ) );

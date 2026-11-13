@@ -61,8 +61,28 @@ FileTransferController::~FileTransferController()
 void FileTransferController::setFiles( const QStringList& files )
 {
 	m_files = files;
+	m_remoteNames.clear();
 	m_currentFileIndex = 0;
 	Q_EMIT filesChanged();
+}
+
+
+
+void FileTransferController::setRemoteNames( const QStringList& remoteNames )
+{
+	m_remoteNames = remoteNames;
+}
+
+
+
+QString FileTransferController::remoteName( int index ) const
+{
+	if( index >= 0 && index < m_remoteNames.size() && m_remoteNames.at( index ).isEmpty() == false )
+	{
+		return m_remoteNames.at( index );
+	}
+
+	return QFileInfo( m_files.value( index ) ).fileName();
 }
 
 
@@ -217,7 +237,7 @@ bool FileTransferController::openFile()
 
 	m_currentTransferId = QUuid::createUuid();
 
-	m_plugin->sendStartMessage( m_currentTransferId, QFileInfo(m_files.value(m_currentFileIndex)).fileName(),
+	m_plugin->sendStartMessage( m_currentTransferId, remoteName( m_currentFileIndex ),
 								m_flags.testFlag( OverwriteExistingFiles ), m_interfaces,
 								m_destinationDirectory );
 
@@ -256,7 +276,7 @@ void FileTransferController::finishFile()
 		delete m_fileReadThread;
 		m_fileReadThread = nullptr;
 
-		m_plugin->sendFinishMessage( m_currentTransferId, QFileInfo(m_files.value(m_currentFileIndex)).fileName(),
+		m_plugin->sendFinishMessage( m_currentTransferId, remoteName( m_currentFileIndex ),
 									 m_flags.testFlag( OpenFilesInApplication ), m_interfaces );
 
 		m_currentTransferId = QUuid();

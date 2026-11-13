@@ -22,8 +22,11 @@
  *
  */
 
+#include <QAction>
 #include <QActionGroup>
 #include <QDir>
+#include <QLocale>
+#include <QMenu>
 #include <QProcess>
 #include <QCloseEvent>
 #include <QFileDialog>
@@ -32,6 +35,9 @@
 #include <QScrollBar>
 #include <QSettings>
 #include <QTimer>
+#include <QToolButton>
+#include <QTranslator>
+#include <QStackedWidget>
 
 #include "Configuration/JsonStore.h"
 #include "Configuration/UiMapping.h"
@@ -43,6 +49,7 @@
 #include "VeyonConfiguration.h"
 #include "MainWindow.h"
 #include "PluginManager.h"
+#include "VeyonCore.h"
 
 #include "ui_MainWindow.h"
 
@@ -61,6 +68,27 @@ MainWindow::MainWindow( QWidget* parent ) :
 	ClassWatchTheme::startWateryAnimation( this );
 
 	setWindowTitle(tr("ClassWatch Setup %1").arg(VeyonCore::versionString()));
+
+	// compact top tabs for the built-in configuration pages
+	static const QHash<QString, QString> tabTitles{
+		{ QStringLiteral("GeneralConfigurationPage"), QStringLiteral("General") },
+		{ QStringLiteral("ServiceConfigurationPage"), QStringLiteral("Student Service") },
+		{ QStringLiteral("MasterConfigurationPage"), QStringLiteral("Teacher App") },
+		{ QStringLiteral("AccessControlPage"), QStringLiteral("Access & Security") },
+		{ QStringLiteral("ClassWatchConfigurationPage"), QStringLiteral("ClassWatch ID") },
+	};
+	for( int i = 0; i < ui->configPages->count(); ++i )
+	{
+		auto page = ui->configPages->widget( i );
+		addPageTab( i );
+		m_pageButtons.last()->setText(
+			tabTitles.value( QString::fromLatin1( page->metaObject()->className() ),
+							 page->windowTitle() ) );
+	}
+	if( !m_pageButtons.isEmpty() )
+	{
+		m_pageButtons.first()->setChecked( true );
+	}
 
 	loadConfigurationPagePlugins();
 
@@ -99,8 +127,16 @@ MainWindow::MainWindow( QWidget* parent ) :
 
 	connect( ui->configPages, &QStackedWidget::currentChanged, this, &MainWindow::updateSizes );
 
-	resize( ui->pageSelector->width() + ui->generalConfigurationPage->minimumSizeHint().width(),
-			ui->generalConfigurationPage->minimumSizeHint().height() );
+	connect( ui->configPages, &QStackedWidget::currentChanged, this, [this]( int index ) {
+		if( index >= 0 && index < m_pageButtons.size() )
+		{
+			m_pageButtons[index]->setChecked( true );
+		}
+	} );
+
+	setupLanguageMenu();
+
+	resize( 980, ui->generalConfigurationPage->minimumSizeHint().height() + 160 );
 
 	updateView();
 }
@@ -303,21 +339,28 @@ void MainWindow::switchToStandardView()
 		}
 	}
 
-	// hide page selector items for advanced pages
-	for( int i = 0; i < ui->pageSelector->count(); ++i )
+	// hide top tabs for advanced pages
+	for( int i = 0; i < ui->configPages->count() && i < m_pageButtons.size(); ++i )
 	{
-		auto item = ui->pageSelector->item( i );
-		auto page = item->data( Qt::UserRole ).value<ConfigurationPage *>();
-		if( page )
+		auto page = qobject_cast<ConfigurationPage *>( ui->configPages->widget( i ) );
+		if( page == nullptr )
 		{
-			const auto flags = Configuration::UiMapping::flags( page );
+			continue;
+		}
 
-			ui->pageSelector->setRowHidden( i, flags & Configuration::Property::Flag::Advanced );
-			ui->configPages->widget( i )->setVisible( i == ui->pageSelector->currentRow() );
-			if( flags & Configuration::Property::Flag::Advanced &&
-				i == ui->pageSelector->currentRow() )
+		const auto flags = Configuration::UiMapping::flags( page );
+		const bool advanced = flags & Configuration::Property::Flag::Advanced;
+
+		m_pageButtons[i]->setVisible( !advanced );
+		if( advanced && ui->configPages->currentIndex() == i )
+		{
+			for( int j = 0; j < m_pageButtons.size(); ++j )
 			{
-				ui->pageSelector->setCurrentRow( 0 );
+				if( m_pageButtons[j]->isVisible() )
+				{
+					m_pageButtons[j]->setChecked( true );
+					break;
+				}
 			}
 		}
 	}
@@ -337,10 +380,9 @@ void MainWindow::switchToAdvancedView()
 		}
 	}
 
-	for( int i = 0; i < ui->pageSelector->count(); ++i )
+	for( int i = 0; i < ui->configPages->count() && i < m_pageButtons.size(); ++i )
 	{
-		ui->pageSelector->setRowHidden( i, false );
-		ui->configPages->widget( i )->setVisible( i == ui->pageSelector->currentRow() );
+		m_pageButtons[i]->setVisible( true );
 	}
 }
 
@@ -359,18 +401,124 @@ void MainWindow::loadConfigurationPagePlugins()
 			if( page )
 			{
 				ui->configPages->addWidget( page );
-
-				auto item = new QListWidgetItem( page->windowIcon(), page->windowTitle() );
-				item->setFlags( Qt::ItemIsSelectable | Qt::ItemIsEnabled );
-				item->setData( Qt::UserRole, QVariant::fromValue( page ) );
-				ui->pageSelector->addItem( item );
+				addPageTab( ui->configPages->count() - 1 );
 			}
 		}
 	}
+}
 
-	// adjust minimum size
-	ui->pageSelector->setMinimumSize( ui->pageSelector->sizeHintForColumn(0) + 3 * ui->pageSelector->spacing(),
-									  ui->pageSelector->minimumHeight() );
+
+
+void MainWindow::addPageTab( int pageIndex )
+{
+	auto page = ui->configPages->widget( pageIndex );
+	if( page == nullptr )
+	{
+		return;
+	}
+
+	auto tab = new QToolButton( this );
+	tab->setText( page->windowTitle() );
+	if( page->windowIcon().isNull() == false )
+	{
+		tab->setIcon( page->windowIcon() );
+	}
+	tab->setToolButtonStyle( Qt::ToolButtonTextBesideIcon );
+	tab->setCheckable( true );
+	tab->setAutoExclusive( true );
+
+	connect( tab, &QToolButton::toggled, this, [this, pageIndex]( bool checked ) {
+		if( checked )
+		{
+			ui->configPages->setCurrentIndex( pageIndex );
+		}
+	} );
+
+	ui->pageTabsLayout->insertWidget( ui->pageTabsLayout->count() - 1, tab );
+	m_pageButtons.append( tab );
+}
+
+
+
+void MainWindow::setupLanguageMenu()
+{
+	const auto qmFiles = QDir( VeyonCore::translationsDirectory() )
+							.entryList( { QStringLiteral("veyon*.qm") }, QDir::Files, QDir::Name );
+	if( qmFiles.isEmpty() )
+	{
+		ui->languageButton->setVisible( false );
+		return;
+	}
+
+	auto* menu = new QMenu( tr( "Language" ), ui->languageButton );
+	ui->languageButton->setMenu( menu );
+
+	auto* group = new QActionGroup( menu );
+	group->setExclusive( true );
+
+	const auto currentLanguage = VeyonCore::config().uiLanguage();
+
+	for( const auto& qmFile : qmFiles )
+	{
+		// "veyon_de_DE.qm" -> "de_DE"
+		const auto localeName = qmFile.mid( 6 ).section( QLatin1Char('.'), 0, 0 );
+		QLocale loc( localeName );
+		const auto known = loc.language() != QLocale::C;
+
+		const auto text = QStringLiteral( "%1 - %2 (%3)" )
+							  .arg( known ? QLocale::languageToString( loc.language() ) : localeName,
+									known ? loc.nativeLanguageName() : localeName,
+									localeName );
+		auto* action = menu->addAction( text );
+		action->setCheckable( true );
+		group->addAction( action );
+
+		if( currentLanguage.contains( localeName ) )
+		{
+			action->setChecked( true );
+		}
+
+		connect( action, &QAction::triggered, this,
+				 [this, text, localeName]() { applyLanguage( text, localeName ); } );
+	}
+
+	auto* systemAction = menu->addAction( tr( "System language" ) );
+	systemAction->setCheckable( true );
+	group->addAction( systemAction );
+	if( currentLanguage.isEmpty() )
+	{
+		systemAction->setChecked( true );
+	}
+	connect( systemAction, &QAction::triggered, this, [this]() {
+		applyLanguage( tr( "System" ), QLocale::system().name() );
+	} );
+}
+
+
+
+void MainWindow::applyLanguage( const QString& languageName, const QString& localeName )
+{
+	VeyonCore::config().setUiLanguage(
+		QStringLiteral( "%1 (%2)" ).arg( languageName, localeName ) );
+
+	const QLocale locale( localeName );
+	QLocale::setDefault( locale );
+
+	for( const auto& resource : { QStringLiteral("qtbase"), QStringLiteral("veyon") } )
+	{
+		const auto dir = resource.startsWith( QLatin1String("qt") )
+							 ? VeyonCore::qtTranslationsDirectory()
+							 : VeyonCore::translationsDirectory();
+		auto* translator = new QTranslator( qApp );
+		if( translator->load( QStringLiteral( "%1_%2" ).arg( resource, localeName ), dir ) )
+		{
+			QCoreApplication::installTranslator( translator );
+		}
+		else
+		{
+			delete translator;
+		}
+	}
 }
 
 

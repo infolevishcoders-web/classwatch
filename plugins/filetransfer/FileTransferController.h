@@ -49,6 +49,7 @@ public:
 	~FileTransferController() override;
 
 	void setFiles( const QStringList& files );
+	void setRemoteNames( const QStringList& remoteNames );
 	void setInterfaces( const ComputerControlInterfaceList& interfaces );
 	void setFlags( Flags flags );
 	void setDestinationDirectory( const QString& destDir );
@@ -86,6 +87,8 @@ private:
 
 	bool allQueuesEmpty();
 
+	QString remoteName( int index ) const;
+
 	static constexpr int ProcessInterval = 25;
 	static constexpr int ChunkSize = 256*1024;
 
@@ -94,6 +97,7 @@ private:
 	int m_currentFileIndex;
 	QUuid m_currentTransferId;
 	QStringList m_files;
+	QStringList m_remoteNames;
 	Flags m_flags;
 	ComputerControlInterfaceList m_interfaces;
 

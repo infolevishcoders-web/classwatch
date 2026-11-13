@@ -26,8 +26,10 @@
 #include <QDesktopServices>
 #include <QGuiApplication>
 #include <QFileDialog>
+#include <QDirIterator>
 #include <QFileInfo>
 #include <QMessageBox>
+#include <QRegularExpression>
 
 #include "BuiltinFeatures.h"
 #include "Filesystem.h"
@@ -121,16 +123,46 @@ bool FileTransferPlugin::startFeature( VeyonMasterInterface& master, const Featu
 		{
 			m_lastFileTransferSourceDirectory = VeyonCore::filesystem().expandPath( m_configuration.fileTransferDefaultSourceDirectory() );
 		}
-		const auto files = QFileDialog::getOpenFileNames( master.mainWindow(),
-														  tr( "Select one or more files to transfer" ),
-														  m_lastFileTransferSourceDirectory );
+		// allow picking files AND folders (ShowDirs requires the non-native dialog)
+		const auto selected = QFileDialog::getOpenFileNames( master.mainWindow(),
+															 tr( "Select files or folders to transfer" ),
+															 m_lastFileTransferSourceDirectory, QString(),
+															 QFileDialog::DontUseNativeDialog | QFileDialog::ShowDirs );
+
+		QStringList files;
+		QStringList remoteNames;
+		for( const auto& path : selected )
+		{
+			const QFileInfo info( path );
+			if( info.isDir() )
+			{
+				// expand folder recursively, keeping the folder structure
+				QDirIterator it( path, QDir::Files | QDir::NoDotAndDotDot | QDir::NoSymLinks,
+								 QDirIterator::Subdirectories );
+				while( it.hasNext() )
+				{
+					const auto filePath = it.next();
+					files.append( filePath );
+					remoteNames.append( info.fileName() + QLatin1Char('/') +
+										it.fileInfo().absoluteFilePath().mid( info.absoluteFilePath().size() + 1 ) );
+				}
+			}
+			else
+			{
+				files.append( path );
+				remoteNames.append( info.fileName() );
+			}
+		}
 
 		if( files.isEmpty() == false )
 		{
 			config.setLastFileTransferSourceDirectory( QFileInfo( files.first() ).absolutePath() );
 
 			if( controlFeature( feature.uid(), Operation::Initialize,
-			{ { argToString(Argument::Files), files } }, computerControlInterfaces ) )
+			{
+				{ argToString(Argument::Files), files },
+				{ QStringLiteral("RemoteNames"), remoteNames }
+			}, computerControlInterfaces ) )
 			{
 				auto dialog = new FileTransferDialog( m_fileTransferController, master.mainWindow() );
 				connect( dialog, &QDialog::finished, dialog, &QDialog::deleteLater );
@@ -501,12 +533,14 @@ bool FileTransferPlugin::handleDistributeFilesMessage(const FeatureMessage& mess
 		m_currentFile.close();
 
 		{
-			// Use custom destination directory if provided, otherwise fall back to config
+			// Use custom destination directory if provided, otherwise fall back to config.
+			// expandPath resolves %DESKTOP%, %DOCUMENTS%, %HOME% etc. on the student PC.
 			QString destDir;
 			if (message.hasArgument(Argument::DestinationDirectory))
 			{
-				destDir = resolvePathToHome(
-								  message.argument(Argument::DestinationDirectory).toString());
+				destDir = VeyonCore::filesystem().expandPath(
+					resolvePathToHome(
+						message.argument(Argument::DestinationDirectory).toString()));
 			}
 			if (destDir.isEmpty())
 			{
@@ -517,7 +551,26 @@ bool FileTransferPlugin::handleDistributeFilesMessage(const FeatureMessage& mess
 				VeyonCore::filesystem().ensurePathExists(destDir);
 			}
 
-			m_currentFileName = destDir + QDir::separator() + message.argument(Argument::FileName).toString();
+			// keep folder structure for distributed directories, but never
+			// allow the file name to escape the destination directory
+			auto remoteName = message.argument(Argument::FileName).toString();
+			remoteName.replace( QLatin1Char('\\'), QLatin1Char('/') );
+			while( remoteName.contains( QStringLiteral("../") ) ||
+				   remoteName.startsWith( QLatin1Char('/') ) )
+			{
+				remoteName.remove( QRegularExpression( QStringLiteral("\\.\\./") ) );
+				if( remoteName.startsWith( QLatin1Char('/') ) )
+				{
+					remoteName.remove( 0, 1 );
+				}
+			}
+
+			m_currentFileName = destDir + QDir::separator() + remoteName;
+			const auto parentDir = QFileInfo( m_currentFileName ).absolutePath();
+			if( QDir( parentDir ).exists() == false )
+			{
+				VeyonCore::filesystem().ensurePathExists( parentDir );
+			}
 		}
 		m_currentFile.setFileName(m_currentFileName);
 		if( m_currentFile.exists() && message.argument(Argument::OverwriteExistingFile).toBool() == false )
@@ -731,9 +784,19 @@ bool FileTransferPlugin::controlDistributeFilesFeature(Operation operation, cons
 		}
 
 		m_fileTransferController->setFiles(files);
+		m_fileTransferController->setRemoteNames(
+			arguments.value(QStringLiteral("RemoteNames")).toStringList());
 		m_fileTransferController->setInterfaces(computerControlInterfaces);
 
-		// Set custom destination directory if provided
+		// default destination: the folder configured in ClassWatch Setup
+		// (defaults to the student's Desktop so files arrive automatically)
+		if( m_configuration.fileTransferDestinationDirectory().isEmpty() == false )
+		{
+			m_fileTransferController->setDestinationDirectory(
+				m_configuration.fileTransferDestinationDirectory() );
+		}
+
+		// explicit destination directory overrides the configured default
 		if (arguments.contains(argToString(Argument::DestinationDirectory)))
 		{
 			m_fileTransferController->setDestinationDirectory(
