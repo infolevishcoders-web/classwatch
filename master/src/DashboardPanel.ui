@@ -2,6 +2,12 @@
 <ui version="4.0">
  <class>DashboardPanel</class>
  <widget class="QWidget" name="DashboardPanel">
+  <property name="minimumSize">
+   <size>
+    <width>300</width>
+    <height>420</height>
+   </size>
+  </property>
   <property name="geometry">
    <rect>
     <x>0</x>

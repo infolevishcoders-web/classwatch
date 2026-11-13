@@ -23,6 +23,7 @@
  */
 
 #include "DashboardPanel.h"
+#include "ClassWatchTheme.h"
 #include "ComputerManager.h"
 #include "ComputerControlListModel.h"
 #include "ComputerMonitoringModel.h"
@@ -48,9 +49,9 @@ DashboardPanel::DashboardPanel( VeyonMaster& master, QWidget *parent ) :
 {
 	ui->setupUi(this);
 
-	// metric cards: big accent numbers on dark glass tiles
+	// metric cards: big accent numbers on dark red glass tiles
 	const QString metricStyle = QStringLiteral(
-		"QLabel { color:#e0f2fe; font-size:26px; font-weight:800; }" );
+		"QLabel { color:#fecaca; font-size:26px; font-weight:800; }" );
 	for( const auto* name : { "totalComputersValue", "connectedComputersValue",
 							  "offlineComputersValue", "activeSessionsValue" } )
 	{
@@ -60,13 +61,19 @@ DashboardPanel::DashboardPanel( VeyonMaster& master, QWidget *parent ) :
 		}
 	}
 	setStyleSheet( QStringLiteral(
-		"QWidget { background: rgba(8,47,73,0.55); border-radius:10px; }"
-		"QLabel { color:#bae6fd; }"
-		"QListWidget { background: rgba(2,132,199,0.08); border:1px solid rgba(56,189,248,0.25);"
-		" border-radius:8px; color:#e0f2fe; }"
-		"QPushButton { background:#0284c7; color:white; border:none; border-radius:8px;"
-		" padding:8px 14px; font-weight:600; }"
-		"QPushButton:hover { background:#0ea5e9; }" ) );
+		"QWidget { background: rgba(28,0,0,0.6); border-radius:10px; }"
+		"QLabel { color:#fecaca; }"
+		"QListWidget { background: rgba(60,10,10,0.15); border:1px solid rgba(220,38,38,0.35);"
+		" border-radius:8px; color:#f4f4f5; }"
+		"QPushButton { background:#991b1b; color:#fff1f2; border:1px solid rgba(254,202,202,0.3);"
+		" border-radius:8px; padding:8px 14px; font-weight:600; }"
+		"QPushButton:hover { background:#dc2626; }"
+		"QPushButton:disabled { background:#3f3f46; color:#a1a1aa; }"
+		"QComboBox { background:rgba(24,24,27,240); border:1px solid #7f1d1d;"
+		" border-radius:7px; padding:4px; color:#f4f4f5; }"
+		"QGroupBox { border:1px solid rgba(220,38,38,0.4); border-radius:10px;"
+		" margin-top:12px; padding-top:8px; color:#fca5a5; font-weight:bold; }"
+		"QGroupBox::title { subcontrol-origin:margin; left:10px; padding:0 5px; color:#fca5a5; }" ) );
 
 	// Connect quick action buttons
 	connect(ui->monitorAllButton, &QPushButton::clicked, this, []() {
@@ -203,27 +210,27 @@ void DashboardPanel::updateComputerList()
 			switch (state) {
 			case VncConnection::State::Connected:
 				statusText = QStringLiteral("%1 - %2 (Connected)").arg(computerName, userName);
-				statusIcon = QIcon(QStringLiteral(":/master/host-online.png"));
+				statusIcon = ClassWatchTheme::darkAwareIcon( QStringLiteral(":/master/host-online.png") );
 				break;
 			case VncConnection::State::Disconnected:
 			case VncConnection::State::HostOffline:
 				statusText = QStringLiteral("%1 - Offline").arg(computerName);
-				statusIcon = QIcon(QStringLiteral(":/master/host-offline.png"));
+				statusIcon = ClassWatchTheme::darkAwareIcon( QStringLiteral(":/master/host-offline.png") );
 				break;
 			case VncConnection::State::AuthenticationFailed:
 			case VncConnection::State::AccessControlFailed:
 			case VncConnection::State::ConnectionFailed:
 			case VncConnection::State::ServerNotRunning:
 				statusText = QStringLiteral("%1 - Error").arg(computerName);
-				statusIcon = QIcon(QStringLiteral(":/master/host-access-denied.png"));
+				statusIcon = ClassWatchTheme::darkAwareIcon( QStringLiteral(":/master/host-access-denied.png") );
 				break;
 			case VncConnection::State::Connecting:
 				statusText = QStringLiteral("%1 - Connecting...").arg(computerName);
-				statusIcon = QIcon(QStringLiteral(":/master/host-dns-error.png"));
+				statusIcon = ClassWatchTheme::darkAwareIcon( QStringLiteral(":/master/host-dns-error.png") );
 				break;
 			default:
 				statusText = QStringLiteral("%1 - Unknown").arg(computerName);
-				statusIcon = QIcon(QStringLiteral(":/master/host-dns-error.png"));
+				statusIcon = ClassWatchTheme::darkAwareIcon( QStringLiteral(":/master/host-dns-error.png") );
 				break;
 			}
 

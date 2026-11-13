@@ -502,13 +502,6 @@ void MainWindow::showAboutDialog()
 
 void MainWindow::addFeaturesToToolBar()
 {
-	// keep the primary features on the bar; everything else goes into the
-	// "More" overflow menu so the toolbar always fits on one line
-	constexpr int kMaxVisibleFeatures = 9;
-
-	FeatureList overflowFeatures;
-	int visibleCount = 0;
-
 	for( const auto& feature : m_master.features() )
 	{
 		if( feature.testFlag( Feature::Flag::Meta ) )
@@ -516,16 +509,7 @@ void MainWindow::addFeaturesToToolBar()
 			continue;
 		}
 
-		const auto toOverflow = visibleCount >= kMaxVisibleFeatures &&
-								!feature.testFlag( Feature::Flag::Mode );
-		if( toOverflow )
-		{
-			overflowFeatures.append( feature );
-			continue;
-		}
-		++visibleCount;
-
-		auto btn = new ToolButton( QIcon( feature.iconUrl() ),
+		auto btn = new ToolButton( ClassWatchTheme::darkAwareIcon( feature.iconUrl() ),
 										  feature.displayName(),
 										  feature.displayNameActive(),
 										  feature.description(),
@@ -547,29 +531,6 @@ void MainWindow::addFeaturesToToolBar()
 			btn->setCheckable( true );
 			m_modeGroup->addButton( btn, buttonId( feature ) );
 		}
-	}
-
-	if( !overflowFeatures.isEmpty() )
-	{
-		auto* moreButton = new QToolButton( this );
-		moreButton->setText( tr( "More" ) );
-		moreButton->setToolTip( tr( "Additional ClassWatch features" ) );
-		moreButton->setPopupMode( QToolButton::InstantPopup );
-		moreButton->setStyleSheet( QStringLiteral("padding: 4px 8px;") );
-
-		auto* menu = new QMenu( moreButton );
-		for( const auto& feature : overflowFeatures )
-		{
-			auto* action = menu->addAction( QIcon( feature.iconUrl() ),
-										 feature.displayName() );
-			action->setToolTip( feature.description() );
-			connect( action, &QAction::triggered, this, [=, this]() {
-				m_master.runFeature( feature );
-				updateModeButtonGroup();
-			} );
-		}
-		moreButton->setMenu( menu );
-		ui->toolBar->addWidget( moreButton );
 	}
 }
 
@@ -599,7 +560,7 @@ void MainWindow::addSubFeaturesToToolButton( QToolButton* button, const Feature&
 
 	for( const auto& subFeature : subFeatures )
 	{
-		auto action = menu->addAction(QIcon(subFeature.iconUrl()), subFeature.displayName(),
+		auto action = menu->addAction(ClassWatchTheme::darkAwareIcon(subFeature.iconUrl()), subFeature.displayName(),
 							   #if QT_VERSION >= QT_VERSION_CHECK(6, 3, 0)
 									  subFeature.shortcut(),
 							   #endif

@@ -111,7 +111,7 @@ void ClassWatchLicenseDialog::setupUi()
 
 	m_accountLabel = new QLabel( this );
 	m_accountLabel->setWordWrap( true );
-	m_accountLabel->setStyleSheet( QStringLiteral("color:#0e7490;font-weight:bold;") );
+	m_accountLabel->setStyleSheet( QStringLiteral("color:#fca5a5;font-weight:bold;") );
 	layout->addWidget( m_accountLabel );
 
 	m_activateButton = new QPushButton( tr( "Sign In" ), this );
@@ -124,7 +124,7 @@ void ClassWatchLicenseDialog::setupUi()
 			"The free trial on the website works without a key on first launch." ),
 		this );
 	hint->setWordWrap( true );
-	hint->setStyleSheet( QStringLiteral("color:#64748b;font-size:11px;") );
+	hint->setStyleSheet( QStringLiteral("color:#a1a1aa;font-size:11px;") );
 	layout->addWidget( hint );
 
 	m_buttonBox = new QDialogButtonBox( QDialogButtonBox::Close, this );

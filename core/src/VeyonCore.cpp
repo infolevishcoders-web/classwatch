@@ -257,23 +257,9 @@ bool VeyonCore::initAuthentication()
 
 bool VeyonCore::useDarkMode()
 {
-	const auto colorScheme = config().uiColorScheme();
-
-#if QT_VERSION >= QT_VERSION_CHECK(6, 5, 0)
-	if (colorScheme == UiColorScheme::System &&
-		QGuiApplication::styleHints() &&
-		QGuiApplication::styleHints()->colorScheme() == Qt::ColorScheme::Dark)
-	{
-		return true;
-	}
-#endif
-
-	if (colorScheme == UiColorScheme::Dark)
-	{
-		return true;
-	}
-
-	return false;
+	// ClassWatch ships a fixed dark (black & red) theme, so dark-appropriate
+	// icons and styles are always correct regardless of OS color scheme.
+	return true;
 }
 
 
