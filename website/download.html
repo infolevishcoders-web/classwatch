@@ -12,9 +12,19 @@
 </div></header>
 
 <div class="auth-wrap" style="display:block;padding:60px 20px">
+
+<div id="needLogin" class="auth-card" style="max-width:520px;margin:40px auto;text-align:center">
+  <h1>Sign in to download</h1>
+  <p class="sub">ClassWatch installers are available to registered accounts only — it keeps downloads safe and lets us support every install.</p>
+  <a class="btn btn-primary" href="login.html?next=download.html" style="margin-top:16px">Log in</a>
+  <a class="btn btn-ghost" href="signup.html" style="margin-top:10px">Start free trial</a>
+</div>
+
+<div id="dlContent" style="display:none">
 <div style="max-width:900px;margin:0 auto">
   <h1 style="font-size:32px;margin-bottom:8px">Download ClassWatch</h1>
   <p class="sub" style="font-size:16px;color:var(--muted);margin-bottom:30px">
+    Signed in as <b id="dlEmail"></b> — <span id="dlPlan" class="small"></span><br>
     <b>Teacher / admin PC:</b> install the full package (Master + Service + Client).<br>
     <b>Student PCs:</b> use the same installer and choose <b>"ClassWatch Client only"</b> — the Master console is never installed on student machines.
   </p>
@@ -57,6 +67,26 @@
   </div>
 </div>
 </div>
+
 <script src="assets/app.js"></script>
+<script>
+// downloads require a signed-in account - the installer files themselves are
+// also gated server-side by a Netlify edge function (cw_session cookie)
+(async () => {
+  if (!token()) return;
+  document.getElementById('needLogin').style.display = 'none';
+  const c = document.getElementById('dlContent'); c.style.display = 'block';
+  const p = profile() || {};
+  document.getElementById('dlEmail').textContent = p.email || p.display_name || 'account';
+  try {
+    const sub = await api('/api/subscription/status');
+    const a = sub.active;
+    document.getElementById('dlPlan').textContent = a
+      ? (a.plans && a.plans.name ? a.plans.name + ' plan' : 'active plan') +
+        ' · expires ' + new Date(a.expires_at).toLocaleDateString()
+      : 'no active subscription - student installs are always free';
+  } catch { document.getElementById('dlPlan').textContent = ''; }
+})();
+</script>
 </body>
 </html>

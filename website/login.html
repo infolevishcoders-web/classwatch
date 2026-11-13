@@ -46,13 +46,14 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="assets/app.js"></script>
 <script>
+const nextTarget = new URLSearchParams(location.search).get('next') || 'dashboard.html';
 document.getElementById('pwForm').onsubmit = async e => {
   e.preventDefault(); hideMsg(document.getElementById('err1'));
   try {
     const d = await api('/api/auth/login', { method:'POST', body:{
       email: document.getElementById('email').value.trim(),
       password: document.getElementById('password').value }});
-    setSession(d.token, d.profile); location.href = 'dashboard.html';
+    setSession(d.token, d.profile); location.href = nextTarget;
   } catch (ex) { showMsg(document.getElementById('err1'), ex.message); }
 };
 document.getElementById('useOtp').onclick = async e => {
@@ -71,7 +72,7 @@ document.getElementById('otpForm').onsubmit = async e => {
     const d = await api('/api/auth/otp/verify', { method:'POST', body:{
       email: document.getElementById('email').value.trim(),
       code: document.getElementById('otpCode').value.trim() }});
-    setSession(d.token, d.profile); location.href = 'dashboard.html';
+    setSession(d.token, d.profile); location.href = nextTarget;
   } catch (ex) { showMsg(document.getElementById('err2'), ex.message); }
 };
 document.getElementById('backPw').onclick = e => {

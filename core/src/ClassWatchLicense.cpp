@@ -321,11 +321,16 @@ void ClassWatchLicense::deactivate()
 }
 
 
-void ClassWatchLicense::saveSession( const QString& token, const QJsonObject& profile )
+void ClassWatchLicense::saveSession( const QString& token, const QJsonObject& profile,
+									  const QJsonObject& extras )
 {
 	QJsonObject session;
 	session[QStringLiteral("token")] = token;
 	session[QStringLiteral("profile")] = profile;
+	for( auto it = extras.begin(); it != extras.end(); ++it )
+	{
+		session[it.key()] = it.value();
+	}
 	session[QStringLiteral("savedUtc")] =
 		QDateTime::currentDateTimeUtc().toString( Qt::ISODate );
 	QFile file( sessionFilePath() );
@@ -367,4 +372,38 @@ QJsonObject ClassWatchLicense::sessionProfile()
 		return {};
 	}
 	return doc.object().value( QStringLiteral("profile") ).toObject();
+}
+
+
+QJsonObject ClassWatchLicense::sessionSubscription()
+{
+	QFile file( sessionFilePath() );
+	if( !file.open( QIODevice::ReadOnly ) )
+	{
+		return {};
+	}
+	QJsonParseError error;
+	const auto doc = QJsonDocument::fromJson( file.readAll(), &error );
+	if( error.error != QJsonParseError::NoError )
+	{
+		return {};
+	}
+	return doc.object().value( QStringLiteral("subscription") ).toObject();
+}
+
+
+QJsonObject ClassWatchLicense::sessionLicense()
+{
+	QFile file( sessionFilePath() );
+	if( !file.open( QIODevice::ReadOnly ) )
+	{
+		return {};
+	}
+	QJsonParseError error;
+	const auto doc = QJsonDocument::fromJson( file.readAll(), &error );
+	if( error.error != QJsonParseError::NoError )
+	{
+		return {};
+	}
+	return doc.object().value( QStringLiteral("license") ).toObject();
 }

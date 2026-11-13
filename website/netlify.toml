@@ -8,3 +8,8 @@
     X-Frame-Options = "DENY"
     X-Content-Type-Options = "nosniff"
     Referrer-Policy = "strict-origin-when-cross-origin"
+
+# installer downloads require a signed-in ClassWatch account
+[[edge_functions]]
+  path = "/files/installers/*"
+  function = "gate-installers"

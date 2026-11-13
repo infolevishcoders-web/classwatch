@@ -35,11 +35,15 @@
 #include <QMenu>
 #include <QMessageBox>
 #include <QSplitter>
+#include <QSettings>
+#include <QTimer>
 #include <QToolButton>
 #include <QTranslator>
 
 #include "AboutDialog.h"
 #include "AccessControlProvider.h"
+#include "ClassWatchAccountDialog.h"
+#include "ClassWatchLicense.h"
 #include "ClassWatchTheme.h"
 #include "ClassWatchComputerPanel.h"
 #include "ClassWatchMessagePanel.h"
@@ -193,6 +197,48 @@ MainWindow::MainWindow( VeyonMaster &masterCore, QWidget* parent ) :
 	languageButton->setAutoRaise( true );
 	setupClassWatchLanguageButton( languageButton );
 	ui->statusBar->addPermanentWidget( languageButton );
+
+	// account/subscription button pinned next to the language switcher
+	auto* accountButton = new QToolButton( this );
+	accountButton->setIcon( QIcon( QStringLiteral( ":/core/license.png" ) ) );
+	accountButton->setToolTip( tr( "Account & subscription" ) );
+	accountButton->setAutoRaise( true );
+	connect( accountButton, &QToolButton::clicked, this, [this]() {
+		ClassWatchAccountDialog dialog( this );
+		dialog.exec();
+	} );
+	ui->statusBar->addPermanentWidget( accountButton );
+
+	// subscription expiry reminder - once per day while <= 7 days remain
+	QTimer::singleShot( 4000, this, [this]() {
+		const auto info = ClassWatchLicense::current();
+		if( ( info.status != ClassWatchLicense::Status::Valid &&
+			  info.status != ClassWatchLicense::Status::Trial ) ||
+			info.daysLeft > 7 )
+		{
+			return;
+		}
+		QSettings settings;
+		const auto today = QDate::currentDate().toString( Qt::ISODate );
+		if( settings.value( QStringLiteral("ClassWatch/lastRenewalReminder") ).toString() == today )
+		{
+			return;
+		}
+		settings.setValue( QStringLiteral("ClassWatch/lastRenewalReminder"), today );
+
+		const auto ret = QMessageBox::question(
+			this, tr( "Subscription expiring soon" ),
+			tr( "Your ClassWatch subscription expires in %1 day(s) (%2).\n"
+				"Renew now with mobile money to keep monitoring your classroom?" )
+				.arg( QString::number( info.daysLeft ),
+					  info.expiresAt.toString( QStringLiteral("dd MMM yyyy") ) ),
+			QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes );
+		if( ret == QMessageBox::Yes )
+		{
+			ClassWatchAccountDialog dialog( this );
+			dialog.exec();
+		}
+	} );
 
 	// create all views
 	auto mainSplitter = new QSplitter( Qt::Horizontal, ui->centralWidget );

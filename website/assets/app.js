@@ -14,13 +14,22 @@ try {
 } catch (e) { /* supabase not configured yet */ }
 
 function token() { return localStorage.getItem('cw_token') || ''; }
+// mirror the session JWT into a cookie so Netlify edge functions can gate
+// installer downloads server-side (localStorage is invisible to them)
+function syncSessionCookie(t) {
+  if (t) document.cookie = 'cw_session=' + encodeURIComponent(t) +
+    '; path=/; SameSite=Lax; Secure; max-age=2592000';
+  else document.cookie = 'cw_session=; path=/; SameSite=Lax; Secure; max-age=0';
+}
 function setSession(t, profile) {
   if (t) localStorage.setItem('cw_token', t);
   if (profile) localStorage.setItem('cw_profile', JSON.stringify(profile));
+  syncSessionCookie(t || '');
 }
 function clearSession() {
   localStorage.removeItem('cw_token');
   localStorage.removeItem('cw_profile');
+  syncSessionCookie('');
 }
 function profile() {
   try { return JSON.parse(localStorage.getItem('cw_profile') || 'null'); } catch { return null; }
@@ -100,6 +109,9 @@ async function renderPlans() {
     el.innerHTML = '<p class="small">Pricing loads from the API once deployed.</p>';
   }
 }
+
+// keep the gate cookie in sync for sessions created before it existed
+if (token()) syncSessionCookie(token());
 
 /* ---------- Google OAuth (Supabase) ---------- */
 async function googleLogin() {

@@ -210,7 +210,11 @@ void ClassWatchLicenseDialog::verifyOnline()
 			return;
 		}
 		const auto profileObj = resp.value( QStringLiteral("profile") ).toObject();
-		ClassWatchLicense::saveSession( resp.value( QStringLiteral("token") ).toString(), profileObj );
+		QJsonObject extras;
+		extras[QStringLiteral("subscription")] = resp.value( QStringLiteral("subscription") ).toObject();
+		extras[QStringLiteral("license")] = resp.value( QStringLiteral("license") ).toObject();
+		ClassWatchLicense::saveSession( resp.value( QStringLiteral("token") ).toString(),
+									  profileObj, extras );
 
 		const auto lic = resp.value( QStringLiteral("license") ).toObject();
 		const auto name = profileObj.value( QStringLiteral("display_name") ).toString();

@@ -66,9 +66,13 @@ public:
 	static void deactivate();
 
 	// website session (JWT + profile JSON) issued by /api/license/verify
-	static void saveSession( const QString& token, const QJsonObject& profile );
+	static void saveSession( const QString& token, const QJsonObject& profile,
+							 const QJsonObject& extras = {} );
 	static QString sessionToken();
 	static QJsonObject sessionProfile();
+	// subscription/license objects returned by the verify endpoint
+	static QJsonObject sessionSubscription();
+	static QJsonObject sessionLicense();
 
 	// paths
 	static QString licenseDirectory();
