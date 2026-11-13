@@ -123,11 +123,35 @@ bool FileTransferPlugin::startFeature( VeyonMasterInterface& master, const Featu
 		{
 			m_lastFileTransferSourceDirectory = VeyonCore::filesystem().expandPath( m_configuration.fileTransferDefaultSourceDirectory() );
 		}
-		// allow picking files AND folders (ShowDirs requires the non-native dialog)
-		const auto selected = QFileDialog::getOpenFileNames( master.mainWindow(),
-															 tr( "Select files or folders to transfer" ),
-															 m_lastFileTransferSourceDirectory, QString(),
-															 QFileDialog::DontUseNativeDialog | QFileDialog::ShowDirs );
+		// let the teacher pick individual files or whole folders
+		const auto choice = QMessageBox::question( master.mainWindow(),
+												  tr( "Distribute files" ),
+												  tr( "Send individual files or a whole folder?\n\n"
+													  "Yes = select files\nNo = select a folder" ),
+												  QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel,
+												  QMessageBox::Yes );
+		if( choice == QMessageBox::Cancel )
+		{
+			return true;
+		}
+
+		QStringList selected;
+		if( choice == QMessageBox::Yes )
+		{
+			selected = QFileDialog::getOpenFileNames( master.mainWindow(),
+													 tr( "Select one or more files to transfer" ),
+													 m_lastFileTransferSourceDirectory );
+		}
+		else
+		{
+			const auto dir = QFileDialog::getExistingDirectory( master.mainWindow(),
+															 tr( "Select a folder to transfer" ),
+															 m_lastFileTransferSourceDirectory );
+			if( dir.isEmpty() == false )
+			{
+				selected.append( dir );
+			}
+		}
 
 		QStringList files;
 		QStringList remoteNames;
