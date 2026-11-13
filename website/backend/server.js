@@ -673,5 +673,10 @@ app.use((err, req, res, next) => {
 
 app.get('/api/health', (req, res) => res.json({ ok: true, service: 'classwatch-api', time: new Date().toISOString() }));
 
+// warn about missing env vars at boot so Render logs show config gaps
+for( const v of [ 'SUPABASE_URL', 'SUPABASE_SERVICE_ROLE_KEY', 'JWT_SECRET', 'CLASSWATCH_LICENSE_SECRET', 'FRONTEND_URL' ] ) {
+  if( !process.env[v] ) console.warn( 'MISSING ENV VAR: ' + v );
+}
+
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`ClassWatch API listening on :${PORT}`));
