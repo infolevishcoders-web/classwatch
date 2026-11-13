@@ -50,7 +50,7 @@
 
 namespace
 {
-	const QString kApiBase = QStringLiteral("https://classwatch-website.onrender.com");
+	const QString kAccountApiBase = QStringLiteral("https://classwatch-website.onrender.com");
 	const QString kDashboardUrl = QStringLiteral("https://classwatch.netlify.app/dashboard.html");
 
 	QString fmtUGX( qint64 cents )
@@ -134,7 +134,7 @@ void ClassWatchAccountDialog::setupUi()
 	layout->addWidget( m_refreshButton );
 
 	auto* dashButton = new QPushButton( tr( "Open web dashboard" ), this );
-	dashButton->setAutoRaise( true );
+	dashButton->setFlat( true );
 	connect( dashButton, &QPushButton::clicked,
 			 this, &ClassWatchAccountDialog::openDashboard );
 	layout->addWidget( dashButton );
@@ -423,7 +423,7 @@ bool ClassWatchAccountDialog::apiCall( const QString& method, const QString& pat
 	}
 
 	QNetworkAccessManager nam;
-	QNetworkRequest req( QUrl( kApiBase + path ) );
+	QNetworkRequest req( QUrl( kAccountApiBase + path ) );
 	req.setHeader( QNetworkRequest::ContentTypeHeader, QStringLiteral("application/json") );
 	req.setRawHeader( "Authorization", QByteArray( "Bearer " ) + token.toUtf8() );
 	req.setRawHeader( "User-Agent", "ClassWatch-Teacher/1.0" );
