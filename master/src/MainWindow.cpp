@@ -291,6 +291,8 @@ MainWindow::MainWindow( VeyonMaster &masterCore, QWidget* parent ) :
 
 	// create the main toolbar
 	ui->toolBar->layout()->setSpacing( 2 );
+	ui->toolBar->setIconSize( QSize( 20, 20 ) );
+	ui->toolBar->setToolButtonStyle( Qt::ToolButtonIconOnly );
 	ui->toolBar->toggleViewAction()->setEnabled( false );
 
 	addToolBar( Qt::TopToolBarArea, ui->toolBar );
@@ -508,6 +510,7 @@ void MainWindow::addFeaturesToToolBar()
 			}
 		});
 		btn->setObjectName( feature.name() );
+		btn->setIconSize( QSize( 20, 20 ) );
 		btn->addTo( ui->toolBar );
 
 		if( feature.testFlag( Feature::Flag::Mode ) )

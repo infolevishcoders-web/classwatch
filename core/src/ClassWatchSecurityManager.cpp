@@ -104,6 +104,16 @@ void ClassWatchSecurityManager::initialize()
 			manager.removeWebFilter();
 		}
 		manager.hardenSecurityFiles();
+		// per-domain blocking via hosts file - runs as SYSTEM so it can
+		// write to the protected hosts file location
+		if( deferredConfig.enableWebFiltering() )
+		{
+			manager.applyDomainFilter();
+		}
+		else
+		{
+			manager.removeDomainFilter();
+		}
 	} );
 }
 
@@ -485,6 +495,179 @@ bool ClassWatchSecurityManager::removeWebFilter()
 bool ClassWatchSecurityManager::isWebFilterActive() const
 {
 	return QFile::exists( webFilterMarkerPath() );
+}
+
+
+QString ClassWatchSecurityManager::hostsFilePath()
+{
+#ifdef Q_OS_WIN
+	return QStringLiteral("C:/Windows/System32/drivers/etc/hosts");
+#else
+	return QStringLiteral("/etc/hosts");
+#endif
+}
+
+
+QStringList ClassWatchSecurityManager::parseDomainList( const QString& raw )
+{
+	QStringList result;
+	const auto parts = raw.split( QRegularExpression( QStringLiteral("[,;\\s]+") ),
+								   Qt::SkipEmptyParts );
+	for( auto part : parts )
+	{
+		part = part.trimmed().toLower();
+		// strip scheme, path, port and leading wildcard
+		part.remove( QRegularExpression( QStringLiteral("^[a-z]+://") ) );
+		part = part.section( QLatin1Char('/'), 0, 0 );
+		part = part.section( QLatin1Char(':'), 0, 0 );
+		while( part.startsWith( QLatin1Char('*') ) || part.startsWith( QLatin1Char('.') ) )
+		{
+			part.remove( 0, 1 );
+		}
+		if( !part.isEmpty() && part.contains( QLatin1Char('.') ) &&
+			QRegularExpression( QStringLiteral("^[a-z0-9.-]+$") ).match( part ).hasMatch() )
+		{
+			result.append( part );
+		}
+	}
+	result.removeDuplicates();
+	return result;
+}
+
+
+bool ClassWatchSecurityManager::domainIsAllowed( const QString& domain,
+												 const QStringList& allowed )
+{
+	for( const auto& entry : allowed )
+	{
+		if( domain == entry || domain.endsWith( QLatin1Char('.') + entry ) )
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+
+QStringList ClassWatchSecurityManager::expandDomainsWithSubdomains( const QStringList& domains )
+{
+	QStringList expanded = domains;
+	static const QStringList prefixes = {
+		QStringLiteral("www."), QStringLiteral("m."),
+		QStringLiteral("mobile."), QStringLiteral("web.")
+	};
+	for( const auto& domain : domains )
+	{
+		for( const auto& prefix : prefixes )
+		{
+			expanded.append( prefix + domain );
+		}
+	}
+	expanded.removeDuplicates();
+	return expanded;
+}
+
+
+bool ClassWatchSecurityManager::applyDomainFilter()
+{
+	const auto blocked = parseDomainList( VeyonCore::config().webFilterBlockedDomains() );
+	const auto allowed = parseDomainList( VeyonCore::config().webFilterAllowedDomains() );
+
+	QStringList effective;
+	for( const auto& domain : expandDomainsWithSubdomains( blocked ) )
+	{
+		// skip when the domain or any parent is on the allow list
+		if( !domainIsAllowed( domain, allowed ) )
+		{
+			effective.append( domain );
+		}
+	}
+	effective.removeDuplicates();
+
+	const auto path = hostsFilePath();
+	QFile file( path );
+	if( !file.open( QIODevice::ReadOnly | QIODevice::Text ) )
+	{
+		return false;
+	}
+	QString content = QString::fromUtf8( file.readAll() );
+	file.close();
+
+	// strip any previous ClassWatch block so re-applying is idempotent
+	const QRegularExpression blockRe(
+		QStringLiteral("(?s)[ \\t]*# CLASSWATCH-BLOCK-START.*?# CLASSWATCH-BLOCK-END[^\\n]*\\n?") );
+	content.remove( blockRe );
+
+	if( effective.isEmpty() )
+	{
+		// nothing to block - still write the file back without the block
+		if( !file.open( QIODevice::WriteOnly | QIODevice::Truncate | QIODevice::Text ) )
+		{
+			return false;
+		}
+		file.write( content.toUtf8() );
+		return true;
+	}
+
+	if( !content.endsWith( QLatin1Char('\n') ) && !content.isEmpty() )
+	{
+		content += QLatin1Char('\n');
+	}
+	content += QStringLiteral("# CLASSWATCH-BLOCK-START - managed by ClassWatch, do not edit\n");
+	for( const auto& domain : effective )
+	{
+		content += QStringLiteral("0.0.0.0 %1\n127.0.0.1 %1\n").arg( domain );
+	}
+	content += QStringLiteral("# CLASSWatch blocked %1 domain(s) - admin can grant access via WebFilterAllowedDomains\n")
+				   .arg( effective.size() );
+	content += QStringLiteral("# CLASSWATCH-BLOCK-END\n");
+
+	if( !file.open( QIODevice::WriteOnly | QIODevice::Truncate | QIODevice::Text ) )
+	{
+		return false;
+	}
+	file.write( content.toUtf8() );
+	return true;
+}
+
+
+bool ClassWatchSecurityManager::removeDomainFilter()
+{
+	const auto path = hostsFilePath();
+	QFile file( path );
+	if( !file.open( QIODevice::ReadOnly | QIODevice::Text ) )
+	{
+		return false;
+	}
+	QString content = QString::fromUtf8( file.readAll() );
+	file.close();
+
+	const QRegularExpression blockRe(
+		QStringLiteral("(?s)[ \\t]*# CLASSWATCH-BLOCK-START.*?# CLASSWATCH-BLOCK-END[^\\n]*\\n?") );
+	if( !content.contains( blockRe ) )
+	{
+		return false;
+	}
+	content.remove( blockRe );
+
+	if( !file.open( QIODevice::WriteOnly | QIODevice::Truncate | QIODevice::Text ) )
+	{
+		return false;
+	}
+	file.write( content.toUtf8() );
+	return true;
+}
+
+
+bool ClassWatchSecurityManager::isDomainFilterActive() const
+{
+	QFile file( hostsFilePath() );
+	if( !file.open( QIODevice::ReadOnly | QIODevice::Text ) )
+	{
+		return false;
+	}
+	return QString::fromUtf8( file.readAll() ).contains(
+		QStringLiteral("# CLASSWATCH-BLOCK-START") );
 }
 
 

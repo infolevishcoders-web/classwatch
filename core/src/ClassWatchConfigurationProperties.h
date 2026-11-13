@@ -40,6 +40,8 @@
 	OP( VeyonConfiguration, VeyonCore::config(), bool, enableAudioClassroom, setEnableAudioClassroom, "EnableAudioClassroom", "ClassWatch", false, Configuration::Property::Flag::Standard ) \
 	OP( VeyonConfiguration, VeyonCore::config(), bool, enableWebFiltering, setEnableWebFiltering, "EnableWebFiltering", "ClassWatch", true, Configuration::Property::Flag::Standard ) \
 	OP( VeyonConfiguration, VeyonCore::config(), QString, webFilterDnsServers, setWebFilterDnsServers, "WebFilterDnsServers", "ClassWatch", QStringLiteral("185.228.168.168,185.228.169.168"), Configuration::Property::Flag::Standard ) \
+	OP( VeyonConfiguration, VeyonCore::config(), QString, webFilterBlockedDomains, setWebFilterBlockedDomains, "WebFilterBlockedDomains", "ClassWatch", QStringLiteral("tiktok.com,www.tiktok.com,vm.tiktok.com,m.tiktok.com,tiktokv.com,likee.video,kwai.com,snapchat.com,chatgpt.com,chat.openai.com,claude.ai,character.ai,c.ai,grok.com,x.ai,perplexity.ai"), Configuration::Property::Flag::Standard ) \
+	OP( VeyonConfiguration, VeyonCore::config(), QString, webFilterAllowedDomains, setWebFilterAllowedDomains, "WebFilterAllowedDomains", "ClassWatch", QString(), Configuration::Property::Flag::Standard ) \
 	OP( VeyonConfiguration, VeyonCore::config(), bool, enableTimetable, setEnableTimetable, "EnableTimetable", "ClassWatch", false, Configuration::Property::Flag::Standard ) \
 	OP( VeyonConfiguration, VeyonCore::config(), int, dashboardRefreshInterval, setDashboardRefreshInterval, "DashboardRefreshInterval", "ClassWatch", 5000, Configuration::Property::Flag::Standard ) \
 	OP( VeyonConfiguration, VeyonCore::config(), bool, enableAuditLogging, setEnableAuditLogging, "EnableAuditLogging", "ClassWatch", true, Configuration::Property::Flag::Standard ) \

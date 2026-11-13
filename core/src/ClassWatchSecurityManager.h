@@ -79,6 +79,14 @@ public:
 	bool removeWebFilter();
 	bool isWebFilterActive() const;
 
+	// per-domain blocking via the hosts file: suspicious domains (social
+	// media, AI chat agents, etc.) resolve to 0.0.0.0 so they cannot be
+	// reached. Domains in the allowed list are never blocked - teachers
+	// can grant access per site. Runs on Windows and Linux.
+	bool applyDomainFilter();
+	bool removeDomainFilter();
+	bool isDomainFilterActive() const;
+
 	// filesystem locations
 	static QString securityDataDirectory();
 	static QString securityEventsLogPath();
@@ -92,5 +100,9 @@ private:
 	bool runNetsh( const QStringList& arguments, int* exitCode = nullptr ) const;
 	QStringList activeInterfaceNames() const;
 	QString webFilterMarkerPath() const;
+	static QString hostsFilePath();
+	static QStringList parseDomainList( const QString& raw );
+	static bool domainIsAllowed( const QString& domain, const QStringList& allowed );
+	static QStringList expandDomainsWithSubdomains( const QStringList& domains );
 	void hardenSecurityFiles();
 };
