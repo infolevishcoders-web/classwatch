@@ -1,4 +1,4 @@
-/*
+﻿/*
  * VeyonMaster.cpp - management of application-global instances
  *
  * Copyright (c) 2017-2026 Tobias Junghans <tobydox@veyon.io>
@@ -61,7 +61,7 @@ VeyonMaster::VeyonMaster( QObject* parent ) :
 		QMessageBox::information(nullptr,
 								 tr("No write access"),
 								 tr("Could not save your personal settings! Please check the user configuration "
-									"file path using ClassWatch Configurator."));
+									"file path using ClassWatch Setup."));
 	}
 
 	connect(m_computerControlListModel, &ComputerControlListModel::modelAboutToBeReset,

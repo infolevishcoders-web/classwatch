@@ -1,13 +1,13 @@
-<?xml version="1.0" encoding="UTF-8"?>
+﻿<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE policyconfig PUBLIC
  "-//freedesktop//DTD PolicyKit Policy Configuration 1.0//EN"
  "http://www.freedesktop.org/software/polkit/policyconfig-1.dtd">
 <policyconfig>
 
   <action id="io.levish.pkexec.classwatch-configurator">
-    <description>ClassWatch Configurator</description>
-    <message>Authentication is required to run the ClassWatch Configurator</message>
-    <message xml:lang="de">Für die Ausführung des ClassWatch Configurators ist eine Authentifizierung erforderlich</message>
+    <description>ClassWatch Setup</description>
+    <message>Authentication is required to run the ClassWatch Setup</message>
+    <message xml:lang="de">Für die Ausführung des ClassWatch Setups ist eine Authentifizierung erforderlich</message>
     <icon_name>classwatch-configurator</icon_name>
     <defaults>
       <allow_any>auth_admin_keep</allow_any>

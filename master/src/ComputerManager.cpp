@@ -1,4 +1,4 @@
-/*
+﻿/*
  * ComputerManager.cpp - maintains and provides a computer object list
  *
  * Copyright (c) 2017-2026 Tobias Junghans <tobydox@veyon.io>
@@ -62,7 +62,7 @@ ComputerManager::ComputerManager( UserConfig& config, QObject* parent ) :
 							  tr("Missing network object directory plugin"),
 							  tr("No default network object directory plugin was found. "
 								 "Please check your installation or configure a different "
-								 "network object directory backend via ClassWatch Configurator."));
+								 "network object directory backend via ClassWatch Setup."));
 		qFatal( "ComputerManager: missing network object directory plugin!" );
 	}
 

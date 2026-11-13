@@ -161,7 +161,7 @@ void LinuxServerProcess::start()
 
 			const auto desktopEnvironment = LinuxSessionFunctions::getSessionDesktopEnvironment(m_sessionPath);
 			const auto desktopFile = VeyonCore::applicationsDirectory() + QDir::separator()
-									 + QStringLiteral("io.veyon.veyon-server.desktop");
+									 + QStringLiteral("io.levish.classwatch-server.desktop");
 			switch (desktopEnvironment)
 			{
 			case LinuxSessionFunctions::DesktopEnvironment::KDE:

@@ -331,8 +331,8 @@ bool MainWindow::initAuthentication()
 								 tr("Authentication impossible"),
 								 tr("No authentication key files were found or your current ones "
 									"are outdated. Please create new key files using ClassWatch "
-									"Configurator. Alternatively set up logon authentication "
-									"using ClassWatch Configurator. Otherwise you won't be "
+									"Setup. Alternatively set up logon authentication "
+									"using ClassWatch Setup. Otherwise you won't be "
 									"able to access computers using ClassWatch."));
 	}
 
