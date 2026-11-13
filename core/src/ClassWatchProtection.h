@@ -49,7 +49,7 @@ public:
 	// on an internal timer and the app exits quietly on detection
 	void installPeriodicChecks();
 
-private slots:
+private Q_SLOTS:
 	void check();
 
 private:
