@@ -49,6 +49,7 @@ private:
 	void openUserConfigurationDirectory();
 	void openScreenshotDirectory();
 	void openConfigurationTemplatesDirectory();
+	void openRecordingsDirectory();
 	void populateFeatureComboBox();
 	void updateFeatureLists();
 

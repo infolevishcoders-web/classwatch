@@ -52,6 +52,9 @@ MasterConfigurationPage::MasterConfigurationPage() :
 	connect(ui->openConfigurationTemplatesDirectory, &QPushButton::clicked,
 			 this, &MasterConfigurationPage::openConfigurationTemplatesDirectory);
 
+	connect(ui->openRecordingsDirectory, &QPushButton::clicked,
+			 this, &MasterConfigurationPage::openRecordingsDirectory);
+
 	connect(ui->guestUserProperty, QOverload<int>::of(&QComboBox::currentIndexChanged), this, [this]() {
 		ui->guestUserValue->setEnabled(ui->guestUserProperty->currentIndex() > 0);
 	});
@@ -150,6 +153,13 @@ void MasterConfigurationPage::openScreenshotDirectory()
 void MasterConfigurationPage::openConfigurationTemplatesDirectory()
 {
 	FileSystemBrowser(FileSystemBrowser::ExistingDirectory, this).exec(ui->configurationTemplatesDirectory);
+}
+
+
+
+void MasterConfigurationPage::openRecordingsDirectory()
+{
+	FileSystemBrowser(FileSystemBrowser::ExistingDirectory, this).exec(ui->recordingsDirectory);
 }
 
 
