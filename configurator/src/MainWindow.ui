@@ -19,7 +19,7 @@
         <verstretch>0</verstretch>
        </sizepolicy>
       </property>
-      <layout class="QHBoxLayout" name="pageTabsLayout" stretch="0,1">
+      <layout class="QHBoxLayout" name="pageTabsLayout">
        <property name="spacing">
         <number>4</number>
        </property>
