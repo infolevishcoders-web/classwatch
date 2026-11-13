@@ -57,6 +57,8 @@ jobs:
         mkdir build
         cd build
         cmake .. -G "MinGW Makefiles" -DCMAKE_BUILD_TYPE=Release -DWITH_TESTS=OFF -DWITH_BUNDLED_LIBVNC=OFF -DWITH_WEBAPI=OFF -DWITH_PCH=OFF 2>&1 | tee configure.log
+        # .ts files are checked in - skip lupdate regeneration (it needs Qt QML libs)
+        find ../translations -name '*.ts' -exec touch {} +
         cmake --build . --parallel 2 2>&1 | tee build-output.log
 
     - name: Report build failure
@@ -274,6 +276,7 @@ jobs:
         mkdir build
         cd build
         cmake .. -DCMAKE_BUILD_TYPE=Release -DWITH_TESTS=OFF -DWITH_WEBAPI=OFF -DWITH_PCH=OFF 2>&1 | tee configure.log
+        find ../translations -name '*.ts' -exec touch {} +
         cmake --build . --parallel $(nproc) 2>&1 | tee build-output.log
 
     - name: Report build failure
@@ -332,6 +335,7 @@ jobs:
           -DLdap_INCLUDE_DIRS=/opt/homebrew/opt/openldap/include \
           -DLdap_LIBRARIES=/opt/homebrew/opt/openldap/lib/libldap.dylib \
           -DLber_LIBRARIES=/opt/homebrew/opt/openldap/lib/liblber.dylib 2>&1 | tee configure.log
+        find ../translations -name '*.ts' -exec touch {} +
         cmake --build . --parallel 2>&1 | tee build-output.log
 
     - name: Report build failure
