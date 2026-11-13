@@ -68,7 +68,7 @@ RequestExecutionLevel admin
 !insertmacro MUI_PAGE_INSTFILES
 
 !define MUI_FINISHPAGE_RUN
-!define MUI_FINISHPAGE_RUN_TEXT "Run ClassWatch Configurator now"
+!define MUI_FINISHPAGE_RUN_TEXT "Run ClassWatch Setup now"
 !define MUI_FINISHPAGE_RUN_FUNCTION "RunConfigurator"
 !define MUI_FINISHPAGE_LINK "Visit Levish Coders website"
 !define MUI_FINISHPAGE_LINK_LOCATION "https://levishcoders.com"
@@ -207,7 +207,7 @@ ${EndIf}
 ExecWait '"$INSTDIR\classwatch-wcli.exe" service start'
 SectionEnd
 
-Section "ClassWatch Master" SEC_MASTER
+Section "ClassWatch Teacher" SEC_MASTER
 ${INSTALL_TYPE}
 SetOutPath "$INSTDIR"
 File "classwatch-master.exe"
@@ -216,9 +216,9 @@ ${GetParameters} $R0
 ${GetOptions} $R0 "/NoStartMenuFolder" $R1
 ${If} ${Errors}
 CreateDirectory "$SMPROGRAMS\ClassWatch"
-CreateShortCut "$SMPROGRAMS\ClassWatch\ClassWatch Master.lnk" "$INSTDIR\${MAIN_APP_EXE}"
+CreateShortCut "$SMPROGRAMS\ClassWatch\ClassWatch Teacher.lnk" "$INSTDIR\${MAIN_APP_EXE}"
 ${EndIf}
-CreateShortCut "$DESKTOP\ClassWatch Master.lnk" "$INSTDIR\${MAIN_APP_EXE}"
+CreateShortCut "$DESKTOP\ClassWatch Teacher.lnk" "$INSTDIR\${MAIN_APP_EXE}"
 SectionEnd
 
 Section "Interception driver" SEC_INTERCEPTION
@@ -263,7 +263,7 @@ ${GetParameters} $R0
 ${GetOptions} $R0 "/NoStartMenuFolder" $R1
 ${If} ${Errors}
 CreateDirectory "$SMPROGRAMS\ClassWatch"
-CreateShortCut "$SMPROGRAMS\ClassWatch\ClassWatch Configurator.lnk" "$INSTDIR\classwatch-configurator.exe"
+CreateShortCut "$SMPROGRAMS\ClassWatch\ClassWatch Setup.lnk" "$INSTDIR\classwatch-configurator.exe"
 CreateShortCut "$SMPROGRAMS\ClassWatch\Uninstall ClassWatch.lnk" "$INSTDIR\uninstall.exe"
 WriteIniStr "$INSTDIR\ClassWatch website.url" "InternetShortcut" "URL" "${WEB_SITE}"
 CreateShortCut "$SMPROGRAMS\ClassWatch\ClassWatch Website.lnk" "$INSTDIR\ClassWatch website.url"
@@ -311,13 +311,13 @@ RmDir /r "$INSTDIR\interception"
 
 RmDir "$INSTDIR"
 
-Delete "$SMPROGRAMS\ClassWatch\ClassWatch Master.lnk"
-Delete "$SMPROGRAMS\ClassWatch\ClassWatch Configurator.lnk"
+Delete "$SMPROGRAMS\ClassWatch\ClassWatch Teacher.lnk"
+Delete "$SMPROGRAMS\ClassWatch\ClassWatch Setup.lnk"
 Delete "$SMPROGRAMS\ClassWatch\Uninstall ClassWatch.lnk"
 Delete "$SMPROGRAMS\ClassWatch\ClassWatch Website.lnk"
 RmDir "$SMPROGRAMS\ClassWatch"
 
-Delete "$DESKTOP\ClassWatch Master.lnk"
+Delete "$DESKTOP\ClassWatch Teacher.lnk"
 
 DeleteRegKey ${REG_ROOT} "${REG_APP_PATH}"
 DeleteRegKey ${REG_ROOT} "${UNINSTALL_PATH}"
@@ -333,8 +333,8 @@ FunctionEnd
 
 LangString DESC_SEC_SERVICE ${LANG_ENGLISH} "ClassWatch service and common files required on all computers"
 LangString DESC_SEC_SERVICE ${LANG_GERMAN} "ClassWatch-Dienst und gemeinsame Dateien, die auf allen Computern benötigt werden"
-LangString DESC_SEC_MASTER ${LANG_ENGLISH} "Master application for monitoring and controlling ClassWatch client computers"
-LangString DESC_SEC_MASTER ${LANG_GERMAN} "Master-Applikation zum Beobachten und Steuern von ClassWatch-Client-Computern"
+LangString DESC_SEC_MASTER ${LANG_ENGLISH} "Teacher application for monitoring and controlling ClassWatch client computers"
+LangString DESC_SEC_MASTER ${LANG_GERMAN} "Teacher-Applikation zum Beobachten und Steuern von ClassWatch-Client-Computern"
 LangString DESC_SEC_INTERCEPTION ${LANG_ENGLISH} "Special input device driver required for intercepting keyboard shortcuts such as Ctrl+Alt+Del in screen lock mode"
 LangString DESC_SEC_INTERCEPTION ${LANG_GERMAN} "Spezieller Eingabegerätetreiber, der zum Abfangen von Tastenkombinationen wie Strg+Alt+Entf im Bildschirmsperr-Modus benötigt wird"
 

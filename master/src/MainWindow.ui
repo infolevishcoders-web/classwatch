@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string notr="true">ClassWatch Master</string>
+   <string notr="true">ClassWatch Teacher</string>
   </property>
   <property name="windowIcon">
    <iconset resource="../../core/resources/core.qrc">

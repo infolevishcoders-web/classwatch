@@ -27,6 +27,7 @@
 #include <QWidget>
 
 class ComputerManager;
+class ScreenRecorder;
 class VeyonMaster;
 
 namespace Ui {
@@ -46,10 +47,17 @@ protected:
 private Q_SLOTS:
 	void refreshStatistics();
 	void updateComputerList();
+	void onRecordClicked();
+	void onStopRecordClicked();
+	void onRecorderFrame( int frameCount );
+	void onRecorderFinished( const QString& filePath, int frames );
+	void onRecorderFailed( const QString& reason );
 
 private:
 	Ui::DashboardPanel *ui;
 	VeyonMaster& m_master;
 	ComputerManager& m_computerManager;
+	ScreenRecorder* m_recorder = nullptr;
+	int m_recorderRow = -1;
 
 };

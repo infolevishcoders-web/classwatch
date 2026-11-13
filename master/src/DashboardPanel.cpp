@@ -26,14 +26,18 @@
 #include "ComputerManager.h"
 #include "ComputerControlListModel.h"
 #include "ComputerMonitoringModel.h"
+#include "ScreenRecorder.h"
 #include "VeyonMaster.h"
 #include "UserConfig.h"
 #include "VncConnection.h"
 
 #include "ui_DashboardPanel.h"
 
+#include <QDateTime>
 #include <QLabel>
 #include <QListWidgetItem>
+#include <QRegularExpression>
+#include <QStandardPaths>
 #include <QTimer>
 
 DashboardPanel::DashboardPanel( VeyonMaster& master, QWidget *parent ) :
@@ -80,6 +84,19 @@ DashboardPanel::DashboardPanel( VeyonMaster& master, QWidget *parent ) :
 	connect(ui->powerOffButton, &QPushButton::clicked, this, []() {
 		// TODO: Implement power off selected computers
 	});
+
+	// Screen recorder
+	m_recorder = new ScreenRecorder( this );
+	connect( ui->recordButton, &QPushButton::clicked,
+			 this, &DashboardPanel::onRecordClicked );
+	connect( ui->stopRecordButton, &QPushButton::clicked,
+			 this, &DashboardPanel::onStopRecordClicked );
+	connect( m_recorder, &ScreenRecorder::frameCaptured,
+			 this, &DashboardPanel::onRecorderFrame );
+	connect( m_recorder, &ScreenRecorder::finished,
+			 this, &DashboardPanel::onRecorderFinished );
+	connect( m_recorder, &ScreenRecorder::failed,
+			 this, &DashboardPanel::onRecorderFailed );
 
 	// Set up refresh timer
 	auto refreshTimer = new QTimer(this);
@@ -158,6 +175,10 @@ void DashboardPanel::updateComputerList()
 		return;
 	}
 
+	// refresh the recorder's computer picker with currently connected PCs
+	const auto previousSelection = ui->recorderComputerCombo->currentText();
+	ui->recorderComputerCombo->clear();
+
 	for (int row = 0; row < model->rowCount(); ++row) {
 		QModelIndex index = model->index(row, 0);
 		if (index.isValid()) {
@@ -166,8 +187,15 @@ void DashboardPanel::updateComputerList()
 			
 			auto controlInterface = model->computerControlInterface(index);
 			if (!controlInterface) continue;
-			
+
 			auto state = controlInterface->state();
+
+			if( state == VncConnection::State::Connected &&
+				controlInterface->vncConnection() &&
+				controlInterface->vncConnection()->hasValidFramebuffer() )
+			{
+				ui->recorderComputerCombo->addItem( computerName, row );
+			}
 
 			QString statusText;
 			QIcon statusIcon;
@@ -203,4 +231,91 @@ void DashboardPanel::updateComputerList()
 			ui->computerStatusList->addItem(item);
 		}
 	}
+
+	// restore previous recorder selection if that computer is still listed
+	const auto idx = ui->recorderComputerCombo->findText( previousSelection );
+	if( idx >= 0 )
+	{
+		ui->recorderComputerCombo->setCurrentIndex( idx );
+	}
+}
+
+
+void DashboardPanel::onRecordClicked()
+{
+	if( m_recorder->isRecording() )
+	{
+		return;
+	}
+
+	auto* model = &m_master.computerControlListModel();
+	const auto row = ui->recorderComputerCombo->currentData().toInt();
+	if( !model || row < 0 || row >= model->rowCount() )
+	{
+		ui->recorderStatusLabel->setText( tr( "Select a connected computer first" ) );
+		return;
+	}
+
+	const auto index = model->index( row, 0 );
+	const auto controlInterface = model->computerControlInterface( index );
+	auto* connection = controlInterface ? controlInterface->vncConnection() : nullptr;
+	if( !connection )
+	{
+		ui->recorderStatusLabel->setText( tr( "That computer is not connected" ) );
+		return;
+	}
+
+	const auto computerName = ui->recorderComputerCombo->currentText()
+			.replace( QRegularExpression( "[^A-Za-z0-9_-]" ), QStringLiteral("_") );
+	const auto dir = QStandardPaths::writableLocation( QStandardPaths::DocumentsLocation )
+			+ QStringLiteral("/ClassWatch Recordings");
+	const auto filePath = dir + QStringLiteral("/%1-%2.avi")
+			.arg( computerName,
+				  QDateTime::currentDateTime().toString( QStringLiteral("yyyyMMdd-HHmmss") ) );
+
+	QString error;
+	if( m_recorder->start( connection, filePath, &error ) )
+	{
+		m_recorderRow = row;
+		ui->recordButton->setEnabled( false );
+		ui->stopRecordButton->setEnabled( true );
+		ui->recorderStatusLabel->setText( tr( "Recording %1 - 0 frames" ).arg( computerName ) );
+	}
+	else
+	{
+		ui->recorderStatusLabel->setText( error );
+	}
+}
+
+
+void DashboardPanel::onStopRecordClicked()
+{
+	const auto path = m_recorder->stop();
+	ui->recordButton->setEnabled( true );
+	ui->stopRecordButton->setEnabled( false );
+	ui->recorderStatusLabel->setText( path.isEmpty()
+			? tr( "Recording failed - no frames captured" )
+			: tr( "Saved: %1" ).arg( path ) );
+}
+
+
+void DashboardPanel::onRecorderFrame( int frameCount )
+{
+	ui->recorderStatusLabel->setText(
+		tr( "Recording… %1 frames (%2s)" )
+			.arg( frameCount )
+			.arg( m_recorder->elapsedMs() / 1000 ) );
+}
+
+
+void DashboardPanel::onRecorderFinished( const QString& filePath, int frames )
+{
+	ui->recorderStatusLabel->setText(
+		tr( "Saved %1 frames to %2" ).arg( frames ).arg( filePath ) );
+}
+
+
+void DashboardPanel::onRecorderFailed( const QString& reason )
+{
+	ui->recorderStatusLabel->setText( reason );
 }

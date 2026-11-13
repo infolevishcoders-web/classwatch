@@ -71,8 +71,8 @@ int main( int argc, char **argv )
 		{
 			bool ok = false;
 			const auto password = QInputDialog::getText(
-				nullptr, MainWindow::tr( "ClassWatch Configurator Locked" ),
-				MainWindow::tr( "The administrator has locked the ClassWatch Configurator.\n"
+				nullptr, MainWindow::tr( "ClassWatch Setup Locked" ),
+				MainWindow::tr( "The administrator has locked the ClassWatch Setup.\n"
 								"Enter the admin password to continue:" ),
 				QLineEdit::Password, QString(), &ok );
 			if( !ok )

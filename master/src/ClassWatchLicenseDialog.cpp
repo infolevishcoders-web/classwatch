@@ -175,7 +175,7 @@ void ClassWatchLicenseDialog::verifyOnline()
 	QNetworkAccessManager nam;
 	QNetworkRequest req( QUrl( kApiBase + QStringLiteral("/api/license/verify") ) );
 	req.setHeader( QNetworkRequest::ContentTypeHeader, QStringLiteral("application/json") );
-	req.setRawHeader( "User-Agent", "ClassWatch-Master/1.0" );
+	req.setRawHeader( "User-Agent", "ClassWatch-Teacher/1.0" );
 
 	auto* reply = nam.post( req, QJsonDocument( body ).toJson( QJsonDocument::Compact ) );
 

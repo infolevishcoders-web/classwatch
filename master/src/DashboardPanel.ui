@@ -157,6 +157,49 @@
     </widget>
    </item>
    <item>
+    <widget class="QGroupBox" name="recorderGroupBox">
+     <property name="title">
+      <string>Screen Recorder</string>
+     </property>
+     <layout class="QVBoxLayout" name="recorderLayout">
+      <item>
+       <widget class="QComboBox" name="recorderComputerCombo">
+        <property name="toolTip">
+         <string>Computer to record (must be connected)</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="recordButton">
+        <property name="text">
+         <string>● Record Screen</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="stopRecordButton">
+        <property name="text">
+         <string>■ Stop &amp; Save Video</string>
+        </property>
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="recorderStatusLabel">
+        <property name="text">
+         <string>Ready - recordings save to Documents\ClassWatch Recordings</string>
+        </property>
+        <property name="wordWrap">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
     <spacer name="verticalSpacer">
      <property name="orientation">
       <enum>Qt::Vertical</enum>
