@@ -7,8 +7,9 @@ const SUPABASE_ANON_KEY = window.SUPABASE_ANON_KEY || 'sb_publishable_a46ZJ-qquf
 
 let supabase = null;
 try {
-  if (window.supabasejs && SUPABASE_URL.includes('http')) {
-    supabase = window.supabasejs.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  const SB = window.supabase || window.supabasejs;
+  if (SB && SUPABASE_URL.includes('http')) {
+    supabase = SB.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
   }
 } catch (e) { /* supabase not configured yet */ }
 
