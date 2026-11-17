@@ -144,10 +144,19 @@ ClassWatchComputer ClassWatchComputerManagerExtension::getClassWatchComputerByNe
 
 void ClassWatchComputerManagerExtension::registerComputer( const Computer& computer )
 {
+	// Only emit computerRegistered for genuinely new registrations. The manager
+	// also emits for already-known computers (info update path), and listeners
+	// may react by re-syncing - emitting unconditionally causes infinite
+	// recursion and a stack overflow.
+	const auto isNew = m_classWatchManager->getComputerByNetworkObjectUid(
+										   computer.networkObjectUid() ).isValid() == false;
+
 	QString classWatchId = m_classWatchManager->registerComputer( computer );
 	m_uidToClassWatchId[computer.networkObjectUid()] = classWatchId;
-	
-	Q_EMIT computerRegistered( classWatchId, m_classWatchManager->getComputer( classWatchId ) );
+
+	if ( isNew ) {
+		Q_EMIT computerRegistered( classWatchId, m_classWatchManager->getComputer( classWatchId ) );
+	}
 }
 
 void ClassWatchComputerManagerExtension::unregisterComputer( const QString& classWatchId )

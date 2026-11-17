@@ -72,15 +72,18 @@ void ClassWatchComputerPanel::setupConnections()
 		return;
 	}
 
-	// Connect to ClassWatch manager signals
+	// Connect to ClassWatch manager signals. These handlers must only repaint
+	// the view - calling refreshComputerList() here would re-enter
+	// syncComputersFromComputerManager() while a registration signal is still
+	// being delivered, causing infinite recursion and a stack overflow.
 	connect( m_classWatchManager, &ClassWatchComputerManagerExtension::computerRegistered,
 			 this, [this]( const QString&, const ClassWatchComputer& ) {
-			 refreshComputerList();
+			 populateComputerTree();
 		 } );
 
 	connect( m_classWatchManager, &ClassWatchComputerManagerExtension::computerUnregistered,
 			 this, [this]( const QString& ) {
-			 refreshComputerList();
+			 populateComputerTree();
 		 } );
 
 	connect( m_classWatchManager, &ClassWatchComputerManagerExtension::computerInfoUpdated,
