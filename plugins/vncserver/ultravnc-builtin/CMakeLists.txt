@@ -103,7 +103,7 @@ target_compile_definitions(builtin-ultravnc-server PRIVATE
 	_USE_DESKTOPDUPLICATION
 )
 
-if(VEYON_BUILD_WIN64)
+if(VEYON_BUILD_WIN64 OR CMAKE_SIZEOF_VOID_P EQUAL 8)
 	target_compile_definitions(builtin-ultravnc-server PRIVATE _X64)
 endif()
 
