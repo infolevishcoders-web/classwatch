@@ -203,10 +203,27 @@ MainWindow::MainWindow( VeyonMaster &masterCore, QWidget* parent ) :
 	accountButton->setIcon( QIcon( QStringLiteral( ":/core/license.png" ) ) );
 	accountButton->setToolTip( tr( "Account & subscription" ) );
 	accountButton->setAutoRaise( true );
-	connect( accountButton, &QToolButton::clicked, this, [this]() {
+	auto updateAccountButton = [accountButton]() {
+		const auto profile = ClassWatchLicense::sessionProfile();
+		const auto email = profile.value( QStringLiteral("email") ).toString();
+		const auto name = profile.value( QStringLiteral("display_name") ).toString();
+		if( email.isEmpty() && name.isEmpty() )
+		{
+			accountButton->setText( tr( "Account" ) );
+			accountButton->setToolTip( tr( "Sign in to your ClassWatch account" ) );
+		}
+		else
+		{
+			accountButton->setText( name.isEmpty() ? email : name );
+			accountButton->setToolTip( tr( "ClassWatch account: %1 (%2)" ).arg( name, email ) );
+		}
+	};
+	connect( accountButton, &QToolButton::clicked, this, [this, updateAccountButton]() {
 		ClassWatchAccountDialog dialog( this );
 		dialog.exec();
+		updateAccountButton();
 	} );
+	updateAccountButton();
 	ui->statusBar->addPermanentWidget( accountButton );
 
 	// subscription expiry reminder - once per day while <= 7 days remain

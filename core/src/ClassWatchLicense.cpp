@@ -407,3 +407,8 @@ QJsonObject ClassWatchLicense::sessionLicense()
 	}
 	return doc.object().value( QStringLiteral("license") ).toObject();
 }
+
+void ClassWatchLicense::clearSession()
+{
+	QFile::remove( sessionFilePath() );
+}

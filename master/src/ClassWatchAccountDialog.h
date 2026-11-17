@@ -33,6 +33,7 @@ class QLineEdit;
 class QComboBox;
 class QPushButton;
 class QTimer;
+class QWidget;
 
 // Shows the signed-in ClassWatch account: profile, plan, seat count and a
 // days-left counter. The "Renew / Upgrade" flow creates a PawaPay mobile
@@ -49,14 +50,23 @@ private Q_SLOTS:
 	void refresh();
 	void startRenewal();
 	void openDashboard();
+	void signIn();
+	void sendOtp();
+	void verifyOtp();
+	void signUp();
+	void signOut();
+	void requestAccountDelete();
 
 private:
 	void setupUi();
+	void showSignedOutView();
+	void showSignedInView();
 	void loadStoredInfo();
 	void fetchOnlineStatus();
 	void renderSubscription( const QJsonObject& subscription );
 	bool apiCall( const QString& method, const QString& path,
-				  const QJsonObject& body, QJsonObject* result, QString* error );
+				  const QJsonObject& body, QJsonObject* result, QString* error,
+				  bool authenticated = true );
 	void pollPayment( const QString& depositId, int attemptsLeft );
 	void finishRenewal( const QString& licenseKey );
 
@@ -72,5 +82,12 @@ private:
 	QPushButton* m_refreshButton;
 	QTimer* m_pollTimer;
 	QString m_pendingDepositId;
+	QWidget* m_signedInWidget{nullptr};
+	QWidget* m_signedOutWidget{nullptr};
+	QLineEdit* m_authEmail{nullptr};
+	QLineEdit* m_authPassword{nullptr};
+	QLineEdit* m_authCode{nullptr};
+	QLabel* m_authStatus{nullptr};
+	QLabel* m_authCodeLabel{nullptr};
 	int m_pollAttempts;
 };

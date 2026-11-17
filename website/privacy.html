@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Privacy Policy — ClassWatch</title>
+<link rel="stylesheet" href="assets/app.css"><link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+</head>
+<body>
+<header class="topbar"><div class="wrap topbar-inner">
+  <a class="brand" href="index.html"><span>Class<span class="accent">Watch</span></span></a>
+  <nav class="nav"><a href="index.html">Home</a><a href="login.html">Log in</a></nav>
+</div></header>
+
+<div class="auth-wrap" style="display:block;padding:50px 20px">
+<div style="max-width:760px;margin:0 auto">
+  <h1 style="font-size:30px;margin-bottom:6px">Privacy Policy</h1>
+  <p class="small" style="color:var(--muted);margin-bottom:26px">Last updated: November 2026 · ClassWatch by Levish Coders</p>
+
+  <div class="panel"><h2>1. Who we are</h2>
+    <p>ClassWatch is a classroom monitoring and management product operated by <b>Levish Coders</b>. This policy explains what data we collect, why, and the choices you have.</p></div>
+
+  <div class="panel"><h2>2. Data we collect</h2>
+    <ul style="margin:10px 0 0 20px;font-size:14.5px;color:var(--muted)">
+      <li><b>Account data</b> — your email address, display name, and sign-in method (email code, Google, or Apple).</li>
+      <li><b>Billing data</b> — plan choice, subscription status, device counts, and mobile-money phone number used for payments. Card/mobile-money details are handled by our payment provider (PawaPay); we never store your mobile-money PIN or full card numbers.</li>
+      <li><b>Device data</b> — hostname, operating system, role (teacher/student), organization, and last-seen timestamps for devices registered to your account.</li>
+      <li><b>Usage data</b> — counts of monitoring events (screens viewed, files transferred, locks applied) used for billing limits and support. We do not record the content of student screens on our servers.</li>
+      <li><b>Location (optional)</b> — only if you tap "Locate me" on the school map; used solely to show nearby schools and never stored permanently.</li>
+    </ul></div>
+
+  <div class="panel"><h2>3. How we use it</h2>
+    <p>To provide the service: authenticate you, enforce plan seat limits, process subscriptions and renewals, show your device list and usage, provide support, and prevent abuse. We do not sell your data or use it for advertising.</p></div>
+
+  <div class="panel"><h2>4. Where data lives</h2>
+    <p>Account and billing data is stored in our Supabase database and Render API infrastructure. ClassWatch monitoring traffic (screen viewing, remote control, file transfer) runs <b>directly over your local network</b> between the teacher console and student devices — it does not pass through our servers and works without internet.</p></div>
+
+  <div class="panel"><h2>5. Third parties</h2>
+    <ul style="margin:10px 0 0 20px;font-size:14.5px;color:var(--muted)">
+      <li><b>Supabase</b> — authentication and database hosting.</li>
+      <li><b>PawaPay</b> — mobile-money payment processing (your number is shared only to complete the deposit you approve).</li>
+      <li><b>Google / Apple</b> — only if you choose social sign-in; we receive your email and basic profile from them.</li>
+    </ul></div>
+
+  <div class="panel"><h2>6. Retention &amp; deletion</h2>
+    <p>We keep account data while your account is active. You can request permanent deletion from the dashboard danger zone — an administrator reviews and completes it, after which your profile, devices, subscriptions, and usage records are removed.</p></div>
+
+  <div class="panel"><h2>7. Security</h2>
+    <p>Passwords are never stored by us (email-code and OAuth sign-in). Sessions use signed tokens. API traffic is HTTPS-only. The desktop apps include anti-tamper protections.</p></div>
+
+  <div class="panel"><h2>8. Children &amp; students</h2>
+    <p>ClassWatch is installed by schools/teachers on devices they manage. Student screens are viewed only by authorized teachers on the local network; we do not collect student personal data on our servers.</p></div>
+
+  <div class="panel"><h2>9. Changes &amp; contact</h2>
+    <p>We may update this policy; material changes will be announced on the site. Questions: <b>info.levishcoders@gmail.com</b> · <b>+256 743 199 780</b> · <a href="https://levishcoders.com" target="_blank" rel="noopener">levishcoders.com</a></p></div>
+</div>
+</div>
+</body>
+</html>

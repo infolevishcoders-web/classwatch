@@ -1,6 +1,6 @@
 /*
- * ClassWatchAccountDialog.cpp - account profile, subscription status and
- * mobile-money renewal for ClassWatch Teacher
+ * ClassWatchAccountDialog.cpp - account profile, sign-in, subscription
+ * status and mobile-money renewal for ClassWatch Teacher
  *
  * Copyright (c) 2026 Levish Coders
  *
@@ -31,6 +31,7 @@
 #include <QDesktopServices>
 #include <QDialogButtonBox>
 #include <QEventLoop>
+#include <QInputDialog>
 #include <QJsonArray>
 #include <QJsonDocument>
 #include <QLabel>
@@ -52,6 +53,7 @@ namespace
 {
 	const QString kAccountApiBase = QStringLiteral("https://classwatch-website.onrender.com");
 	const QString kDashboardUrl = QStringLiteral("https://classwatch.netlify.app/dashboard.html");
+	const QString kWebsiteUrl = QStringLiteral("https://classwatch.netlify.app");
 
 	QString fmtUGX( qint64 cents )
 	{
@@ -79,54 +81,147 @@ void ClassWatchAccountDialog::setupUi()
 {
 	auto* layout = new QVBoxLayout( this );
 
-	m_profileLabel = new QLabel( this );
+	// signed-in view: profile, plan and renewal
+	m_signedInWidget = new QWidget( this );
+	auto* accountLayout = new QVBoxLayout( m_signedInWidget );
+	accountLayout->setContentsMargins( 0, 0, 0, 0 );
+
+	m_profileLabel = new QLabel( tr( "ClassWatch Account" ), m_signedInWidget );
 	m_profileLabel->setStyleSheet( QStringLiteral("font-size:15px;font-weight:bold;") );
-	layout->addWidget( m_profileLabel );
+	accountLayout->addWidget( m_profileLabel );
 
-	m_planLabel = new QLabel( this );
+	m_planLabel = new QLabel( m_signedInWidget );
 	m_planLabel->setStyleSheet( QStringLiteral("color:#a1a1aa;") );
-	layout->addWidget( m_planLabel );
+	accountLayout->addWidget( m_planLabel );
 
-	m_daysLabel = new QLabel( this );
+	m_daysLabel = new QLabel( m_signedInWidget );
 	m_daysLabel->setStyleSheet(
 		QStringLiteral("font-size:26px;font-weight:bold;color:#dc2626;") );
-	layout->addWidget( m_daysLabel );
+	accountLayout->addWidget( m_daysLabel );
 
-	m_detailLabel = new QLabel( this );
+	m_detailLabel = new QLabel( m_signedInWidget );
 	m_detailLabel->setWordWrap( true );
 	m_detailLabel->setStyleSheet( QStringLiteral("color:#a1a1aa;") );
-	layout->addWidget( m_detailLabel );
+	accountLayout->addWidget( m_detailLabel );
 
-	m_statusLabel = new QLabel( this );
+	m_statusLabel = new QLabel( m_signedInWidget );
 	m_statusLabel->setWordWrap( true );
 	m_statusLabel->setStyleSheet( QStringLiteral("color:#fca5a5;") );
-	layout->addWidget( m_statusLabel );
+	accountLayout->addWidget( m_statusLabel );
 
-	m_paymentLabel = new QLabel( this );
+	m_paymentLabel = new QLabel( m_signedInWidget );
 	m_paymentLabel->setWordWrap( true );
 	m_paymentLabel->setStyleSheet(
 		QStringLiteral("background:#052e16;color:#4ade80;padding:8px;border-radius:6px;") );
 	m_paymentLabel->setVisible( false );
-	layout->addWidget( m_paymentLabel );
+	accountLayout->addWidget( m_paymentLabel );
 
 	// renewal section
-	auto* renewLabel = new QLabel( tr( "Renew or upgrade (mobile money):" ), this );
+	auto* renewLabel = new QLabel( tr( "Renew or upgrade (mobile money):" ), m_signedInWidget );
 	renewLabel->setStyleSheet( QStringLiteral("font-weight:bold;margin-top:8px;") );
-	layout->addWidget( renewLabel );
+	accountLayout->addWidget( renewLabel );
 
-	m_planCombo = new QComboBox( this );
-	layout->addWidget( m_planCombo );
+	m_planCombo = new QComboBox( m_signedInWidget );
+	accountLayout->addWidget( m_planCombo );
 
 	auto* phoneRow = new QHBoxLayout;
-	m_phoneEdit = new QLineEdit( this );
+	m_phoneEdit = new QLineEdit( m_signedInWidget );
 	m_phoneEdit->setPlaceholderText( tr( "Mobile money number e.g. 743199780" ) );
 	phoneRow->addWidget( m_phoneEdit );
-	layout->addLayout( phoneRow );
+	accountLayout->addLayout( phoneRow );
 
-	m_renewButton = new QPushButton( tr( "Pay with Mobile Money" ), this );
+	m_renewButton = new QPushButton( tr( "Pay with Mobile Money" ), m_signedInWidget );
 	connect( m_renewButton, &QPushButton::clicked,
 			 this, &ClassWatchAccountDialog::startRenewal );
-	layout->addWidget( m_renewButton );
+	accountLayout->addWidget( m_renewButton );
+
+	auto* accountButtons = new QHBoxLayout;
+	auto* signOutButton = new QPushButton( tr( "Sign out" ), m_signedInWidget );
+	connect( signOutButton, &QPushButton::clicked,
+			 this, &ClassWatchAccountDialog::signOut );
+	auto* deleteButton = new QPushButton( tr( "Delete account" ), m_signedInWidget );
+	deleteButton->setStyleSheet( QStringLiteral("color:#fca5a5;") );
+	connect( deleteButton, &QPushButton::clicked,
+			 this, &ClassWatchAccountDialog::requestAccountDelete );
+	accountButtons->addWidget( signOutButton );
+	accountButtons->addWidget( deleteButton );
+	accountLayout->addLayout( accountButtons );
+
+	layout->addWidget( m_signedInWidget );
+
+	// signed-out view: sign in / create account
+	m_signedOutWidget = new QWidget( this );
+	auto* authLayout = new QVBoxLayout( m_signedOutWidget );
+	authLayout->setContentsMargins( 0, 0, 0, 0 );
+
+	auto* authTitle = new QLabel( tr( "Sign in to ClassWatch" ), m_signedOutWidget );
+	authTitle->setStyleSheet( QStringLiteral("font-size:15px;font-weight:bold;") );
+	authLayout->addWidget( authTitle );
+
+	auto* authHint = new QLabel(
+		tr( "Use your ClassWatch account to manage your subscription. "
+			"You can also create an account here - it starts with a free trial." ),
+		m_signedOutWidget );
+	authHint->setWordWrap( true );
+	authHint->setStyleSheet( QStringLiteral("color:#a1a1aa;") );
+	authLayout->addWidget( authHint );
+
+	m_authEmail = new QLineEdit( m_signedOutWidget );
+	m_authEmail->setPlaceholderText( tr( "Email address" ) );
+	authLayout->addWidget( m_authEmail );
+
+	m_authPassword = new QLineEdit( m_signedOutWidget );
+	m_authPassword->setPlaceholderText( tr( "Password (min. 6 characters)" ) );
+	m_authPassword->setEchoMode( QLineEdit::Password );
+	authLayout->addWidget( m_authPassword );
+
+	m_authCodeLabel = new QLabel( tr( "Sign-in code sent to your email:" ), m_signedOutWidget );
+	m_authCodeLabel->setVisible( false );
+	authLayout->addWidget( m_authCodeLabel );
+
+	m_authCode = new QLineEdit( m_signedOutWidget );
+	m_authCode->setPlaceholderText( tr( "6-digit code" ) );
+	m_authCode->setVisible( false );
+	authLayout->addWidget( m_authCode );
+
+	m_authStatus = new QLabel( m_signedOutWidget );
+	m_authStatus->setWordWrap( true );
+	m_authStatus->setStyleSheet( QStringLiteral("color:#fca5a5;") );
+	authLayout->addWidget( m_authStatus );
+
+	auto* signInButton = new QPushButton( tr( "Sign in" ), m_signedOutWidget );
+	connect( signInButton, &QPushButton::clicked,
+			 this, &ClassWatchAccountDialog::signIn );
+	authLayout->addWidget( signInButton );
+
+	auto* signUpButton = new QPushButton( tr( "Create account" ), m_signedOutWidget );
+	connect( signUpButton, &QPushButton::clicked,
+			 this, &ClassWatchAccountDialog::signUp );
+	authLayout->addWidget( signUpButton );
+
+	auto* otpButton = new QPushButton( tr( "Email me a sign-in code instead" ), m_signedOutWidget );
+	otpButton->setFlat( true );
+	connect( otpButton, &QPushButton::clicked,
+			 this, &ClassWatchAccountDialog::sendOtp );
+	authLayout->addWidget( otpButton );
+
+	auto* verifyButton = new QPushButton( tr( "Verify code" ), m_signedOutWidget );
+	verifyButton->setObjectName( QStringLiteral("verifyCodeButton") );
+	verifyButton->setVisible( false );
+	connect( verifyButton, &QPushButton::clicked,
+			 this, &ClassWatchAccountDialog::verifyOtp );
+	authLayout->addWidget( verifyButton );
+
+	auto* googleButton = new QPushButton( tr( "Sign in with Google (website)" ), m_signedOutWidget );
+	googleButton->setFlat( true );
+	connect( googleButton, &QPushButton::clicked, this, [this]() {
+		QDesktopServices::openUrl( QUrl( kWebsiteUrl ) );
+		m_authStatus->setText( tr( "Finish signing in on the website - your license key "
+								   "activates automatically in ClassWatch." ) );
+	} );
+	authLayout->addWidget( googleButton );
+
+	layout->addWidget( m_signedOutWidget );
 
 	m_refreshButton = new QPushButton( tr( "Refresh status" ), this );
 	connect( m_refreshButton, &QPushButton::clicked,
@@ -149,6 +244,31 @@ void ClassWatchAccountDialog::setupUi()
 			pollPayment( m_pendingDepositId, m_pollAttempts );
 		}
 	} );
+
+	if( ClassWatchLicense::sessionToken().isEmpty() )
+	{
+		showSignedOutView();
+	}
+	else
+	{
+		showSignedInView();
+	}
+}
+
+
+void ClassWatchAccountDialog::showSignedOutView()
+{
+	m_signedInWidget->setVisible( false );
+	m_signedOutWidget->setVisible( true );
+	m_refreshButton->setVisible( false );
+}
+
+
+void ClassWatchAccountDialog::showSignedInView()
+{
+	m_signedInWidget->setVisible( true );
+	m_signedOutWidget->setVisible( false );
+	m_refreshButton->setVisible( true );
 }
 
 
@@ -261,7 +381,7 @@ void ClassWatchAccountDialog::renderSubscription( const QJsonObject& sub )
 			QStringLiteral("font-size:26px;font-weight:bold;color:%1;")
 				.arg( daysLeft <= 3 ? QStringLiteral("#dc2626")
 									 : daysLeft <= 7 ? QStringLiteral("#d97706")
-													: QStringLiteral("#4ade80") ) );
+												: QStringLiteral("#4ade80") ) );
 		m_detailLabel->setText(
 			tr( "Expires: %1" ).arg( expires.toString( QStringLiteral("dd MMM yyyy, HH:mm") ) ) +
 			( daysLeft <= 7
@@ -411,21 +531,260 @@ void ClassWatchAccountDialog::openDashboard()
 }
 
 
-bool ClassWatchAccountDialog::apiCall( const QString& method, const QString& path,
-									   const QJsonObject& body, QJsonObject* result,
-									   QString* error )
+// ---------- sign in / sign up / delete ----------
+
+void ClassWatchAccountDialog::signIn()
 {
-	const auto token = ClassWatchLicense::sessionToken();
+	const auto email = m_authEmail->text().trimmed();
+	const auto password = m_authPassword->text();
+	if( email.isEmpty() || password.isEmpty() )
+	{
+		m_authStatus->setText( tr( "Enter your email and password." ) );
+		return;
+	}
+
+	QJsonObject body;
+	body[QStringLiteral("email")] = email;
+	body[QStringLiteral("password")] = password;
+
+	QJsonObject result;
+	QString error;
+	m_authStatus->setText( tr( "Signing in…" ) );
+	if( !apiCall( QStringLiteral("POST"), QStringLiteral("/api/auth/login"),
+				  body, &result, &error, false ) )
+	{
+		m_authStatus->setText( tr( "Sign-in failed: %1" ).arg( error ) );
+		return;
+	}
+
+	const auto token = result.value( QStringLiteral("token") ).toString();
+	const auto profile = result.value( QStringLiteral("profile") ).toObject();
 	if( token.isEmpty() )
 	{
-		if( error ) *error = tr( "not signed in" );
-		return false;
+		m_authStatus->setText( tr( "Sign-in failed: no session returned." ) );
+		return;
+	}
+
+	QJsonObject extras;
+	const auto sub = result.value( QStringLiteral("subscription") ).toObject();
+	if( !sub.isEmpty() )
+	{
+		extras[QStringLiteral("subscription")] = sub;
+	}
+	ClassWatchLicense::saveSession( token, profile, extras );
+
+	const auto licenseKey = result.value( QStringLiteral("license_key") ).toString();
+	if( !licenseKey.isEmpty() )
+	{
+		QString localError;
+		ClassWatchLicense::activate( licenseKey, &localError );
+	}
+
+	showSignedInView();
+	refresh();
+}
+
+
+void ClassWatchAccountDialog::signUp()
+{
+	const auto email = m_authEmail->text().trimmed();
+	const auto password = m_authPassword->text();
+	if( email.isEmpty() || password.size() < 6 )
+	{
+		m_authStatus->setText( tr( "Enter your email and a password of at least 6 characters." ) );
+		return;
+	}
+
+	QJsonObject body;
+	body[QStringLiteral("email")] = email;
+	body[QStringLiteral("password")] = password;
+
+	QJsonObject result;
+	QString error;
+	m_authStatus->setText( tr( "Creating account…" ) );
+	if( !apiCall( QStringLiteral("POST"), QStringLiteral("/api/auth/signup"),
+				  body, &result, &error, false ) )
+	{
+		m_authStatus->setText( tr( "Sign-up failed: %1" ).arg( error ) );
+		return;
+	}
+
+	const auto token = result.value( QStringLiteral("token") ).toString();
+	const auto profile = result.value( QStringLiteral("profile") ).toObject();
+	const auto sub = result.value( QStringLiteral("subscription") ).toObject();
+	QJsonObject extras;
+	if( !sub.isEmpty() )
+	{
+		extras[QStringLiteral("subscription")] = sub;
+	}
+	ClassWatchLicense::saveSession( token, profile, extras );
+
+	const auto licenseKey = result.value( QStringLiteral("license_key") ).toString();
+	if( !licenseKey.isEmpty() )
+	{
+		QString localError;
+		if( ClassWatchLicense::activate( licenseKey, &localError ) )
+		{
+			QMessageBox::information( this, tr( "Account created" ),
+									  tr( "Your ClassWatch account is ready - "
+										  "your free trial has started automatically." ) );
+		}
+	}
+
+	showSignedInView();
+	refresh();
+}
+
+
+void ClassWatchAccountDialog::sendOtp()
+{
+	const auto email = m_authEmail->text().trimmed();
+	if( email.isEmpty() )
+	{
+		m_authStatus->setText( tr( "Enter your email address first." ) );
+		return;
+	}
+
+	QJsonObject body;
+	body[QStringLiteral("email")] = email;
+
+	QJsonObject result;
+	QString error;
+	m_authStatus->setText( tr( "Sending code…" ) );
+	if( !apiCall( QStringLiteral("POST"), QStringLiteral("/api/auth/otp/send"),
+				  body, &result, &error, false ) )
+	{
+		m_authStatus->setText( tr( "Could not send code: %1" ).arg( error ) );
+		return;
+	}
+
+	m_authCodeLabel->setVisible( true );
+	m_authCode->setVisible( true );
+	if( auto* btn = findChild<QPushButton *>( QStringLiteral("verifyCodeButton") ) )
+	{
+		btn->setVisible( true );
+	}
+
+	const auto devCode = result.value( QStringLiteral("dev_code") ).toString();
+	if( !devCode.isEmpty() )
+	{
+		// backend has no SMTP configured yet - show the code so sign-in works
+		m_authStatus->setText( tr( "Code (dev mode): %1" ).arg( devCode ) );
+	}
+	else
+	{
+		m_authStatus->setText( tr( "Code sent - check your email and enter it below." ) );
+	}
+}
+
+
+void ClassWatchAccountDialog::verifyOtp()
+{
+	const auto email = m_authEmail->text().trimmed();
+	const auto code = m_authCode->text().trimmed();
+	if( email.isEmpty() || code.isEmpty() )
+	{
+		m_authStatus->setText( tr( "Enter your email and the code." ) );
+		return;
+	}
+
+	QJsonObject body;
+	body[QStringLiteral("email")] = email;
+	body[QStringLiteral("code")] = code;
+
+	QJsonObject result;
+	QString error;
+	m_authStatus->setText( tr( "Verifying…" ) );
+	if( !apiCall( QStringLiteral("POST"), QStringLiteral("/api/auth/otp/verify"),
+				  body, &result, &error, false ) )
+	{
+		m_authStatus->setText( tr( "Verification failed: %1" ).arg( error ) );
+		return;
+	}
+
+	const auto token = result.value( QStringLiteral("token") ).toString();
+	const auto profile = result.value( QStringLiteral("profile") ).toObject();
+	if( token.isEmpty() )
+	{
+		m_authStatus->setText( tr( "Verification failed: no session returned." ) );
+		return;
+	}
+
+	ClassWatchLicense::saveSession( token, profile );
+	showSignedInView();
+	refresh();
+}
+
+
+void ClassWatchAccountDialog::signOut()
+{
+	ClassWatchLicense::clearSession();
+	m_planCombo->clear();
+	m_planLabel->setText( {} );
+	m_daysLabel->setText( {} );
+	m_detailLabel->setText( {} );
+	m_paymentLabel->setVisible( false );
+	showSignedOutView();
+}
+
+
+void ClassWatchAccountDialog::requestAccountDelete()
+{
+	bool ok = false;
+	const auto confirm = QInputDialog::getText(
+		this, tr( "Delete account" ),
+		tr( "This permanently deletes your ClassWatch account and data.\n"
+			"Type DELETE to request deletion (an administrator approves it on the website):" ),
+		QLineEdit::Normal, {}, &ok );
+	if( !ok || confirm.trimmed() != QLatin1String("DELETE") )
+	{
+		return;
+	}
+
+	QJsonObject body;
+	body[QStringLiteral("reason")] = QStringLiteral("requested from ClassWatch Teacher");
+	body[QStringLiteral("confirm_text")] = QStringLiteral("DELETE");
+
+	QJsonObject result;
+	QString error;
+	if( !apiCall( QStringLiteral("POST"), QStringLiteral("/api/account/delete-request"),
+				  body, &result, &error ) )
+	{
+		QMessageBox::warning( this, tr( "Delete account" ),
+							  tr( "Could not send deletion request: %1" ).arg( error ) );
+		return;
+	}
+
+	QMessageBox::information( this, tr( "Delete account" ),
+							  tr( "Deletion requested. An administrator will review and "
+								  "approve it on the ClassWatch website - your data is "
+								  "removed once approved." ) );
+	signOut();
+}
+
+
+bool ClassWatchAccountDialog::apiCall( const QString& method, const QString& path,
+									   const QJsonObject& body, QJsonObject* result,
+									   QString* error, bool authenticated )
+{
+	QString token;
+	if( authenticated )
+	{
+		token = ClassWatchLicense::sessionToken();
+		if( token.isEmpty() )
+		{
+			if( error ) *error = tr( "not signed in" );
+			return false;
+		}
 	}
 
 	QNetworkAccessManager nam;
 	QNetworkRequest req( QUrl( kAccountApiBase + path ) );
 	req.setHeader( QNetworkRequest::ContentTypeHeader, QStringLiteral("application/json") );
-	req.setRawHeader( "Authorization", QByteArray( "Bearer " ) + token.toUtf8() );
+	if( !token.isEmpty() )
+	{
+		req.setRawHeader( "Authorization", QByteArray( "Bearer " ) + token.toUtf8() );
+	}
 	req.setRawHeader( "User-Agent", "ClassWatch-Teacher/1.0" );
 
 	QNetworkReply* reply = nullptr;

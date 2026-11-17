@@ -73,6 +73,7 @@ public:
 	// subscription/license objects returned by the verify endpoint
 	static QJsonObject sessionSubscription();
 	static QJsonObject sessionLicense();
+	static void clearSession();
 
 	// paths
 	static QString licenseDirectory();
