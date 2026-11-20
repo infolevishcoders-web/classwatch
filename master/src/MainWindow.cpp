@@ -25,6 +25,7 @@
 #include <QAction>
 #include <QActionGroup>
 #include <QCloseEvent>
+#include <QDesktopServices>
 #include <QDir>
 #include <QFileDialog>
 #include <QJsonDocument>
@@ -39,10 +40,11 @@
 #include <QTimer>
 #include <QToolButton>
 #include <QTranslator>
+#include <QUrl>
 
 #include "AboutDialog.h"
 #include "AccessControlProvider.h"
-#include "ClassWatchAccountDialog.h"
+#include "ClassWatchGuideDialog.h"
 #include "ClassWatchLicense.h"
 #include "ClassWatchTheme.h"
 #include "ClassWatchComputerPanel.h"
@@ -198,33 +200,17 @@ MainWindow::MainWindow( VeyonMaster &masterCore, QWidget* parent ) :
 	setupClassWatchLanguageButton( languageButton );
 	ui->statusBar->addPermanentWidget( languageButton );
 
-	// account/subscription button pinned next to the language switcher
-	auto* accountButton = new QToolButton( this );
-	accountButton->setIcon( QIcon( QStringLiteral( ":/core/license.png" ) ) );
-	accountButton->setToolTip( tr( "Account & subscription" ) );
-	accountButton->setAutoRaise( true );
-	auto updateAccountButton = [accountButton]() {
-		const auto profile = ClassWatchLicense::sessionProfile();
-		const auto email = profile.value( QStringLiteral("email") ).toString();
-		const auto name = profile.value( QStringLiteral("display_name") ).toString();
-		if( email.isEmpty() && name.isEmpty() )
-		{
-			accountButton->setText( tr( "Account" ) );
-			accountButton->setToolTip( tr( "Sign in to your ClassWatch account" ) );
-		}
-		else
-		{
-			accountButton->setText( name.isEmpty() ? email : name );
-			accountButton->setToolTip( tr( "ClassWatch account: %1 (%2)" ).arg( name, email ) );
-		}
-	};
-	connect( accountButton, &QToolButton::clicked, this, [this, updateAccountButton]() {
-		ClassWatchAccountDialog dialog( this );
+	// getting-started guide pinned next to the language switcher
+	auto* guideButton = new QToolButton( this );
+	guideButton->setIcon( QIcon( QStringLiteral( ":/core/license.png" ) ) );
+	guideButton->setText( tr( "Guide" ) );
+	guideButton->setToolTip( tr( "ClassWatch guide: downloads, setup and usage" ) );
+	guideButton->setAutoRaise( true );
+	connect( guideButton, &QToolButton::clicked, this, [this]() {
+		ClassWatchGuideDialog dialog( this );
 		dialog.exec();
-		updateAccountButton();
 	} );
-	updateAccountButton();
-	ui->statusBar->addPermanentWidget( accountButton );
+	ui->statusBar->addPermanentWidget( guideButton );
 
 	// subscription expiry reminder - once per day while <= 7 days remain
 	QTimer::singleShot( 4000, this, [this]() {
@@ -252,8 +238,8 @@ MainWindow::MainWindow( VeyonMaster &masterCore, QWidget* parent ) :
 			QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes );
 		if( ret == QMessageBox::Yes )
 		{
-			ClassWatchAccountDialog dialog( this );
-			dialog.exec();
+			QDesktopServices::openUrl(
+				QUrl( QStringLiteral("https://classwatch.netlify.app/dashboard.html") ) );
 		}
 	} );
 

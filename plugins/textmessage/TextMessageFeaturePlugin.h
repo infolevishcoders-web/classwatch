@@ -27,6 +27,8 @@
 #include "Feature.h"
 #include "FeatureProviderInterface.h"
 
+class StickyMessageWidget;
+
 class TextMessageFeaturePlugin : public QObject, FeatureProviderInterface, PluginInterface
 {
 	Q_OBJECT
@@ -41,7 +43,7 @@ public:
 	Q_ENUM(Argument)
 
 	explicit TextMessageFeaturePlugin( QObject* parent = nullptr );
-	~TextMessageFeaturePlugin() override = default;
+	~TextMessageFeaturePlugin() override;
 
 	Plugin::Uid uid() const override
 	{
@@ -89,10 +91,13 @@ public:
 
 private:
 	enum class FeatureCommand {
-		ShowTextMessage
+		ShowTextMessage,
+		HideTextMessage
 	};
 
 	const Feature m_textMessageFeature;
+	const Feature m_clearAnnouncementFeature;
 	const FeatureList m_features;
+	StickyMessageWidget* m_stickyWidget{nullptr};
 
 };

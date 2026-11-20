@@ -29,6 +29,7 @@
 #include "ClassWatchLicense.h"
 #include "ClassWatchLicenseDialog.h"
 #include "ClassWatchProtection.h"
+#include "ClassWatchTheme.h"
 #include "DocumentationFigureCreator.h"
 #include "VeyonMaster.h"
 #include "MainWindow.h"
@@ -39,6 +40,7 @@ int main( int argc, char** argv )
 	VeyonCore::setupApplicationParameters();
 
 	QApplication app( argc, argv );
+	app.setStyleSheet( ClassWatchTheme::styleSheet() );
 	app.connect( &app, &QApplication::lastWindowClosed, &QApplication::quit );
 
 	// anti-tamper: refuse to run under a debugger or next to common

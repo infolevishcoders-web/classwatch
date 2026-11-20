@@ -25,6 +25,7 @@
 #include <QApplication>
 #include <QIcon>
 
+#include "ClassWatchTheme.h"
 #include "Feature.h"
 #include "VeyonWorker.h"
 
@@ -35,6 +36,7 @@ int main( int argc, char **argv )
 
 	QApplication app( argc, argv );
 	app.setWindowIcon( QIcon( QStringLiteral(":/core/icon64.png") ) );
+	app.setStyleSheet( ClassWatchTheme::styleSheet() );
 
 	const auto arguments = app.arguments();
 

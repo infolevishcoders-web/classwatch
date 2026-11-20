@@ -26,6 +26,7 @@
 
 #include "TextMessageFeaturePlugin.h"
 #include "TextMessageDialog.h"
+#include "StickyMessageWidget.h"
 #include "FeatureWorkerManager.h"
 #include "ComputerControlInterface.h"
 #include "PlatformCoreFunctions.h"
@@ -43,8 +44,22 @@ TextMessageFeaturePlugin::TextMessageFeaturePlugin( QObject* parent ) :
 								   tr( "Use this function to send a text message to all "
 									   "users e.g. to assign them new tasks." ),
 								   QStringLiteral(":/textmessage/dialog-information.png") ) ),
-	m_features( { m_textMessageFeature } )
+	m_clearAnnouncementFeature( Feature( QStringLiteral( "ClearAnnouncement" ),
+										 Feature::Flag::Action | Feature::Flag::AllComponents,
+										 Feature::Uid( "7f2a1c4e-3b8d-4e6a-9c1f-2d5b8a0e4f73" ),
+										 Feature::Uid(),
+										 tr( "Clear announcement" ), {},
+										 tr( "Remove the announcement banner from all student screens." ),
+										 QStringLiteral(":/textmessage/dialog-information.png") ) ),
+	m_features( { m_textMessageFeature, m_clearAnnouncementFeature } )
 {
+}
+
+
+
+TextMessageFeaturePlugin::~TextMessageFeaturePlugin()
+{
+	delete m_stickyWidget;
 }
 
 
@@ -63,6 +78,18 @@ bool TextMessageFeaturePlugin::controlFeature( Feature::Uid featureUid,
 {
 	if( operation != Operation::Start )
 	{
+		return false;
+	}
+
+	if( featureUid == m_clearAnnouncementFeature.uid() )
+	{
+		if( operation == Operation::Start )
+		{
+			sendFeatureMessage( FeatureMessage{ m_textMessageFeature.uid(),
+												 FeatureCommand::HideTextMessage },
+								computerControlInterfaces );
+			return true;
+		}
 		return false;
 	}
 
@@ -88,6 +115,13 @@ bool TextMessageFeaturePlugin::controlFeature( Feature::Uid featureUid,
 bool TextMessageFeaturePlugin::startFeature( VeyonMasterInterface& master, const Feature& feature,
 											 const ComputerControlInterfaceList& computerControlInterfaces )
 {
+	if( feature == m_clearAnnouncementFeature )
+	{
+		controlFeature( m_clearAnnouncementFeature.uid(), Operation::Start,
+						{}, computerControlInterfaces );
+		return true;
+	}
+
 	if( feature.uid() != m_textMessageFeature.uid() )
 	{
 		return false;
@@ -121,7 +155,8 @@ bool TextMessageFeaturePlugin::handleFeatureMessage( VeyonServerInterface& serve
 {
 	Q_UNUSED(messageContext)
 
-	if( m_textMessageFeature.uid() == message.featureUid() )
+	if( m_textMessageFeature.uid() == message.featureUid() ||
+		m_clearAnnouncementFeature.uid() == message.featureUid() )
 	{
 		// forward message to worker
 		server.featureWorkerManager().sendMessageToUnmanagedSessionWorker( message );
@@ -138,33 +173,27 @@ bool TextMessageFeaturePlugin::handleFeatureMessage( VeyonWorkerInterface& worke
 {
 	Q_UNUSED(worker);
 
-	if( message.featureUid() == m_textMessageFeature.uid() )
+	if( message.featureUid() == m_textMessageFeature.uid() ||
+		message.featureUid() == m_clearAnnouncementFeature.uid() )
 	{
+		if( message.command<FeatureCommand>() == FeatureCommand::HideTextMessage )
+		{
+			delete m_stickyWidget;
+			m_stickyWidget = nullptr;
+			return true;
+		}
+
 		auto title = message.argument( Argument::Title ).toString();
 		if( title.isEmpty() )
 		{
 			title = tr( "Message from teacher" );
 		}
 
-		auto messageBox = new QMessageBox( static_cast<QMessageBox::Icon>( message.argument( Argument::Icon ).toInt() ),
-										   title,
-										   message.argument( Argument::Text ).toString() );
-		messageBox->setTextFormat( Qt::RichText );
-		messageBox->setTextInteractionFlags( Qt::TextBrowserInteraction | Qt::TextSelectableByKeyboard );
-		messageBox->setAttribute( Qt::WA_DeleteOnClose );
-		// ClassWatch "watery" popup - the student must click to dismiss it;
-		// it stays on top until the monitor closes it from their side
-		messageBox->setWindowFlag( Qt::WindowStaysOnTopHint, true );
-		messageBox->setStyleSheet( QStringLiteral(
-			"QMessageBox { background: qlineargradient(x1:0,y1:0,x2:0,y2:1,"
-			" stop:0 #e0f2fe, stop:1 #f8fafc); border: 2px solid #38bdf8; border-radius: 12px; }"
-			"QMessageBox QLabel { color: #164e63; font-size: 14px; }"
-			"QMessageBox QPushButton {"
-			"  background: qlineargradient(x1:0,y1:0,x2:0,y2:1, stop:0 #7dd3fc, stop:1 #38bdf8);"
-			"  color: #082f49; border-radius: 8px; padding: 8px 20px; font-weight: bold; min-width: 90px; }"
-			"QMessageBox QPushButton:hover { background: #38bdf8; }" ) );
-		messageBox->show();
-		VeyonCore::platform().coreFunctions().raiseWindow(messageBox, true);
+		delete m_stickyWidget;
+		m_stickyWidget = new StickyMessageWidget( title,
+												  message.argument( Argument::Text ).toString() );
+		m_stickyWidget->setAttribute( Qt::WA_DeleteOnClose );
+		m_stickyWidget->show();
 
 		return true;
 	}
