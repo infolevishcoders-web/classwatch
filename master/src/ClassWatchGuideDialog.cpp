@@ -32,6 +32,7 @@
 #include <QPixmap>
 #include <QPushButton>
 #include <QScrollArea>
+#include <QString>
 #include <QTabWidget>
 #include <QUrl>
 #include <QVBoxLayout>
@@ -284,7 +285,7 @@ QWidget* ClassWatchGuideDialog::buildTroubleshootingTab()
 	auto* vbox = new QVBoxLayout( page );
 
 	auto* steps = makeStepsLabel(
-		QStringLiteral(
+		QString::fromUtf8(
 			R"HTML(<p><b>Troubleshooting — what you see → what it means → the fix:</b></p>
 <table cellspacing="6" cellpadding="4" style="font-size:12px;">
 <tr style="background:#EDE9FE;"><th align="left">You see</th><th align="left">Means</th><th align="left">Fix</th></tr>
