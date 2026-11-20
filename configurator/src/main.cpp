@@ -28,7 +28,6 @@
 #include <QMessageBox>
 
 #include "ClassWatchSecurityManager.h"
-#include "ClassWatchTheme.h"
 #include "VeyonConfiguration.h"
 #include "VeyonCore.h"
 #include "MainWindow.h"
@@ -42,7 +41,6 @@ int main( int argc, char **argv )
 	VeyonCore::setupApplicationParameters();
 
 	QApplication app( argc, argv );
-	app.setStyleSheet( ClassWatchTheme::styleSheet() );
 
 	VeyonCore core( &app, VeyonCore::Component::Configurator, QStringLiteral("Configurator") );
 
