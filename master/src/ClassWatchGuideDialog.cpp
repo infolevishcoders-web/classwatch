@@ -137,7 +137,7 @@ QWidget* ClassWatchGuideDialog::buildDownloadTab()
 	vbox->addWidget( intro );
 
 	auto* openButton = new QPushButton( tr( "Open download page" ), page );
-	connect( openButton, &QPushButton::clicked, this, [this]() {
+	connect( openButton, &QPushButton::clicked, []() {
 		QDesktopServices::openUrl( QUrl( kDownloadPage ) );
 	} );
 	vbox->addWidget( openButton );
