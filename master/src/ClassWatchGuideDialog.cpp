@@ -305,7 +305,7 @@ QWidget* ClassWatchGuideDialog::buildTroubleshootingTab()
 <li>PowerShell admin: <code>Restart-Service ClassWatchService</code> — restart the agent</li>
 </ul>
 <p><b>Router warning:</b> some routers have "AP isolation" or "client isolation" which
-stops devices talking to each other — turn it OFF for the classroom network.</p>)HTML" );
+stops devices talking to each other — turn it OFF for the classroom network.</p>)HTML" ) );
 	vbox->addWidget( steps );
 	vbox->addStretch();
 	return scrollWrap( page );
