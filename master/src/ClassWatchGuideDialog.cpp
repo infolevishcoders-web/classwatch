@@ -159,8 +159,8 @@ QWidget* ClassWatchGuideDialog::buildInstallTab()
 			"(USB drive, shared folder, or the download page).</li>"
 			"<li>Double-click it and click <b>Next → Install</b>.</li>"
 			"<li>The <b>ClassWatch Service</b> starts automatically — no login needed.</li>"
-			"<li>On the <b>teacher computer</b> only: open <b>ClassWatch Teacher</b> and "
-			"enter your license key when asked (free trial works too).</li>"
+			"<li>On the <b>teacher computer</b> only: open <b>ClassWatch Teacher</b> — "
+			"no account or license needed.</li>"
 			"</ol>"
 			"<p><b>Updating?</b> Just run the new installer — classrooms, student PCs, "
 			"keys and settings are kept automatically. You never need to reconfigure.</p>"
@@ -290,7 +290,7 @@ QWidget* ClassWatchGuideDialog::buildTroubleshootingTab()
 <table cellspacing="6" cellpadding="4" style="font-size:12px;">
 <tr style="background:#EDE9FE;"><th align="left">You see</th><th align="left">Means</th><th align="left">Fix</th></tr>
 <tr><td>PC missing from list</td><td>Service not running or wrong name</td><td>On that PC: <code>hostname</code>, check the name in Setup; run <code>Get-Service ClassWatchService</code></td></tr>
-<tr><td>Padlock / locked screen</td><td>Windows or ClassWatch lock is on</td><td>Click the PC → Lock → Unlock; or sign in at the PC</td></tr>
+<tr><td>Padlock / locked screen</td><td>Windows or ClassWatch lock is on</td><td>Click the PC → Lock → Unlock; or log in at the PC</td></tr>
 <tr><td>"error" / offline</td><td>Network or firewall blocking port 11100</td><td>Ping the hostname; check Windows Firewall allows ClassWatch; same Wi-Fi network?</td></tr>
 <tr><td>Black screen in live view</td><td>PC locked, asleep or capture crashed</td><td>Wake/unlock the PC; restart ClassWatch Service; update to latest installer</td></tr>
 <tr><td>Connects then drops</td><td>Wi-Fi roaming or DHCP change</td><td>Hostname entries handle IP changes — make sure you used hostname, not IP</td></tr>

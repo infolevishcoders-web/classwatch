@@ -25,7 +25,6 @@
 #include <QAction>
 #include <QActionGroup>
 #include <QCloseEvent>
-#include <QDesktopServices>
 #include <QDir>
 #include <QFileDialog>
 #include <QJsonDocument>
@@ -45,7 +44,6 @@
 #include "AboutDialog.h"
 #include "AccessControlProvider.h"
 #include "ClassWatchGuideDialog.h"
-#include "ClassWatchLicense.h"
 #include "ClassWatchTheme.h"
 #include "ClassWatchComputerPanel.h"
 #include "ClassWatchMessagePanel.h"
@@ -211,37 +209,6 @@ MainWindow::MainWindow( VeyonMaster &masterCore, QWidget* parent ) :
 		dialog.exec();
 	} );
 	ui->statusBar->addPermanentWidget( guideButton );
-
-	// subscription expiry reminder - once per day while <= 7 days remain
-	QTimer::singleShot( 4000, this, [this]() {
-		const auto info = ClassWatchLicense::current();
-		if( ( info.status != ClassWatchLicense::Status::Valid &&
-			  info.status != ClassWatchLicense::Status::Trial ) ||
-			info.daysLeft > 7 )
-		{
-			return;
-		}
-		QSettings settings;
-		const auto today = QDate::currentDate().toString( Qt::ISODate );
-		if( settings.value( QStringLiteral("ClassWatch/lastRenewalReminder") ).toString() == today )
-		{
-			return;
-		}
-		settings.setValue( QStringLiteral("ClassWatch/lastRenewalReminder"), today );
-
-		const auto ret = QMessageBox::question(
-			this, tr( "Subscription expiring soon" ),
-			tr( "Your ClassWatch subscription expires in %1 day(s) (%2).\n"
-				"Renew now with mobile money to keep monitoring your classroom?" )
-				.arg( QString::number( info.daysLeft ),
-					  info.expiresAt.toString( QStringLiteral("dd MMM yyyy") ) ),
-			QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes );
-		if( ret == QMessageBox::Yes )
-		{
-			QDesktopServices::openUrl(
-				QUrl( QStringLiteral("https://classwatch.netlify.app/dashboard.html") ) );
-		}
-	} );
 
 	// create all views
 	auto mainSplitter = new QSplitter( Qt::Horizontal, ui->centralWidget );
