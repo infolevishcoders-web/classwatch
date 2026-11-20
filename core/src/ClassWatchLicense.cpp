@@ -210,8 +210,9 @@ ClassWatchLicense::Info ClassWatchLicense::current()
 	const auto license = loadLicenseFile();
 	if( !license.isEmpty() )
 	{
-		const auto payload = license.value( QStringLiteral("payload") ).toString().toUtf8();
+		const auto payloadEncoded = license.value( QStringLiteral("payload") ).toString().toUtf8();
 		const auto signature = license.value( QStringLiteral("signature") ).toString();
+		const auto payload = urlDecode( payloadEncoded );
 
 		if( !verifySignature( payload, signature ) )
 		{
@@ -221,7 +222,7 @@ ClassWatchLicense::Info ClassWatchLicense::current()
 			return evaluateTrial();
 		}
 
-		const auto doc = QJsonDocument::fromJson( urlDecode( payload ) );
+		const auto doc = QJsonDocument::fromJson( payload );
 		const auto data = doc.object();
 
 		Info info;
